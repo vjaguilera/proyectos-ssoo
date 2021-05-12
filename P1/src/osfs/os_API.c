@@ -3,8 +3,13 @@
 
 // GENERALES
 
-void os_mount(char* diskname, int partition) {
+volatile char* NOMBRE_DISCO;
+volatile int PARTICION;
 
+void os_mount(char* diskname, int partition) {
+    NOMBRE_DISCO = diskname;
+    PARTICION = partition;
+    // Definir directorio y bitmaps
 };
 
 void os_bitmap(unsigned num) {
