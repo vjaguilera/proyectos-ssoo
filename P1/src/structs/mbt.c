@@ -1,6 +1,7 @@
 #include "mbt.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../helpers/bitExtract.h"
 
 
 MBT* mbt_init() {
@@ -24,7 +25,7 @@ void set_mbt_data(MBT* mbt, char* diskname) {
     int x = 128;
     // printf("Primeras %d entradas.\n", x);
     for (int i = 0; i < 8 * x; i += 8 ) {
-        // printf("Entrada %d:\n", i / 8);
+        // printf("Entrada %d %d:\n", i / 8, i);
         unsigned char first = buffer[i];
         // printf("%d \n", buffer[i]);
         char validez = first >> 7;
@@ -32,9 +33,11 @@ void set_mbt_data(MBT* mbt, char* diskname) {
         unsigned char mask = (1 << 7) - 1;
         int seven = buffer[i] & mask;
         // printf("\tParticion: %d\n", seven);
-        unsigned long int primer_bloque = (buffer[i + 1] << 16) | (buffer[i + 2] << 8) | (buffer[i + 3]);
+        long int primer_bloque = ((buffer[i + 1] << 16) | (buffer[i + 2] << 8) | (buffer[i + 3]));
+        primer_bloque = bitExtracted(primer_bloque, 21, 1);
         // printf("\tPrimer bloque: %ld\n", primer_bloque);
-        unsigned long int cantidad_bloques = ((buffer[i + 4] << 24) | (buffer[i + 5] << 16) | (buffer[i + 6] << 8) | buffer[i + 7]) << 16 >> 16;
+        unsigned long int cantidad_bloques = ((buffer[i + 5] << 16) | (buffer[i + 6] << 8) | buffer[i + 7]);
+        cantidad_bloques = bitExtracted(cantidad_bloques, 17, 1);
         // printf("\tCantidad bloques: %ld\n", cantidad_bloques);
         if (validez) {
             EntDir* entdir = entdir_init(validez, seven, primer_bloque, cantidad_bloques);

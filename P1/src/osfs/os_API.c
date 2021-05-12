@@ -99,7 +99,7 @@ void set_mbt() {
 
 void set_directory() {
     Directory* _directory = directory_init(mbt -> lista_de_particiones[PARTICION] -> identificador_directorio, mbt -> lista_de_particiones[PARTICION] -> cantidad_bitmaps);
-    set_directory_data(_directory, NOMBRE_DISCO);
+    set_directory_data(_directory, NOMBRE_DISCO, _directory -> indentificador_bloque * 2048 + 1024);
     directory = _directory;
     printf("\tSe cargó el directorio\n");
 }
@@ -110,7 +110,7 @@ void set_bitmap() {
         set_bitmap_data(
             mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[0],
             NOMBRE_DISCO,
-            mbt -> lista_de_particiones[PARTICION] -> identificador_directorio + 2048,
+            mbt -> lista_de_particiones[PARTICION] -> identificador_directorio * 2048 + 2048 + 1024,
             cantidad_bloques_particion
         );
     } else {
@@ -125,7 +125,7 @@ void set_bitmap() {
             set_bitmap_data(
                 mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[i],
                 NOMBRE_DISCO,
-                mbt -> lista_de_particiones[PARTICION] -> identificador_directorio + 2048 + i * 2048, // directorio + tamaño directorio + bitmaps leidos
+                mbt -> lista_de_particiones[PARTICION] -> identificador_directorio + 2048 + i * 2048 + 1024, // directorio + tamaño directorio + bitmaps leidos
                 cantidad_bits_setear
             );
             cantidad_bloques -= 16384;

@@ -1,4 +1,5 @@
 #include "directory.h"
+#include "../helpers/bitExtract.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -7,6 +8,7 @@
 
 Directory* directory_init(unsigned long int indentificador_bloque, int cantidad_bloques_bitmap) {
     Directory* directory = malloc(sizeof(Directory));
+    printf("dasdjsad %ld %d\n", indentificador_bloque, cantidad_bloques_bitmap);
     directory -> indentificador_bloque = indentificador_bloque;
     directory -> cantidad_bloques_bitmap = cantidad_bloques_bitmap;
     directory -> cantidad_archivos = 0; // inicial
@@ -14,13 +16,13 @@ Directory* directory_init(unsigned long int indentificador_bloque, int cantidad_
     return directory;
 };
 
-void set_directory_data(Directory* directory, char* diskname) {
+void set_directory_data(Directory* directory, char* diskname, long int initial) {
     FILE *file = NULL;
     unsigned char buffer[2048];  // array of bytes, not pointers-to-bytes  => 1KB
 
     file = fopen(diskname, "rb");  
-    // printf("Identificador bloque %ld \n", directory -> indentificador_bloque);
-    fseek(file, directory -> indentificador_bloque, SEEK_SET); 
+    printf("Iniciar en byte %ld \n", initial);
+    fseek(file, initial, SEEK_SET); 
     // fseek(file, 1, SEEK_SET); 
     if (file != NULL) {
         // read up to sizeof(buffer) bytes
@@ -36,6 +38,7 @@ void set_directory_data(Directory* directory, char* diskname) {
         char validez = buffer[i];
         // printf("\tPrimer byte: %d\n", validez);
         unsigned long int primer_bloque_relativo = (buffer[i + 1] << 16) | (buffer[i + 2] << 8) | (buffer[i + 3]);
+        primer_bloque_relativo = bitExtracted(primer_bloque_relativo, 21, 1);
         // printf("\tPrimer bloque relativo: %ld\n", primer_bloque_relativo);
         
         // PUEDE QUE ESTO ESTE RARO (guardar el nombre)

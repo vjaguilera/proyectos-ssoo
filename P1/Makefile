@@ -45,7 +45,7 @@ LIB=$(GTK) $(MTH)
 ###############################################################################
 
 # Directorios con elementos de uso común
-COMMON= structs
+COMMON= structs helpers
 
 # Directorios que serán compilados a un programa
 PROGRAMS= osfs

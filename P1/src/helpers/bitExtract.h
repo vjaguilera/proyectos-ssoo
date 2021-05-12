@@ -1,0 +1,1 @@
+int bitExtracted(int number, int k, int p);

@@ -12,7 +12,7 @@ typedef struct directory {
 
 Directory* directory_init(unsigned long int indentificador_bloque, int cantidad_bloques_bitmap);
 
-void set_directory_data(Directory* directory, char* diskname);
+void set_directory_data(Directory* directory, char* diskname, long int initial);
 
 void directory_clean(Directory* directory);
 
