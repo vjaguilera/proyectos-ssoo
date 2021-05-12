@@ -6,6 +6,7 @@ typedef struct ent_dir {
     int identificador_particion;
     unsigned long int identificador_directorio;
     unsigned long int cantidad_bloques_particion;
+    unsigned long int cantidad_bitmaps;
     BitMap** lista_de_bitmaps;
 } EntDir;
 

@@ -39,3 +39,5 @@ int os_rm(char* filename);
 void set_mbt();
 
 void set_directory();
+
+void set_bitmap();

@@ -11,4 +11,6 @@ BitMap* bitmap_init(int cantidad_bloques);
 
 void assign_bit_block(BitMap* bitmap, int bit, int indice);
 
+void set_bitmap_data(BitMap* bitmap, char* diskname, int initial, unsigned long int bits);
+
 void bitmap_clean(BitMap* bitmap);
