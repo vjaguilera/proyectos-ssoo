@@ -9,7 +9,9 @@ typedef struct directory {
 
 // FUNCTIONS
 
-Directory* directory_init(unsigned long int indentificador_bloque, int cantidad_archivos);
+Directory* directory_init(unsigned long int indentificador_bloque);
+
+void set_directory_data(Directory* directory, char* diskname);
 
 void assing_entradas_archivos(Directory* directory, EntAr** entradas_archivos);
 

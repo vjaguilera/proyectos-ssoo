@@ -1,10 +1,10 @@
-#pragma once
 #include "bitmap.h"
 #include "ent_dir.h"
 #include <stdlib.h>
 
 EntDir* entdir_init(char validez, int identificador_particion, unsigned long int identificador_directorio, unsigned long int cantidad_bloques_particion) {
     EntDir* entdir = malloc(sizeof(EntDir));
+    entdir -> validez = (int) validez;
     entdir -> identificador_particion = identificador_particion;
     entdir -> identificador_directorio = identificador_directorio;
     entdir -> cantidad_bloques_particion = cantidad_bloques_particion;

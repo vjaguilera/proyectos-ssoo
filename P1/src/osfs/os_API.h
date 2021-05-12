@@ -1,4 +1,6 @@
 #include "../structs/osFile.h"
+#include "../structs/mbt.h"
+#include "../structs/directory.h"
 
 // GENERALES
 
@@ -32,3 +34,8 @@ int os_close(osFile* file_desc);
 
 int os_rm(char* filename);
 
+// HELPERS
+
+void set_mbt();
+
+void set_directory();
