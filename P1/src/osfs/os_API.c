@@ -99,7 +99,7 @@ void set_mbt() {
 
 void set_directory() {
     Directory* _directory = directory_init(mbt -> lista_de_particiones[PARTICION] -> identificador_directorio, mbt -> lista_de_particiones[PARTICION] -> cantidad_bitmaps);
-    set_directory_data(_directory, NOMBRE_DISCO, _directory -> indentificador_bloque * 2048 + 1024);
+    set_directory_data(_directory, NOMBRE_DISCO, (long int)((_directory -> indentificador_bloque) * 2048 + 1024));
     directory = _directory;
     printf("\tSe cargó el directorio\n");
 }

@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     // printf("Directorio particion 8 = %ld\n", mbt -> lista_de_particiones[8] -> identificador_directorio);
 
     // Montar
-    os_mount(nombre_disco, 5);
+    os_mount(nombre_disco, 8);
     os_mbt();
     os_ls();
     os_delete_partition(8); // No tiene archivos
