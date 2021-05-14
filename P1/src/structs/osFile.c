@@ -3,7 +3,7 @@
 
 osFile* osfile_init(int mode, char* nombre_archivo, Indice* indice) {
     osFile* osfile = malloc(sizeof(osFile));
-    osfile ->mode = mode;
+    osfile -> mode = mode;
     osfile -> nombre_archivo = nombre_archivo;
     osfile -> indice = indice;
     return osfile;

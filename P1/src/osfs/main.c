@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     os_mount(nombre_disco, 8);
     os_mbt();
     os_ls();
-    os_delete_partition(8); // No tiene archivos
+    os_delete_partition(5); // No tiene archivos
     os_mbt();
 
     return 0;

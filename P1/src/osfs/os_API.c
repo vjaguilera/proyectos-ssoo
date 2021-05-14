@@ -43,7 +43,7 @@ void os_mbt() {
     printf("Particiones válidas:\n");
     for (int i = 0; i < 128; i++) {
         if (mbt -> particiones_validas[i] == 1) {
-           printf(" - %d - Bitmaps: %ld\n", mbt -> lista_de_particiones[i] -> identificador_particion, mbt -> lista_de_particiones[i] -> cantidad_bitmaps); 
+           printf(" - %d - Bitmaps: %d\n", mbt -> lista_de_particiones[i] -> identificador_particion, mbt -> lista_de_particiones[i] -> cantidad_bitmaps); 
         }
     }
 
@@ -97,15 +97,31 @@ void set_mbt() {
     printf("\tSe cargó el mbt\n");
 };
 
+void get_bits2(unsigned int num) {
+    int i=0;
+    unsigned int size = sizeof(unsigned int);
+    unsigned int maxPow = 1<<(size*8-1);
+    for(;i<size*8;++i){
+        // print last bit and shift left.
+        printf("%u",num&maxPow ? 1 : 0);
+        num = num<<1;
+    }
+    printf("\n");
+}
+
 void set_directory() {
     Directory* _directory = directory_init(mbt -> lista_de_particiones[PARTICION] -> identificador_directorio, mbt -> lista_de_particiones[PARTICION] -> cantidad_bitmaps);
-    set_directory_data(_directory, NOMBRE_DISCO, (long int)((_directory -> indentificador_bloque) * 2048 + 1024));
+    // printf("Iden %d\n", _directory -> indentificador_bloque);
+    // get_bits2(_directory -> indentificador_bloque);
+    // get_bits2(_directory -> indentificador_bloque * 2048 + 1024);
+    // get_bits3((long int) _directory -> indentificador_bloque);
+    set_directory_data(_directory, NOMBRE_DISCO, (_directory -> indentificador_bloque * 2048 + 1024));
     directory = _directory;
     printf("\tSe cargó el directorio\n");
 }
 
 void set_bitmap() {
-    unsigned long int cantidad_bloques_particion =  mbt -> lista_de_particiones[PARTICION] -> cantidad_bloques_particion;
+    unsigned int cantidad_bloques_particion =  mbt -> lista_de_particiones[PARTICION] -> cantidad_bloques_particion;
     if (cantidad_bloques_particion < 16384) {
         set_bitmap_data(
             mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[0],
@@ -115,7 +131,7 @@ void set_bitmap() {
         );
     } else {
         int cantidad_bloques = cantidad_bloques_particion;
-        unsigned long int cantidad_bits_setear = 0;
+        unsigned int cantidad_bits_setear = 0;
         for (int i = 0; i < mbt -> lista_de_particiones[PARTICION] -> cantidad_bitmaps; i ++) {
             if (cantidad_bloques > 16384) {
                 cantidad_bits_setear = 16384;

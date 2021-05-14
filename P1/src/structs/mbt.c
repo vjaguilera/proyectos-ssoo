@@ -16,7 +16,7 @@ void set_mbt_data(MBT* mbt, char* diskname) {
     FILE *file = NULL;
     unsigned char buffer[1024];  // array of bytes, not pointers-to-bytes  => 1KB
 
-    file = fopen(diskname, "rb");   
+    file = fopen(diskname, "rb"); 
     if (file != NULL) {
         // read up to sizeof(buffer) bytes
         fread(buffer, 1, sizeof(buffer), file);
@@ -25,7 +25,7 @@ void set_mbt_data(MBT* mbt, char* diskname) {
     int x = 128;
     // printf("Primeras %d entradas.\n", x);
     for (int i = 0; i < 8 * x; i += 8 ) {
-        // printf("Entrada %d %d:\n", i / 8, i);
+        // printf("Entrada %d:\n", i / 8);
         unsigned char first = buffer[i];
         // printf("%d \n", buffer[i]);
         char validez = first >> 7;
@@ -33,12 +33,12 @@ void set_mbt_data(MBT* mbt, char* diskname) {
         unsigned char mask = (1 << 7) - 1;
         int seven = buffer[i] & mask;
         // printf("\tParticion: %d\n", seven);
-        long int primer_bloque = ((buffer[i + 1] << 16) | (buffer[i + 2] << 8) | (buffer[i + 3]));
+        unsigned int primer_bloque = ((buffer[i + 1] << 16) | (buffer[i + 2] << 8) | (buffer[i + 3]));
         primer_bloque = bitExtracted(primer_bloque, 21, 1);
-        // printf("\tPrimer bloque: %ld\n", primer_bloque);
-        unsigned long int cantidad_bloques = ((buffer[i + 5] << 16) | (buffer[i + 6] << 8) | buffer[i + 7]);
+        // printf("\tPrimer bloque: %d\n", primer_bloque);
+        unsigned int cantidad_bloques = ((buffer[i + 5] << 16) | (buffer[i + 6] << 8) | buffer[i + 7]);
         cantidad_bloques = bitExtracted(cantidad_bloques, 17, 1);
-        // printf("\tCantidad bloques: %ld\n", cantidad_bloques);
+        // printf("\tCantidad bloques: %d\n", cantidad_bloques);
         if (validez) {
             EntDir* entdir = entdir_init(validez, seven, primer_bloque, cantidad_bloques);
             assign_lista_de_particiones(mbt, entdir, seven);

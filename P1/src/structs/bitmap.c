@@ -14,7 +14,7 @@ void assign_bit_block(BitMap* bitmap, int bit, int indice) {
     bitmap -> bloques[indice] = bit;
 };
 
-void set_bitmap_data(BitMap* bitmap, char* diskname, int initial, unsigned long int bits) {
+void set_bitmap_data(BitMap* bitmap, char* diskname, int initial, unsigned int bits) {
     FILE *file = NULL;
     unsigned char buffer[2048];  // array of bytes, not pointers-to-bytes  => 1KB
 
