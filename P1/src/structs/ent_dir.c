@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-EntDir* entdir_init(char validez, int identificador_particion, signed int identificador_directorio, signed int cantidad_bloques_particion) {
+EntDir* entdir_init(char validez, int identificador_particion, unsigned int identificador_directorio, unsigned int cantidad_bloques_particion) {
     EntDir* entdir = malloc(sizeof(EntDir));
     entdir -> validez = (int) validez;
     entdir -> identificador_particion = identificador_particion;
