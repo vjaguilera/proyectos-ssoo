@@ -32,6 +32,7 @@ void set_directory_data(Directory* directory, char* diskname, long int initial) 
     int x = 37;
     // printf("Primeras %d entradas directorio.\n", x);
     for (int i = 35 * 32; i < 32 * x; i += 32 ) {
+        printf("0: %c\n",buffer[i + 3]);
         printf("1: %c\n",buffer[i + 4]);
         printf("2: %c\n",buffer[i + 5]);
         printf("3: %c\n",buffer[i + 6]);
@@ -51,12 +52,12 @@ void set_directory_data(Directory* directory, char* diskname, long int initial) 
         
         // PUEDE QUE ESTO ESTE RARO (guardar el nombre)
         for (int j = 0; j < 28; j++) {
-            printf("%c", buffer[i + 4 + j]);
-            name[j] = buffer[i + 4 + j];
+            printf("%c", buffer[i + 3 + j]);
+            name[j] = buffer[i + 3 + j];
         }
         printf("\n");
         name[28] = '\0';
-        // printf("Nombre archivo %s\n", name);
+        printf("Nombre archivo -> %s\n", name);
         // Lo deje como 0 el absoluto mientras
         EntAr* ent_ar = entar_init(
             validez,

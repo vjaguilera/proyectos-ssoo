@@ -25,6 +25,14 @@ void os_bitmap(unsigned num) {
 };
 
 int os_exists(char* filename) {
+    printf("Vamos a revisar los archivos y buscar el %s\n", filename);
+    for (int i = 0; i < 64; i++) {
+        if (directory -> entradas_archivos[i] -> nombre_archivo == filename) {
+            printf("El archivo %s existe\n", directory -> entradas_archivos[i] -> nombre_archivo); 
+            return 1;
+        }
+    }
+    printf("El archivo %s no existe\n", filename);
     return 0;
 };
 
