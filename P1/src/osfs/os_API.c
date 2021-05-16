@@ -20,7 +20,11 @@ void os_mount(char* diskname, int partition) {
 
 
 void os_bitmap(unsigned num) {
-    // Revisar mbt -> lista_de_particiones[PARTICION] -> lista_bitmaps
+    for (int i = 0; i < mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> cantidad_bloques; i++) {
+        printf("%d", mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> bloques[i]);
+    };
+    printf("\n");
+    // Revisar mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps
     // Revisar mbt -> lista_de_particiones[PARTICION] -> cantidad_bitmaps
 };
 
@@ -111,11 +115,12 @@ void get_bits2(unsigned int num) {
 
 void set_directory() {
     Directory* _directory = directory_init(mbt -> lista_de_particiones[PARTICION] -> identificador_directorio, mbt -> lista_de_particiones[PARTICION] -> cantidad_bitmaps);
-    // printf("Iden %d\n", _directory -> indentificador_bloque);
+    printf("Bloque %d\n", _directory -> indentificador_bloque);
     // get_bits2(_directory -> indentificador_bloque);
+    printf("byte del bloque a buscar %ld\n", ((long int) _directory -> indentificador_bloque) * 2048 + 1024); // * 2KB dir + 1KB mbt
     // get_bits2(_directory -> indentificador_bloque * 2048 + 1024);
     // get_bits3((long int) _directory -> indentificador_bloque);
-    set_directory_data(_directory, NOMBRE_DISCO, (_directory -> indentificador_bloque * 2048 + 1024));
+    set_directory_data(_directory, NOMBRE_DISCO, (_directory -> indentificador_bloque));
     directory = _directory;
     printf("\tSe cargó el directorio\n");
 }
@@ -126,7 +131,7 @@ void set_bitmap() {
         set_bitmap_data(
             mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[0],
             NOMBRE_DISCO,
-            mbt -> lista_de_particiones[PARTICION] -> identificador_directorio * 2048 + 2048 + 1024,
+            mbt -> lista_de_particiones[PARTICION] -> identificador_directorio + 1,
             cantidad_bloques_particion
         );
     } else {
@@ -141,7 +146,7 @@ void set_bitmap() {
             set_bitmap_data(
                 mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[i],
                 NOMBRE_DISCO,
-                mbt -> lista_de_particiones[PARTICION] -> identificador_directorio + 2048 + i * 2048 + 1024, // directorio + tamaño directorio + bitmaps leidos
+                mbt -> lista_de_particiones[PARTICION] -> identificador_directorio + i + 1, // directorio
                 cantidad_bits_setear
             );
             cantidad_bloques -= 16384;

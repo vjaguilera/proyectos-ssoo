@@ -32,17 +32,23 @@ void set_directory_data(Directory* directory, char* diskname, unsigned int initi
     FILE *file = NULL;
     char buffer[2048];  // array of bytes, not pointers-to-bytes  => 1KB
 
-    file = fopen(diskname, "r");  
-    // printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
+    file = fopen(diskname, "rb");  
+    printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
     // get_bits1(initial);
-    // printf("---\n");
-    lseek(fileno(file), initial, SEEK_SET); 
+    // fseek(file, initial, SEEK_SET); 
     // printf("Posicion actual %ld\n", ftell(file));
     // fseek(file, 1, SEEK_SET); 
+
     if (file != NULL) {
-        // read up to sizeof(buffer) bytes
-        fread(buffer, 1, sizeof(buffer), file);
+        fread(buffer, 1, 1024, file); // avanzar 1024
+        for (int i = 0; i < initial; i++) {
+            // ir bloque a bloque
+            fread(buffer, 1, 2048, file); // ir bloque a bloque
+        }
+        // leer directorio
+        fread(buffer, 1, 2048, file);
     }
+    fclose(file);  
 
     int x = 64;
     // printf("Primeras %d entradas directorio.\n", x);
