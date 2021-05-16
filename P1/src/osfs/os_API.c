@@ -22,6 +22,53 @@ void os_mount(char* diskname, int partition) {
 void os_bitmap(unsigned num) {
     // Revisar mbt -> lista_de_particiones[PARTICION] -> lista_bitmaps
     // Revisar mbt -> lista_de_particiones[PARTICION] -> cantidad_bitmaps
+    if (num >= mbt ->lista_de_particiones[PARTICION] ->cantidad_bitmaps){
+        // El input debe ser menor a la cantidad de bloques de bitmaps de la particion 
+        printf("Ingrese valor menor a %d", mbt ->lista_de_particiones[PARTICION] ->cantidad_bitmaps);
+    }
+    else if(num == 0){
+        // Retorna toda la info del bitmap
+        // Es posible que se pida el binario completo de todos los bloques de bitmap
+        for (int i = 0; i < mbt -> lista_de_particiones[PARTICION] -> cantidad_bitmaps; i ++){
+            int ocupado = 0;
+            char* estado_bloque;
+            int largo_bitmap = mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[i] -> cantidad_bloques;
+            for (int j = 0; j < largo_bitmap; j++){
+                ocupado +=  mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[i] -> bloques[j];
+                sprintf(estado_bloque, "%d", mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> bloques[j]);
+            }
+            int desocupado = largo_bitmap - ocupado; 
+            int value = (int)strtol(estado_bloque, NULL, 2);
+            // convert integer to hex string
+            char hexString[2048]; // QUE WEA PONEMOS AQUI -> Era [12] porque asumía 32bits
+            sprintf(hexString, "%x", value);
+            fprintf( stderr, "%x\n", hexString);
+            printf("Bits ocupados: %i\nBits desocupados: %i\n", ocupado, desocupado);
+        }
+        // fprintf( stderr, "El bitmap es %p\n", "string format", 30);
+    }
+    else{
+        // Retorna solo el estado actual
+        // Se asume que lo que se quiere es la info del estado del bloque bitmap[num] de la particion actual
+        // Y no el bit correspondiente a num
+        int ocupado = 0;
+        int largo_bitmap = mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> cantidad_bloques;
+        char* estado_bloque;
+        for (int j = 0; j < largo_bitmap; j++){
+            ocupado +=  mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> bloques[j];
+            sprintf(estado_bloque, "%d", mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> bloques[j]);
+        }
+        // estado_bloque se espera que termine como un char "0100101"
+
+        int value = (int)strtol(estado_bloque, NULL, 2);
+        // convert integer to hex string
+        char hexString[2048]; // QUE WEA PONEMOS AQUI -> Era [12] porque asumía 32bits
+        sprintf(hexString, "%x", value);
+        fprintf( stderr, "%x\n", hexString);
+        int desocupado =  largo_bitmap - ocupado; 
+        printf("Bits ocupados: %i\nBits desocupados: %i\n", ocupado, desocupado);
+    }
+
 };
 
 int os_exists(char* filename) {
