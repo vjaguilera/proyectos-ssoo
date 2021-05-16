@@ -20,6 +20,7 @@ void os_mount(char* diskname, int partition) {
 
 
 void os_bitmap(unsigned num) {
+    // Revisar foro https://github.com/IIC2333/Foro-2021-1/discussions/211
     // Revisar mbt -> lista_de_particiones[PARTICION] -> lista_bitmaps
     // Revisar mbt -> lista_de_particiones[PARTICION] -> cantidad_bitmaps
     if (num >= mbt ->lista_de_particiones[PARTICION] ->cantidad_bitmaps){
@@ -105,7 +106,21 @@ void os_mbt() {
 };
 
 void os_create_partition(int id, int size) {
+    // Revisar foro si hay respuesta en https://github.com/IIC2333/Foro-2021-1/discussions/213
+
+    // Revisar si el id está disponible
+
+    // Revisar donde cabe el size
+
+    // Crear el directorio para asignar la particion
     printf("Crear particion %d de tamaño %d.\n", id, size);
+    char validez = "1";
+    // EntDir* entdir_init(validez, id, unsigned long int identificador_directorio, unsigned long int cantidad_bloques_particion);
+
+    // Se creó efectivamente 
+    // k va a ser la primera poscionn de mbt -> particiones_validas[i] que sea 0
+    // mbt -> lista_de_particiones[k] = entdir;
+    // assign_lista_de_particiones(mbt, EntDir* entdir, int k)
 };
 
 void os_delete_partition(int id) {
