@@ -130,7 +130,13 @@ void os_delete_partition(int id) {
 };
 
 void os_reset_mbt() {
-    
+    // Por cada particion válida del mbt
+    // Se llama a os_delete_partition de esta, con el identificador de la particion dada
+    for (int i = 0; i < 128; i++) {
+        if(mbt -> lista_de_particiones[i]){
+            os_delete_partition(mbt -> lista_de_particiones[i] -> identificador_particion);
+        }
+    };
 };
 
 // Manejo archivos
