@@ -66,7 +66,11 @@ void set_directory_data(Directory* directory, char* diskname, long int initial) 
             name
         );
         directory -> entradas_archivos[entrada] = ent_ar;
-        // directory -> cantidad_archivos += 1;
+        directory -> cantidad_archivos += 1;
+        // Falta crear indice
+        // assign_indice(ent_ar,) 
+        // El indice apunta a las mismas direcciones del bitmap
+        // Ahi si se pasa, esta en el siguiente
         // Deberia asignarse al bitmap correspondiente
     }
 }

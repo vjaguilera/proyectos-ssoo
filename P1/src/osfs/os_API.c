@@ -108,16 +108,20 @@ void os_create_partition(int id, int size) {
 
     // Revisar si el id está disponible
     int cont_bloques = 0;
+    if (mbt->particiones_validas[id]){
+        printf("El id ingresado ya existe, entregue uno valido");
+        return;
+    }
+
     for (int i = 0; i < 128; i++){
         // Particiones validas
         if (mbt->particiones_validas[i]){
-            cont_bloques += mbt->lista_de_particiones[i]->cantidad_bloques_particion;
+            // cont_bloques += mbt->lista_de_particiones[i]->cantidad_bloques_particion;
             // If ID invalido
-            if (mbt->lista_de_particiones[i]->identificador_particion == id){
-                printf("El id ingresado ya existe, entregue uno valido");
+            // if (mbt->lista_de_particiones[i]->identificador_particion == id){
+            //    printf("El id ingresado ya existe, entregue uno valido");
                 return;
             }
-        }
         // k va a ser la poscion de mbt -> particiones_validas[i] que sea 0
         else{
             // Revisar si cabe en esta posicion que no era valida
@@ -125,6 +129,8 @@ void os_create_partition(int id, int size) {
             // Hay que definir bien el primer bloque donde se escribira esta particion
             // Ver como hacer el if de que quepa o no el size
             // Actualmente se asume que cabe en el primero invalido
+
+            // identificador_directorio es la primera posicion de la particion
             EntDir* entdir = entdir_init("1", id, cont_bloques, size);
             assign_lista_de_particiones(mbt, entdir, id);
             printf("Crear particion %d de tamaño %d.\n", id, size);
@@ -132,7 +138,7 @@ void os_create_partition(int id, int size) {
         }
     }
     printf("No se pudo crear la particion, no cabe en ninguna parte");
-
+    
 };
 
 void os_delete_partition(int id) {
@@ -179,7 +185,11 @@ int os_rm(char* filename) {
             // Los bloques que estaban siendo usados por el archivo deben quedar libres.
             directory->cantidad_archivos -= 1;
             directory->entradas_archivos[i] -> validez = 0;
-            for (int j = 0; j < directory->entradas_archivos[i] -> indice -> cantidad_bloques; j++){
+            for (int j = 0; j < directory->entradas_archivos[i] -> indice -> cantidad_bloques; j++){\
+
+                // El indice apunta a las mismas direcciones del bitmap
+                // Ahi si se pasa, esta en el siguiente
+
                 // id del bitmap va a ser indice -> iden relat + j - k * cantidad de bloques en un bitmap
                 // Nos falta conocer el k, el bitmap que
                 // mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[k] -> bloques[iden relat + j];
