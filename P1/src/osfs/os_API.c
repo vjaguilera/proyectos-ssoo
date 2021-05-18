@@ -173,6 +173,22 @@ int os_close(osFile* file_desc) {
 };
 
 int os_rm(char* filename) {
+    for (int i = 0; i < directory -> cantidad_archivos; i++){
+        if (directory -> entradas_archivos[i]->nombre_archivo == filename){
+            // Este es el archivo a eliminar
+            // Los bloques que estaban siendo usados por el archivo deben quedar libres.
+            directory->cantidad_archivos -= 1;
+            directory->entradas_archivos[i] -> validez = 0;
+            for (int j = 0; j < directory->entradas_archivos[i] -> indice -> cantidad_bloques; j++){
+                // id del bitmap va a ser indice -> iden relat + j - k * cantidad de bloques en un bitmap
+                // Nos falta conocer el k, el bitmap que
+                // mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[k] -> bloques[iden relat + j];
+            }
+            
+            // entar_clean(directory -> entradas_archivos[i]);
+        }
+    }
+    
     return 0;
 };
 
