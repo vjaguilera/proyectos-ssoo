@@ -21,8 +21,6 @@ void os_mount(char* diskname, int partition) {
 
 void os_bitmap(unsigned num) {
     // Revisar foro https://github.com/IIC2333/Foro-2021-1/discussions/211
-    // Revisar mbt -> lista_de_particiones[PARTICION] -> lista_bitmaps
-    // Revisar mbt -> lista_de_particiones[PARTICION] -> cantidad_bitmaps
     if (num >= mbt ->lista_de_particiones[PARTICION] ->cantidad_bitmaps){
         // El input debe ser menor a la cantidad de bloques de bitmaps de la particion 
         printf("Ingrese valor menor a %d", mbt ->lista_de_particiones[PARTICION] ->cantidad_bitmaps);
@@ -41,7 +39,7 @@ void os_bitmap(unsigned num) {
             int desocupado = largo_bitmap - ocupado; 
             int value = (int)strtol(estado_bloque, NULL, 2);
             // convert integer to hex string
-            char hexString[2048]; // QUE WEA PONEMOS AQUI -> Era [12] porque asumía 32bits
+            char hexString[32768]; // 32768 = 2048 * 8 * 8 / 4 
             sprintf(hexString, "%x", value);
             fprintf( stderr, "%x\n", hexString);
             printf("Bits ocupados: %i\nBits desocupados: %i\n", ocupado, desocupado);
@@ -63,7 +61,7 @@ void os_bitmap(unsigned num) {
 
         int value = (int)strtol(estado_bloque, NULL, 2);
         // convert integer to hex string
-        char hexString[2048]; // QUE WEA PONEMOS AQUI -> Era [12] porque asumía 32bits
+        char hexString[32768]; // 32768 = 2048 * 8 * 8 / 4 
         sprintf(hexString, "%x", value);
         fprintf( stderr, "%x\n", hexString);
         int desocupado =  largo_bitmap - ocupado; 
@@ -109,18 +107,32 @@ void os_create_partition(int id, int size) {
     // Revisar foro si hay respuesta en https://github.com/IIC2333/Foro-2021-1/discussions/213
 
     // Revisar si el id está disponible
+    int cont_bloques = 0;
+    for (int i = 0; i < 128; i++){
+        // Particiones validas
+        if (mbt->particiones_validas[i]){
+            cont_bloques += mbt->lista_de_particiones[i]->cantidad_bloques_particion;
+            // If ID invalido
+            if (mbt->lista_de_particiones[i]->identificador_particion == id){
+                printf("El id ingresado ya existe, entregue uno valido");
+                return;
+            }
+        }
+        // k va a ser la poscion de mbt -> particiones_validas[i] que sea 0
+        else{
+            // Revisar si cabe en esta posicion que no era valida
+            // if (cabe) -> se crea 
+            // Hay que definir bien el primer bloque donde se escribira esta particion
+            // Ver como hacer el if de que quepa o no el size
+            // Actualmente se asume que cabe en el primero invalido
+            EntDir* entdir = entdir_init("1", id, cont_bloques, size);
+            assign_lista_de_particiones(mbt, entdir, id);
+            printf("Crear particion %d de tamaño %d.\n", id, size);
+            return;
+        }
+    }
+    printf("No se pudo crear la particion, no cabe en ninguna parte");
 
-    // Revisar donde cabe el size
-
-    // Crear el directorio para asignar la particion
-    printf("Crear particion %d de tamaño %d.\n", id, size);
-    char validez = "1";
-    // EntDir* entdir_init(validez, id, unsigned long int identificador_directorio, unsigned long int cantidad_bloques_particion);
-
-    // Se creó efectivamente 
-    // k va a ser la primera poscionn de mbt -> particiones_validas[i] que sea 0
-    // mbt -> lista_de_particiones[k] = entdir;
-    // assign_lista_de_particiones(mbt, EntDir* entdir, int k)
 };
 
 void os_delete_partition(int id) {
