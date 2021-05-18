@@ -66,6 +66,8 @@ void set_directory_data(Directory* directory, char* diskname, long int initial) 
             name
         );
         directory -> entradas_archivos[entrada] = ent_ar;
+        // directory -> cantidad_archivos += 1;
+        // Deberia asignarse al bitmap correspondiente
     }
 }
 
