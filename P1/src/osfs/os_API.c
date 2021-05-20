@@ -1,5 +1,6 @@
 #include "os_API.h"
 #include <stdio.h>
+#include "../helpers/sort.h"
 
 // GENERALES
 
@@ -107,35 +108,85 @@ void os_create_partition(int id, int size) {
     // Revisar foro si hay respuesta en https://github.com/IIC2333/Foro-2021-1/discussions/213
 
     // Revisar si el id está disponible
-    int cont_bloques = 0;
     if (mbt->particiones_validas[id]){
         printf("El id ingresado ya existe, entregue uno valido");
         return;
     }
-
+    
+    unsigned long int* lista_id_particiones[128];
+    int cant_particiones_validas = 0;
+    int prox_part;
+    int flag = 0;
     for (int i = 0; i < 128; i++){
+
         // Particiones validas
         if (mbt->particiones_validas[i]){
-            // cont_bloques += mbt->lista_de_particiones[i]->cantidad_bloques_particion;
-            // If ID invalido
-            // if (mbt->lista_de_particiones[i]->identificador_particion == id){
-            //    printf("El id ingresado ya existe, entregue uno valido");
-                return;
-            }
-        // k va a ser la poscion de mbt -> particiones_validas[i] que sea 0
-        else{
-            // Revisar si cabe en esta posicion que no era valida
-            // if (cabe) -> se crea 
-            // Hay que definir bien el primer bloque donde se escribira esta particion
-            // Ver como hacer el if de que quepa o no el size
-            // Actualmente se asume que cabe en el primero invalido
+            cant_particiones_validas += 1;
 
-            // identificador_directorio es la primera posicion de la particion
-            EntDir* entdir = entdir_init("1", id, cont_bloques, size);
+            // crear arreglo de tuplas (id_dir, cantidad_bloques, i) ordenadas por id_dir menor a mayor 
+            lista_id_particiones[i] = mbt->lista_de_particiones[i]->identificador_directorio;
+            }
+        else{
+            if (flag == 0){
+                prox_part = i;
+                flag = 1;
+            }
+
+        }
+    }
+    selectionSort(lista_id_particiones, cant_particiones_validas);
+    // recorrer la lista de id particiones
+    // sumar al id_dir la cantidad de bloques, y el resultado restarlo al id_dir del siguiente.
+    // caso borde -> ultimo bloque
+
+    // caso borde de primer bloque que no parte en el bloque con id 0
+    if (lista_id_particiones[0] != 0){
+        if(lista_id_particiones[0] > size){
+            EntDir* entdir = entdir_init("1", id, 0, size);
             assign_lista_de_particiones(mbt, entdir, id);
             printf("Crear particion %d de tamaño %d.\n", id, size);
             return;
+
         }
+    }
+
+    for (int j = 0; j < cant_particiones_validas; j++){
+        for (int p = 0; p < 128; p++){
+            // recorro todos las posibles particiones
+            if (mbt->particiones_validas[p]){
+                // revisar si la particion es valida para buscar el identificador
+                unsigned long int posicion_total;
+                if (mbt->lista_de_particiones[p]->identificador_directorio == lista_id_particiones[j]){
+                    // aqui se suma el identificador con la cantidad de bloques
+                    // posicion total es el identificador + la cantidad de bloques de la particion anterior al espacio candidato
+                    posicion_total = mbt->lista_de_particiones[p]->identificador_directorio + mbt->lista_de_particiones[p]->cantidad_bloques_particion;
+                    if (j == cant_particiones_validas - 1){
+                        // si no entra aca, no cabe en ningun lado
+                        if (posicion_total + size <= 2097151){ // ultimo bloque posible
+                            EntDir* entdir = entdir_init("1", id, posicion_total, size);
+                            assign_lista_de_particiones(mbt, entdir, id);
+                            printf("Crear particion %d de tamaño %d.\n", id, size);
+                            return;
+                        }
+                        else{
+                            printf("No cabe en ningun lado");
+                            return;
+                        }
+
+                    }
+                    unsigned long int inicio_sig_part = lista_id_particiones[j+1]; // revisar caso borde del final
+                    if (inicio_sig_part - posicion_total >= size){
+                        // crear la nueva particion
+                        EntDir* entdir = entdir_init("1", id, posicion_total, size);
+                        assign_lista_de_particiones(mbt, entdir, id);
+                        printf("Crear particion %d de tamaño %d.\n", id, size);
+                        return;
+                    }
+                    }
+
+            }
+
+        }  
     }
     printf("No se pudo crear la particion, no cabe en ninguna parte");
     
