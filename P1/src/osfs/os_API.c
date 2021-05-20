@@ -78,14 +78,40 @@ osFile *os_open(char *filename, char mode)
     printf("Buscando archivo de nombre %s:\n", filename);
     for (int i = 0; i < 64; i++)
     {
-        if (directory->entradas_archivos[i]->validez == 1)
+        if (directory->entradas_archivos[i]->nombre_archivo == filename)
         {
-            printf(" - %s\n", directory->entradas_archivos[i]->nombre_archivo);
+            printf("Archivo encontrado en el directorio \n");
+
+            // Extraer indice absoluto desde el directorio
+            FILE *file = NULL;
+            char buffer[1]; // array of bytes, not pointers-to-bytes  => 2KB
+
+            file = fopen(NOMBRE_DISCO, "r");
+            unsigned int initial = directory->entradas_archivos[i]->identificador_absoluto;
+            printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
+            // get_bits1(initial);
+            // printf("---\n");
+            lseek(fileno(file), initial, SEEK_SET);
+            printf("Posicion actual %ld\n", ftell(file));
+            // fseek(file, 1, SEEK_SET);
+            if (file != NULL)
+            {
+                // read up to sizeof(buffer) bytes
+                fread(buffer, 5, sizeof(buffer), file);
+            }
+
+            // Convert buffer to unsigned int and assign it as tamano
+            unsigned int tamano = (unsigned int)buffer;
+
+            // Init Indice
+            Indice *indice = indice_init(tamano, directory->entradas_archivos[i]->identificador_absoluto, initial);
+
+            // Init osFile
+            osFile *osFile = osfile_init(mode, filename, indice);
+            return osFile;
         }
     }
-    // Indice* indice = indice_init(); .. COMPLETAR
-    // osFile* osfile = osfile_init(mode, filename, indice);
-    return 0; // osfile
+    return NULL;
 };
 
 int os_read(osFile *file_desc, void *buffer, int nbytes)
