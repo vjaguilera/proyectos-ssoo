@@ -1,4 +1,5 @@
 #include "os_API.h"
+#include "../helpers/writeBytes.h"
 #include <stdio.h>
 
 // GENERALES
@@ -12,6 +13,7 @@ void os_mount(char* diskname, int partition) {
     printf("Se ha montado la partición %d del disco %s.\n", partition, diskname);
     NOMBRE_DISCO = diskname;
     PARTICION = partition;
+    set_disk_name(diskname); // para escritura
     set_mbt();
     set_directory();
     set_bitmap();
