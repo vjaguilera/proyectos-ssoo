@@ -18,15 +18,17 @@ void set_bitmap_data(BitMap* bitmap, char* diskname, int initial, unsigned int b
     FILE *file = NULL;
     unsigned char buffer[2048];  // array of bytes, not pointers-to-bytes  => 1KB
 
-    file = fopen(diskname, "rb");  
+    file = fopen(diskname, "r");  
+    long int initial_2 = (long int) initial * 2048 + 1024;
+    fseek(file, initial_2, SEEK_SET); 
     if (file != NULL) {
-        fread(buffer, 1, 1024, file); // avanzar 1024
-        for (int i = 0; i < initial; i++) {
+        // fread(buffer, 1, 1024, file); // avanzar 1024
+        // for (int i = 0; i < initial; i++) {
             // ir bloque a bloque
-            fread(buffer, 1, 2048, file); // ir bloque a bloque
-        }
+        fread(buffer, 1, 2048, file); // ir bloque a bloque
+        // }
         // leer directorio
-        fread(buffer, 1, 2048, file);
+        // fread(buffer, 1, 2048, file);
     }
     fclose(file);  
 

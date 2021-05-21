@@ -15,9 +15,20 @@ void os_mount(char* diskname, int partition) {
     PARTICION = partition;
     set_disk_name(diskname); // para escritura
     set_mbt();
-    set_directory();
-    set_bitmap();
-    // Definir directorio y bitmaps
+    if (mbt -> particiones_validas[partition] == 1) {
+        set_directory();
+        set_bitmap();
+    }
+    // char bytes_to_modify[8] = "\x81\x00\x00\xC8\x00\x00\x4E\x20";      
+    // writeBytesMBT(0, bytes_to_modify, 8);
+    // - edito el primer byte y le pongo un 129 -> particion válida de id 1
+    // - directorio en 200 y tamaño particion 9000
+
+    // char bytes_to_modify[13] = "\x01\x00\x03\xE8\x68\x6f\x6c\x61\x2e\x74\x78\x74\x00";
+    // writeBytes(200, 32, bytes_to_modify, 13);
+    // - edito el bloque con id 200 y escribo a partir
+    // - del byte 32, es decir, la segunda entrada de archivos
+    // - archivo valido, indice en bloque 1000 nombre hola.txt
 };
 
 
@@ -35,10 +46,12 @@ int os_exists(char* filename) {
 };
 
 void os_ls() {
-    printf("Archivos válidos:\n");
-    for (int i = 0; i < 64; i++) {
-        if (directory -> entradas_archivos[i] -> validez == 1) {
-            printf(" - %s\n", directory -> entradas_archivos[i] -> nombre_archivo); 
+    if (directory != NULL) {
+        printf("Archivos válidos: %d\n", directory -> cantidad_archivos);
+        for (int i = 0; i < 64; i++) {
+            if (directory -> entradas_archivos[i] -> validez == 1) {
+                printf(" %d.- Id. %d Nombre: %s\n", i, directory -> entradas_archivos[i]->identificador_relativo, directory -> entradas_archivos[i] -> nombre_archivo); 
+            }
         }
     }
 };
@@ -61,8 +74,10 @@ void os_create_partition(int id, int size) {
 
 void os_delete_partition(int id) {
     printf("Eliminar particion %d.\n", id);
-    mbt -> particiones_validas[id] = 0;
-    mbt -> lista_de_particiones[id] -> validez = 0;
+    if (mbt -> particiones_validas[id] == 1) {
+        mbt -> particiones_validas[id] = 0;
+        mbt -> lista_de_particiones[id] -> validez = 0;
+    }
 };
 
 void os_reset_mbt() {

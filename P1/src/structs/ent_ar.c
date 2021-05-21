@@ -1,5 +1,6 @@
 #include "ent_ar.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 EntAr* entar_init(char validez, unsigned int identificador_relativo, unsigned int identificador_absoluto, char* nombre_archivo) {
     EntAr* entar = malloc(sizeof(EntAr));
