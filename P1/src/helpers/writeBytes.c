@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* DISKNAME;
+char* DISKNAME = "file1.txt";
 
 
 void set_disk_name(char* diskname) {
