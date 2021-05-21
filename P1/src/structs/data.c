@@ -27,12 +27,12 @@ void set_data_block(Data *data_block, char *diskname, unsigned int initial)
     data_block->byte_array = buffer;
 }
 
-void read_bytes(Data *data_block, char *buffer, int buffer_pos, int bytes_to_read)
+void read_bytes(Data *data_block, char *buffer, int buffer_pos, int bytes_to_read, unsigned int initial)
 {
     for (int i = 0; i < bytes_to_read; i++)
     {
         // Actualizar buffer con los datos del bloque de datos
-        buffer[i + buffer_pos] = data_block->byte_array[i];
+        buffer[i + buffer_pos] = data_block->byte_array[i + initial];
     }
     // Actualizar la ultima posicion del buffer de respuesta
     buffer_pos += bytes_to_read;

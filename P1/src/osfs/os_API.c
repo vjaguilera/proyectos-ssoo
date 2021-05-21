@@ -109,14 +109,15 @@ que el archivo no exista y se retorna un nuevo osFile* que lo representa.*/
                 printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
                 // get_bits1(initial);
                 // printf("---\n");
-                lseek(fileno(file), initial, SEEK_SET);
+                fseek(file, initial, SEEK_SET);
                 printf("Posicion actual %ld\n", ftell(file));
                 // fseek(file, 1, SEEK_SET);
                 if (file != NULL)
                 {
                     // Leer 5 bytes y guardarlos en el buffer
-                    fread(buffer, 5, sizeof(buffer), file);
+                    fread(buffer, 5, 1, file);
                 }
+                fclose(file);
 
                 // Convert buffer to unsigned int and assign it as tamano
                 unsigned int tamano = (unsigned int)buffer;
@@ -170,23 +171,33 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
     printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
     // get_bits1(initial);
     // printf("---\n");
-    lseek(fileno(file), initial, SEEK_SET);
+    fseek(file, initial, SEEK_SET);
     printf("Posicion actual %ld\n", ftell(file));
     // fseek(file, 1, SEEK_SET);
     if (file != NULL)
     {
         // Leer de 1 byte y guardar 2043 de estos en el buffer
-        fread(buffer, 1, sizeof(data_buffer), file);
+        fread(buffer, 1, 2043, file);
     }
 
     // Iterar por los Bytes de Buffer generando struct Datas y Asignandolas al Indice
     // Comenzando desde el last read byte
     int x = 681;
+    // Last readed byte
     unsigned int LRB = file_desc->indice->last_read_byte;
+    // Get starting point to read from the buffer
+    int starting_point = (int)(LRB / 2048); // Math floor of LRB and 2KB from Data Block
+    // Get ending point based on nbytes to read
+    int ending_point = (int)((LRB + nbytes) / 2048) + 1; // Math floor of LRB + nbytes to read and 2KB from Data Block
+
+    // Set bytes already read
     int bytes_read = 0;
+    // Set buffer position to write on
     int buffer_pos = 0;
-    int n_bytes_to_read = nbytes;
-    for (int i = LRB * x; i < 3 * x; i += 3)
+    // Set bytes left to read
+    int n_bytes_left = nbytes;
+    // Iterate in Indice Data Block segments
+    for (int i = starting_point; i < 3 * ending_point; i += 3)
     {
         // Identificador relativo de Bloque de datos
         //printf("\tPrimer byte: %d\n", buffer[i]);
@@ -203,16 +214,21 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
         // ES NECESARIO???
 
         // Hacer lectura de los nbytes desde bloque data y actualizar contador de bytes leidos
-        if (n_bytes_to_read >= 0)
+        if (n_bytes_left >= 0)
         {
-            int bytes_to_read = n_bytes_to_read < 2048 ? n_bytes_to_read : 2048;
-            read_bytes(data_block, buffer, buffer_pos, bytes_to_read);
+            // Get bytes dispo to read in data block based on last readed byte
+            int bytes_able_to_read = (((i + 1) * 2048) - LRB);
+            // Declare bytes to be read
+            int bytes_to_read = n_bytes_left < bytes_able_to_read ? n_bytes_left : bytes_able_to_read;
+            // Set starting point to read from Data block
+            int data_block_initial = (LRB - (i * 2048));
+            read_bytes(data_block, buffer, buffer_pos, bytes_to_read, data_block_initial);
             // Actualizar ultimo byte leido desde el indice
             file_desc->indice->last_read_byte = LRB + bytes_to_read;
             // Actualizar bytes leidos desde el bloque de datos
             bytes_read += bytes_to_read;
             // Actualizar nbytes restantes por leer
-            n_bytes_to_read -= bytes_to_read;
+            n_bytes_left -= bytes_to_read;
         }
         else
         {
