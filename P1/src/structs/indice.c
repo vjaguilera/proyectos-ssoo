@@ -9,6 +9,7 @@ Indice *indice_init(unsigned int tamano, unsigned int identificador_relativo, un
     indice->lista_de_datos = malloc(sizeof(Data *) * indice->cantidad_bloques);
     indice->identificador_relativo = identificador_relativo;
     indice->identificador_absoluto = identificador_absoluto;
+    indice->last_read_byte = 0;
     return indice;
 };
 

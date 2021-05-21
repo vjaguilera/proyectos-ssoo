@@ -71,52 +71,155 @@ void os_reset_mbt(){
 
 };
 
-// Manejo archivos
+// ====================
+//      Manejo archivos
+// ====================
 
 osFile *os_open(char *filename, char mode)
+/* Función para abrir un archivo. Si mode es ‘r’,
+busca el archivo con nombre filename y retorna un osFile* que lo representa. Si mode es ‘w’, se verifica
+que el archivo no exista y se retorna un nuevo osFile* que lo representa.*/
 {
-    printf("Buscando archivo de nombre %s:\n", filename);
-    for (int i = 0; i < 64; i++)
+    // Check valid mode
+    if (mode != 'r' || mode != 'w')
     {
-        if (directory->entradas_archivos[i]->nombre_archivo == filename)
+        return NULL;
+    }
+
+    switch (mode)
+    {
+    case 'r':
+        // READ MODE
+        printf("Buscando archivo de nombre %s:\n", filename);
+        for (int i = 0; i < 64; i++)
         {
-            printf("Archivo encontrado en el directorio \n");
-
-            // Extraer indice absoluto desde el directorio
-            FILE *file = NULL;
-            char buffer[1]; // array of bytes, not pointers-to-bytes  => 2KB
-
-            file = fopen(NOMBRE_DISCO, "r");
-            unsigned int initial = directory->entradas_archivos[i]->identificador_absoluto;
-            printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
-            // get_bits1(initial);
-            // printf("---\n");
-            lseek(fileno(file), initial, SEEK_SET);
-            printf("Posicion actual %ld\n", ftell(file));
-            // fseek(file, 1, SEEK_SET);
-            if (file != NULL)
+            // Archivo encontrado en el directorio
+            if (directory->entradas_archivos[i]->nombre_archivo == filename)
             {
-                // read up to sizeof(buffer) bytes
-                fread(buffer, 5, sizeof(buffer), file);
+                printf("Archivo encontrado en el directorio \n");
+
+                // Extraer indice absoluto desde el directorio
+                FILE *file = NULL;
+                char buffer[1]; // array of bytes, to store 5 bytes of file size
+
+                // Open disk to read bytes
+                file = fopen(NOMBRE_DISCO, "r");
+                // Utilizar identificador absoluto de EntAr asociado para comenzar lectura
+                unsigned int initial = directory->entradas_archivos[i]->identificador_absoluto;
+                printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
+                // get_bits1(initial);
+                // printf("---\n");
+                lseek(fileno(file), initial, SEEK_SET);
+                printf("Posicion actual %ld\n", ftell(file));
+                // fseek(file, 1, SEEK_SET);
+                if (file != NULL)
+                {
+                    // Leer 5 bytes y guardarlos en el buffer
+                    fread(buffer, 5, sizeof(buffer), file);
+                }
+
+                // Convert buffer to unsigned int and assign it as tamano
+                unsigned int tamano = (unsigned int)buffer;
+
+                // Init Indice
+                Indice *indice = indice_init(tamano, directory->entradas_archivos[i]->identificador_absoluto, initial);
+
+                // Init osFile
+                osFile *osFile = osfile_init(mode, filename, indice);
+                return osFile;
             }
-
-            // Convert buffer to unsigned int and assign it as tamano
-            unsigned int tamano = (unsigned int)buffer;
-
-            // Init Indice
-            Indice *indice = indice_init(tamano, directory->entradas_archivos[i]->identificador_absoluto, initial);
-
-            // Init osFile
-            osFile *osFile = osfile_init(mode, filename, indice);
-            return osFile;
         }
+        break;
+
+    case 'w':
+        // WRITE MODE
+        printf("Verificando que el archivo %s NO exista \n", filename);
+        for (int i = 0; i < 64; i++)
+        {
+            // Archivo encontrado en el directorio
+            if (directory->entradas_archivos[i]->nombre_archivo == filename)
+            {
+                printf("[ X ] - Archivo EXISTE en el directorio \n");
+                return NULL;
+            }
+        }
+        // Archivo no encontrado en el directorio, se puede crear uno nuevo
+        // COMPLETAR
+    default:
+        break;
     }
     return NULL;
 };
 
 int os_read(osFile *file_desc, void *buffer, int nbytes)
+/*Función para leer archivos.
+Lee los siguientes nbytes desde el archivo descrito por file desc y los guarda en la dirección apuntada
+por buffer. Debe retornar la cantidad de Bytes efectivamente leı́dos desde el archivo. Esto es importante si
+nbytes es mayor a la cantidad de Bytes restantes en el archivo. La lectura de read se efectúa desde la posición
+del archivo inmediatamente posterior a la última posición leı́da por un llamado a read.*/
 {
-    return 0;
+    // Utilizar Indice apuntando por osFile para hacer lectura de Datas
+    // Extraer indice absoluto desde el directorio
+    FILE *file = NULL;
+    char data_buffer[2043]; // array of bytes, to store 2043 bytes of file Data
+
+    // Open disk to read bytes
+    file = fopen(NOMBRE_DISCO, "r");
+    // Utilizar identificador absoluto de EntAr asociado para comenzar lectura
+    unsigned int initial = file_desc->indice->identificador_absoluto + 5; // Identificador absoluto + 5 bytes de tamano de archivo
+    printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
+    // get_bits1(initial);
+    // printf("---\n");
+    lseek(fileno(file), initial, SEEK_SET);
+    printf("Posicion actual %ld\n", ftell(file));
+    // fseek(file, 1, SEEK_SET);
+    if (file != NULL)
+    {
+        // Leer de 1 byte y guardar 2043 de estos en el buffer
+        fread(buffer, 1, sizeof(data_buffer), file);
+    }
+
+    // Iterar por los Bytes de Buffer generando struct Datas y Asignandolas al Indice
+    // Comenzando desde el last read byte
+    int x = 681;
+    unsigned int LRB = file_desc->indice->last_read_byte;
+    int bytes_read = 0;
+    int buffer_pos = 0;
+    int n_bytes_to_read = nbytes;
+    for (int i = LRB * x; i < 3 * x; i += 3)
+    {
+        // Identificador relativo de Bloque de datos
+        //printf("\tPrimer byte: %d\n", buffer[i]);
+        //printf("\tSegundo byte: %d\n", buffer[i + 1]);
+        //printf("\tTercer byte: %d\n", buffer[i + 2]);
+        unsigned int identificador_bloque_datos = ((data_buffer[i] << 16) | (data_buffer[i + 1] << 8) | (data_buffer[i + 2]));
+        identificador_bloque_datos = bitExtracted(identificador_bloque_datos, 24, 1);
+
+        // Inicializar Bloque de Datos y asignarlo al indice
+        Data *data_block = data_init();
+        // Assign 2048 bytes to data byte array
+        set_data_block(data_block, NOMBRE_DISCO, identificador_bloque_datos);
+        // Asignar bloque de datos al indice
+        // ES NECESARIO???
+
+        // Hacer lectura de los nbytes desde bloque data y actualizar contador de bytes leidos
+        if (n_bytes_to_read >= 0)
+        {
+            int bytes_to_read = n_bytes_to_read < 2048 ? n_bytes_to_read : 2048;
+            read_bytes(data_block, buffer, buffer_pos, bytes_to_read);
+            // Actualizar ultimo byte leido desde el indice
+            file_desc->indice->last_read_byte = LRB + bytes_to_read;
+            // Actualizar bytes leidos desde el bloque de datos
+            bytes_read += bytes_to_read;
+            // Actualizar nbytes restantes por leer
+            n_bytes_to_read -= bytes_to_read;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return bytes_read;
 };
 
 int os_write(osFile *file_desc, void *buffer, int nbytes)
