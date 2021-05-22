@@ -90,7 +90,6 @@ void set_directory_data(Directory* directory, char* diskname, unsigned int initi
     if (file != NULL) {
         fread(buffer, 1, 2048, file);
     }
-
     fclose(file);  
 
     int x = 64;
@@ -105,7 +104,7 @@ void set_directory_data(Directory* directory, char* diskname, unsigned int initi
             name[j] = buffer[i + 4 + j];
         }
         name[28] = '\0';
-        
+
         EntAr* ent_ar = entar_init(
             validez,
             primer_bloque_relativo,
