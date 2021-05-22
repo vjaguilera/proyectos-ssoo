@@ -9,7 +9,7 @@ void swap(int* xp, int* yp)
 }
  
 // Function to perform Selection Sort
-void selectionSort(int arr[], int n)
+void selectionSort(unsigned int* arr, int n)
 {
     int i, j, min_idx;
  

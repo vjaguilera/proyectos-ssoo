@@ -74,10 +74,10 @@ void set_mbt_data(MBT* mbt, char* diskname) {
         unsigned int primer_bloque2 = bitExtracted(primer_bloque, 21, 1); // der a izq
         if (primer_bloque2 != 0) {
             // printf("%d %d %d\n", buffer[i + 1], buffer[i + 2], buffer[i + 3]);
-            // printf("%d %d\n", buffer[i], i / 8);
-            printf("\tPrimer bit: %d\n", validez);
-            printf("\tParticion: %d\n", seven);
-            printf("\tPrimer bloque 1: %d\n", primer_bloque2);
+            printf("[m] Entrada %d\n", i / 8);
+            printf("[m] \tPrimer bit: %d\n", validez);
+            printf("[m] \tParticion: %d\n", seven);
+            printf("[m] \tPrimer bloque 1: %d\n", primer_bloque2);
         }
         // primer_bloque2 = bitExtracted(primer_bloque, 21, 4); // izq a derecha
         // if (primer_bloque2 != 0) {
@@ -101,7 +101,6 @@ void set_mbt_data(MBT* mbt, char* diskname) {
             // write_partition_mbt(entdir);  ---> PARA GUARDAR EntDir
         }
     }
-    printf("\n");
 }
 
 void assign_lista_de_particiones(MBT* mbt, EntDir* entdir, int k) {
