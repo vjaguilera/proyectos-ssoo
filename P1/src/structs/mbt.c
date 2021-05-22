@@ -98,7 +98,7 @@ void set_mbt_data(MBT* mbt, char* diskname) {
         if (validez) {
             EntDir* entdir = entdir_init(validez, seven, primer_bloque2, cantidad_bloques2, i / 8);
             assign_lista_de_particiones(mbt, entdir, seven);
-            write_partition_mbt(entdir);
+            // write_partition_mbt(entdir);  ---> PARA GUARDAR EntDir
         }
     }
     printf("\n");
@@ -175,7 +175,7 @@ void write_partition_mbt(EntDir* ent_dir) {
     response = calloc(1, size);
     get_bits(response, ent_dir -> cantidad_bloques_particion, 0);
     while (size < 4) {
-        bytes_array[5 + 2 - size] = 0;
+        bytes_array[5 + 3 - size] = 0;
         size += 1;
     }
     arraySize = strlen(response);

@@ -121,7 +121,8 @@ void set_directory_data(Directory* directory, char* diskname, unsigned int initi
             printf("\tPrimer bloque relativo: %d\n", primer_bloque_relativo);
             printf("\tNombre archivo %s\n", name);
             directory -> cantidad_archivos += 1;
-            write_file_directory(directory, ent_ar);
+            
+            // write_file_directory(directory, ent_ar); ---> PARA GUARDAR EntAr
         }
     }
 }
