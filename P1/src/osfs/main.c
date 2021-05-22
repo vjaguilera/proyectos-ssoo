@@ -19,11 +19,19 @@ int main(int argc, char **argv)
 
     // Montar
     os_mount(nombre_disco, 1);
+    printf("[=] ------------------------\n");
     os_mbt();
+    printf("[=] ------------------------\n");
     os_ls();
-    // os_bitmap(0);
+    printf("[=] ------------------------\n");
+    os_exists("hola.txt");
+    printf("[=] ------------------------\n");
+    os_bitmap(2);
+    printf("[=] ------------------------\n");
     os_delete_partition(5); // No tiene archivos
+    printf("[=] ------------------------\n");
     os_mbt();
+    printf("[=] ------------------------\n");
 
     return 0;
 }

@@ -71,10 +71,10 @@ void set_directory_data(Directory* directory, char* diskname, unsigned int initi
     unsigned char buffer[2048];  // array of bytes, not pointers-to-bytes  => 1KB
 
     file = fopen(diskname, "r");  
-    printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
+    printf("[d] Directorio en bloque %u \n", initial);
     long int initial_2 = (long int) initial * 2048 + 1024;
     fseek(file, initial_2, SEEK_SET); 
-    printf("Posicion actual %ld %ld\n", ftell(file), initial_2);
+    // printf("Posicion actual %ld %ld\n", ftell(file), initial_2);
     // fseek(file, 1, SEEK_SET); 
 
     // if (file != NULL) {
@@ -115,10 +115,10 @@ void set_directory_data(Directory* directory, char* diskname, unsigned int initi
         directory -> entradas_archivos[entrada] = ent_ar;
 
         if (validez == 1) {
-            printf("Entrada %d:\n", entrada);
-            printf("\tPrimer byte: %d\n", validez);
-            printf("\tPrimer bloque relativo: %d\n", primer_bloque_relativo);
-            printf("\tNombre archivo %s\n", name);
+            printf("[d] Entrada %d:\n", entrada);
+            printf("[d] \tPrimer byte: %d\n", validez);
+            printf("[d] \tPrimer bloque relativo: %d\n", primer_bloque_relativo);
+            printf("[d] \tNombre archivo %s\n", name);
             directory -> cantidad_archivos += 1;
             
             // write_file_directory(directory, ent_ar); ---> PARA GUARDAR EntAr

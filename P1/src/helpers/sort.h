@@ -1,2 +1,2 @@
 void swap(int* xp, int* yp);
-void selectionSort(int arr[], int n);
+void selectionSort(unsigned int* arr, int n);

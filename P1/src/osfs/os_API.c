@@ -1,6 +1,8 @@
 #include "os_API.h"
 #include "../helpers/writeBytes.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "../helpers/sort.h"
 
 // GENERALES
@@ -35,27 +37,28 @@ void os_mount(char* diskname, int partition) {
 
 void os_bitmap(unsigned num) {
     // Revisar foro https://github.com/IIC2333/Foro-2021-1/discussions/211
-    if (num >= mbt ->lista_de_particiones[PARTICION] ->cantidad_bitmaps){
+    if (num >= mbt ->lista_de_particiones[PARTICION] -> cantidad_bitmaps + 1){
         // El input debe ser menor a la cantidad de bloques de bitmaps de la particion 
-        printf("Ingrese valor menor a %d", mbt ->lista_de_particiones[PARTICION] ->cantidad_bitmaps);
+        printf("Ingrese valor menor o igual %d\n", mbt ->lista_de_particiones[PARTICION] ->cantidad_bitmaps);
     }
     else if(num == 0){
         // Retorna toda la info del bitmap
         // Es posible que se pida el binario completo de todos los bloques de bitmap
         for (int i = 0; i < mbt -> lista_de_particiones[PARTICION] -> cantidad_bitmaps; i ++){
             int ocupado = 0;
-            char* estado_bloque;
+            char* estado_bloque = calloc(1, 1);
             int largo_bitmap = mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[i] -> cantidad_bloques;
             for (int j = 0; j < largo_bitmap; j++){
                 ocupado +=  mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[i] -> bloques[j];
-                sprintf(estado_bloque, "%d", mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> bloques[j]);
+                // sprintf(estado_bloque, "%d", mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> bloques[j]);
+                estado_bloque[0] = (char) mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> bloques[j];
             }
             int desocupado = largo_bitmap - ocupado; 
             int value = (int)strtol(estado_bloque, NULL, 2);
             // convert integer to hex string
             char hexString[32768]; // 32768 = 2048 * 8 * 8 / 4 
             sprintf(hexString, "%x", value);
-            fprintf( stderr, "%x\n", hexString);
+            fprintf( stderr, "%s\n", hexString);
             printf("Bits ocupados: %i\nBits desocupados: %i\n", ocupado, desocupado);
         }
         // fprintf( stderr, "El bitmap es %p\n", "string format", 30);
@@ -65,19 +68,21 @@ void os_bitmap(unsigned num) {
         // Se asume que lo que se quiere es la info del estado del bloque bitmap[num] de la particion actual
         // Y no el bit correspondiente a num
         int ocupado = 0;
+        num -= 1;
         int largo_bitmap = mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> cantidad_bloques;
-        char* estado_bloque;
+        char* estado_bloque = calloc(1, 1);
         for (int j = 0; j < largo_bitmap; j++){
             ocupado +=  mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> bloques[j];
-            sprintf(estado_bloque, "%d", mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> bloques[j]);
+            // sprintf(estado_bloque, "%d", mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> bloques[j]);
+            estado_bloque[0] = (char) mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> bloques[j];
         }
         // estado_bloque se espera que termine como un char "0100101"
 
         int value = (int)strtol(estado_bloque, NULL, 2);
         // convert integer to hex string
         char hexString[32768]; // 32768 = 2048 * 8 * 8 / 4 
-        sprintf(hexString, "%x", value);
-        fprintf( stderr, "%x\n", hexString);
+        sprintf(hexString, "%x", value); // ¿QUÉ HACE ESTO?
+        fprintf( stderr, "%s\n", hexString); // ¿QUÉ HACE ESTO?
         int desocupado =  largo_bitmap - ocupado; 
         printf("Bits ocupados: %i\nBits desocupados: %i\n", ocupado, desocupado);
     }
@@ -86,9 +91,21 @@ void os_bitmap(unsigned num) {
 int os_exists(char* filename) {
     printf("Vamos a revisar los archivos y buscar el %s\n", filename);
     for (int i = 0; i < 64; i++) {
-        if (directory -> entradas_archivos[i] -> nombre_archivo == filename) {
-            printf("El archivo %s existe\n", directory -> entradas_archivos[i] -> nombre_archivo); 
-            return 1;
+        if (directory -> entradas_archivos[i] -> validez == 1) {
+            int ex = 1;
+            for (int j = 0; j < strlen(filename); j ++) {
+                if (directory -> entradas_archivos[i] -> nombre_archivo[j] != filename[j]) {
+                    ex = 0;
+                    break;                
+                }
+            }
+            if (ex == 1) {
+                printf("El archivo %s existe\n", filename); 
+                return 1;
+            } else {
+                printf("El archivo %s no existe\n", filename); 
+                return 0;
+            }
         }
     }
     printf("El archivo %s no existe\n", filename);
@@ -117,7 +134,7 @@ void os_mbt() {
     printf("Particiones válidas:\n");
     for (int i = 0; i < 128; i++) {
         if (mbt -> particiones_validas[i] == 1) {
-           printf(" - %d - Bitmaps: %d\n", mbt -> lista_de_particiones[i] -> identificador_particion, mbt -> lista_de_particiones[i] -> cantidad_bitmaps); 
+           printf(" - %d - Tienen %d bitmaps\n", mbt -> lista_de_particiones[i] -> identificador_particion, mbt -> lista_de_particiones[i] -> cantidad_bitmaps); 
         }
     }
 
@@ -132,9 +149,9 @@ void os_create_partition(int id, int size) {
         return;
     }
     
-    unsigned long int* lista_id_particiones[128];
+    unsigned int* lista_id_particiones = malloc(sizeof(unsigned int) * 128);
     int cant_particiones_validas = 0;
-    int prox_part;
+    int prox_part; // SE USARÁ?
     int flag = 0;
     for (int i = 0; i < 128; i++){
 
@@ -161,7 +178,7 @@ void os_create_partition(int id, int size) {
     // caso borde de primer bloque que no parte en el bloque con id 0
     if (lista_id_particiones[0] != 0){
         if(lista_id_particiones[0] > size){
-            EntDir* entdir = entdir_init("1", id, 0, size);
+            EntDir* entdir = entdir_init('1', id, 0, size, 10); // ESE 10 DEBERIA SER EL NÚMERO DE LA ENTRADA DEL MBT ENTRE 0 Y 127
             assign_lista_de_particiones(mbt, entdir, id);
             printf("Crear particion %d de tamaño %d.\n", id, size);
             return;
@@ -182,7 +199,7 @@ void os_create_partition(int id, int size) {
                     if (j == cant_particiones_validas - 1){
                         // si no entra aca, no cabe en ningun lado
                         if (posicion_total + size <= 2097151){ // ultimo bloque posible
-                            EntDir* entdir = entdir_init("1", id, posicion_total, size);
+                            EntDir* entdir = entdir_init('1', id, posicion_total, size, 10);
                             assign_lista_de_particiones(mbt, entdir, id);
                             printf("Crear particion %d de tamaño %d.\n", id, size);
                             return;
@@ -196,7 +213,7 @@ void os_create_partition(int id, int size) {
                     unsigned long int inicio_sig_part = lista_id_particiones[j+1]; // revisar caso borde del final
                     if (inicio_sig_part - posicion_total >= size){
                         // crear la nueva particion
-                        EntDir* entdir = entdir_init("1", id, posicion_total, size);
+                        EntDir* entdir = entdir_init('1', id, posicion_total, size, 10);
                         assign_lista_de_particiones(mbt, entdir, id);
                         printf("Crear particion %d de tamaño %d.\n", id, size);
                         return;
@@ -280,7 +297,7 @@ void set_mbt() {
     MBT* _mbt = mbt_init();
     set_mbt_data(_mbt, NOMBRE_DISCO);
     mbt = _mbt;
-    printf("\tSe cargó el mbt\n");
+    printf("[*] Se cargó el mbt\n");
 };
 
 void get_bits2(unsigned int num) {
@@ -297,14 +314,14 @@ void get_bits2(unsigned int num) {
 
 void set_directory() {
     Directory* _directory = directory_init(mbt -> lista_de_particiones[PARTICION] -> identificador_directorio, mbt -> lista_de_particiones[PARTICION] -> cantidad_bitmaps);
-    printf("Bloque %d\n", _directory -> indentificador_bloque);
+    // printf("Bloque %d\n", _directory -> indentificador_bloque);
     // get_bits2(_directory -> indentificador_bloque);
-    printf("byte del bloque a buscar %ld\n", ((long int) _directory -> indentificador_bloque) * 2048 + 1024); // * 2KB dir + 1KB mbt
+    // printf("byte del bloque a buscar %ld\n", ((long int) _directory -> indentificador_bloque) * 2048 + 1024); // * 2KB dir + 1KB mbt
     // get_bits2(_directory -> indentificador_bloque * 2048 + 1024);
     // get_bits3((long int) _directory -> indentificador_bloque);
     set_directory_data(_directory, NOMBRE_DISCO, (_directory -> indentificador_bloque));
     directory = _directory;
-    printf("\tSe cargó el directorio\n");
+    printf("[*] Se cargó el directorio\n");
 }
 
 void set_bitmap() {
@@ -334,5 +351,5 @@ void set_bitmap() {
             cantidad_bloques -= 16384;
         }
     }
-    printf("\tSe cargaron los bitmaps\n");
+    printf("[*] Se cargaron los bitmaps\n");
 }
