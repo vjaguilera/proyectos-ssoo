@@ -3,10 +3,10 @@
 #include "../structs/mbt.h"
 #include "os_API.h"
 
-// https://stackoverflow.com/a/46648676
-char get_bits(char a, char no_of_bits) {
-    return a & ((no_of_bits << 1) - 1);
-}
+// // https://stackoverflow.com/a/46648676
+// char get_bits(char a, char no_of_bits) {
+//     return a & ((no_of_bits << 1) - 1);
+// }
 
 
 int main(int argc, char **argv)

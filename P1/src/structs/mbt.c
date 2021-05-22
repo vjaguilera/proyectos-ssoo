@@ -1,7 +1,9 @@
 #include "mbt.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../helpers/bitExtract.h"
+#include "../helpers/writeBytes.h"
 
 
 MBT* mbt_init() {
@@ -71,8 +73,8 @@ void set_mbt_data(MBT* mbt, char* diskname) {
         unsigned int primer_bloque = ((buffer[i + 1] << 16) | (buffer[i + 2] << 8) | (buffer[i + 3]));
         unsigned int primer_bloque2 = bitExtracted(primer_bloque, 21, 1); // der a izq
         if (primer_bloque2 != 0) {
-            // printf("%d %d %d\n", buffer[i + 1], buffer[i + 2], buffer[i + 3]);
-            // printf("%d %d\n", buffer[i], i / 8);
+            printf("%d %d %d\n", buffer[i + 1], buffer[i + 2], buffer[i + 3]);
+            printf("%d %d\n", buffer[i], i / 8);
             printf("\tPrimer bit: %d\n", validez);
             printf("\tParticion: %d\n", seven);
             printf("\tPrimer bloque 1: %d\n", primer_bloque2);
@@ -96,6 +98,7 @@ void set_mbt_data(MBT* mbt, char* diskname) {
         if (validez) {
             EntDir* entdir = entdir_init(validez, seven, primer_bloque2, cantidad_bloques2);
             assign_lista_de_particiones(mbt, entdir, seven);
+            write_partition_mbt(entdir, i / 8);
         }
     }
     printf("\n");
@@ -118,7 +121,28 @@ void mbt_clean(MBT* mbt) {
     free(mbt);
 }
 
-
+void write_partition_mbt(EntDir* ent_dir, int entrada) {
+    // Supone que el MBT tiene una entrada particion con la entrada indicada de 0 a 127
+    char bytes_array[8];
+    char primer[8];
+    unsigned int size = sizeof(ent_dir -> identificador_particion) / sizeof(int);
+    char* response = calloc(1, size);
+    char val[2];
+    sprintf(val, "%d", ent_dir -> validez);
+    strcpy(primer, val);
+    // printf("%s\n", primer);
+    get_bits(response, ent_dir -> identificador_particion);
+    // printf("%s\n", response);
+    strcat(primer, response);
+    printf("%s\n", primer);
+    // printf("*%s\n", response);
+    int largo = strlen(primer) / 8;
+    printf("Largo %d\n", largo);
+    char hexadecimal[largo];
+    binaryToHex(hexadecimal, primer);
+    bytes_array[0] = hexadecimal[0];
+    writeBytesMBT(entrada, bytes_array, 8);
+}
 
 
 
