@@ -15,7 +15,7 @@ void set_data_block(Data *data_block, char *diskname, unsigned int initial)
 
     file = fopen(diskname, "r");
 
-    lseek(fileno(file), initial, SEEK_SET);
+    fseek(file, (initial * 2048) + 1024, SEEK_SET);
     printf("Posicion actual %ld\n", ftell(file));
     // fseek(file, 1, SEEK_SET);
     if (file != NULL)

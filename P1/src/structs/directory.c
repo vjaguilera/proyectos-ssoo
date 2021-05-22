@@ -84,6 +84,38 @@ void set_directory_data(Directory *directory, char *diskname, unsigned int initi
             primer_bloque_relativo + directory->indentificador_bloque + directory->cantidad_bloques_bitmap,
             name);
         directory->entradas_archivos[entrada] = ent_ar;
+
+        // CREAR INDICE
+        // Extraer indice absoluto desde el directorio
+        FILE *file = NULL;
+        char buffer[5]; // array of bytes, to store 5 bytes of file size
+
+        // Open disk to read bytes
+        file = fopen(diskname, "r");
+        // Utilizar identificador absoluto de EntAr asociado para comenzar lectura
+        unsigned int initial = ent_ar->identificador_absoluto;
+        printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
+        // get_bits1(initial);
+        // printf("---\n");
+        fseek(file, initial, SEEK_SET);
+        printf("Posicion actual %ld\n", ftell(file));
+        // fseek(file, 1, SEEK_SET);
+        if (file != NULL)
+        {
+            // Leer 5 bytes y guardarlos en el buffer
+            fread(buffer, 1, 5, file);
+        }
+        fclose(file);
+
+        // Convert buffer to unsigned int and assign it as tamano
+        unsigned int tamano = ((buffer[i + 1] << 32) | (buffer[i + 2] << 24) | (buffer[i + 3] << 16) | (buffer[i + 4] << 8) | (buffer[i + 5]));
+        tamano = bitExtracted(tamano, 40, 1);
+
+        // Init Indice
+        Indice *indice = indice_init(tamano, ent_ar->identificador_relativo, initial);
+
+        // Assign Indice to EntAr
+        assign_indice(ent_ar, indice);
     }
 }
 

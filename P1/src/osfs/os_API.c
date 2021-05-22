@@ -98,35 +98,10 @@ que el archivo no exista y se retorna un nuevo osFile* que lo representa.*/
             {
                 printf("Archivo encontrado en el directorio \n");
 
-                // Extraer indice absoluto desde el directorio
-                FILE *file = NULL;
-                char buffer[1]; // array of bytes, to store 5 bytes of file size
-
-                // Open disk to read bytes
-                file = fopen(NOMBRE_DISCO, "r");
-                // Utilizar identificador absoluto de EntAr asociado para comenzar lectura
-                unsigned int initial = directory->entradas_archivos[i]->identificador_absoluto;
-                printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
-                // get_bits1(initial);
-                // printf("---\n");
-                fseek(file, initial, SEEK_SET);
-                printf("Posicion actual %ld\n", ftell(file));
-                // fseek(file, 1, SEEK_SET);
-                if (file != NULL)
-                {
-                    // Leer 5 bytes y guardarlos en el buffer
-                    fread(buffer, 5, 1, file);
-                }
-                fclose(file);
-
-                // Convert buffer to unsigned int and assign it as tamano
-                unsigned int tamano = (unsigned int)buffer;
-
-                // Init Indice
-                Indice *indice = indice_init(tamano, directory->entradas_archivos[i]->identificador_absoluto, initial);
-
                 // Init osFile
-                osFile *osFile = osfile_init(mode, filename, indice);
+                osFile *osFile = osfile_init(mode, filename);
+                // Assign Indice to osFile
+                assign_osfile_indice(osFile, directory->entradas_archivos[i]->indice);
                 return osFile;
             }
         }
@@ -145,7 +120,10 @@ que el archivo no exista y se retorna un nuevo osFile* que lo representa.*/
             }
         }
         // Archivo no encontrado en el directorio, se puede crear uno nuevo
-        // COMPLETAR
+
+        // Init osFile without Indice
+        osFile *osFile = osfile_init(mode, filename);
+        return osFile;
     default:
         break;
     }
@@ -167,7 +145,7 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
     // Open disk to read bytes
     file = fopen(NOMBRE_DISCO, "r");
     // Utilizar identificador absoluto de EntAr asociado para comenzar lectura
-    unsigned int initial = file_desc->indice->identificador_absoluto + 5; // Identificador absoluto + 5 bytes de tamano de archivo
+    unsigned int initial = (file_desc->indice->identificador_absoluto * 2048 + 1024) + 5; // Identificador absoluto + 5 bytes de tamano de archivo
     printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
     // get_bits1(initial);
     // printf("---\n");
@@ -183,7 +161,7 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
     // Iterar por los Bytes de Buffer generando struct Datas y Asignandolas al Indice
     // Comenzando desde el last read byte
     int x = 681;
-    // Last readed byte
+    // Last read byte
     unsigned int LRB = file_desc->indice->last_read_byte;
     // Get starting point to read from the buffer
     int starting_point = (int)(LRB / 2048); // Math floor of LRB and 2KB from Data Block
