@@ -3,12 +3,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-EntDir* entdir_init(char validez, int identificador_particion, unsigned int identificador_directorio, unsigned int cantidad_bloques_particion) {
+EntDir* entdir_init(char validez, int identificador_particion, unsigned int identificador_directorio, unsigned int cantidad_bloques_particion, int entrada) {
     EntDir* entdir = malloc(sizeof(EntDir));
     entdir -> validez = (int) validez;
     entdir -> identificador_particion = identificador_particion;
     entdir -> identificador_directorio = identificador_directorio;
     entdir -> cantidad_bloques_particion = cantidad_bloques_particion;
+    entdir -> entrada = entrada;
     int cantidad_bitmaps = cantidad_bloques_particion / 16384; // 2kb = 2048 x 8 bytes
     if (cantidad_bitmaps * 16384 < cantidad_bloques_particion) {
         cantidad_bitmaps += 1;
