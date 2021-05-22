@@ -1,5 +1,9 @@
 #include "indice.h"
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include "../helpers/writeBytes.h"
+#include "../helpers/bitExtract.h"
 
 Indice *indice_init(unsigned int tamano, unsigned int identificador_relativo, unsigned int identificador_absoluto)
 {
@@ -28,3 +32,47 @@ void indice_clean(Indice *indice)
     free(indice->lista_de_datos);
     free(indice);
 };
+
+void write_indice(Indice *indice)
+{
+    unsigned char bytes_array[2048];
+    unsigned int size;
+    char *response;
+    // Primeros 5 bytes tamaño archivo
+    int j = indice->tamano;
+    size = 1;
+    while (j > 255)
+    {
+        size += 1;
+        j /= 255;
+    }
+    response = calloc(1, size);
+    get_bits(response, indice->tamano, 0);
+    while (size < 5)
+    {
+        bytes_array[0 + 4 - size] = 0;
+        size += 1;
+    }
+    int arraySize = strlen(response);
+    int i = 0;
+    char subset[8];
+    while (i * 8 < arraySize)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            subset[j] = response[arraySize - (i + 1) * 8 + j];
+        }
+        i += 1;
+        bytes_array[0 + size - i] = binarioADecimal(subset, 8);
+        for (int i = 0; i < 8; i++)
+        {
+            subset[i] = 0;
+        }
+    }
+    printf("-- %d %d %d %d %d\n", bytes_array[0], bytes_array[1], bytes_array[2], bytes_array[3], bytes_array[4]);
+
+    // PUNTEROS
+    // Guardar punteros
+
+    writeBytes(indice->identificador_absoluto, 0, bytes_array, 2048);
+}
