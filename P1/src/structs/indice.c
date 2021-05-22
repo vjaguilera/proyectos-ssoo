@@ -63,5 +63,14 @@ void write_indice(Indice* indice) {
     // PUNTEROS
     // Guardar punteros
 
+    for (i = 0; i < indice -> cantidad_bloques; i++) {
+        // indice -> lista_de_punteros[i]
+        // Obtener 3 bytes para cada numero
+        int numeros[3];
+        bytes_array[5 + i * 3 + 0] = numeros[0];
+        bytes_array[5 + i * 3 + 1] = numeros[1];
+        bytes_array[5 + i * 3 + 2] = numeros[2];
+    }
+
     writeBytes(indice -> identificador_absoluto, 0, bytes_array, 2048);
 }

@@ -264,6 +264,7 @@ int os_write(osFile* file_desc, void* buffer, int nbytes) {
 };
 
 int os_close(osFile* file_desc) {
+    // write_data(Data* data) ---> Guarda la información de Data en su bloque correspondiente
     return 0;
 };
 

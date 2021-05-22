@@ -7,6 +7,7 @@ typedef struct indice {
     Data** lista_de_datos; // lista con numeros de bloques
     unsigned int identificador_relativo;
     unsigned int identificador_absoluto;
+    int* lista_de_punteros;
 } Indice;
 
 
@@ -17,3 +18,5 @@ Indice* indice_init(unsigned int tamano, unsigned int identificador_relativo, un
 void assing_data_list(Indice* indice, Data* data, int index);
 
 void indice_clean(Indice* indice);
+
+void write_indice(Indice* indice);
