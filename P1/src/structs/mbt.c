@@ -123,25 +123,75 @@ void mbt_clean(MBT* mbt) {
 
 void write_partition_mbt(EntDir* ent_dir, int entrada) {
     // Supone que el MBT tiene una entrada particion con la entrada indicada de 0 a 127
-    char bytes_array[8];
+    unsigned char bytes_array[8];
+    // Primer byte
     char primer[8];
     unsigned int size = sizeof(ent_dir -> identificador_particion) / sizeof(int);
     char* response = calloc(1, size);
     char val[2];
     sprintf(val, "%d", ent_dir -> validez);
     strcpy(primer, val);
-    // printf("%s\n", primer);
-    get_bits(response, ent_dir -> identificador_particion);
-    // printf("%s\n", response);
+    get_bits(response, ent_dir -> identificador_particion, -1);
     strcat(primer, response);
-    printf("%s\n", primer);
-    // printf("*%s\n", response);
-    int largo = strlen(primer) / 8;
-    printf("Largo %d\n", largo);
-    char hexadecimal[largo];
-    binaryToHex(hexadecimal, primer);
-    bytes_array[0] = hexadecimal[0];
-    writeBytesMBT(entrada, bytes_array, 8);
+    unsigned int nume = binarioADecimal(primer, sizeof(primer) / sizeof(char));
+    unsigned char numero = (unsigned char) nume;
+    bytes_array[0] = numero;
+
+    // IDENTIFICADOR DIRECTORIO
+    int j = ent_dir -> identificador_directorio;
+    size = 1;
+    while (j > 255) {
+        size += 1;
+        j /= 255;
+    }
+    response = calloc(1, size);
+    get_bits(response, ent_dir -> identificador_directorio, 0);
+    while (size < 3) {
+        bytes_array[1 + 2 - size] = 0;
+        size += 1;
+    }
+    int arraySize = strlen(response);
+    int i = 0;
+    char subset[8];
+    while (i * 8 < arraySize) {
+        for (int j = 0; j < 8; j++) {
+            subset[j] = response[arraySize - (i + 1) * 8 + j];
+        }
+        i += 1;
+        bytes_array[1 + size - i] = binarioADecimal(subset, 8);
+        for (int i = 0; i < 8; i++) {
+            subset[i] = 0;
+        }
+    }
+    printf("-- %d %d %d %d \n", bytes_array[0], bytes_array[1], bytes_array[2], bytes_array[3]);
+
+    // TAMAÑO PARTICION
+    j = ent_dir -> cantidad_bloques_particion;
+    size = 1;
+    while (j > 255) {
+        size += 1;
+        j /= 255;
+    }
+    response = calloc(1, size);
+    get_bits(response, ent_dir -> cantidad_bloques_particion, 0);
+    while (size < 4) {
+        bytes_array[5 + 2 - size] = 0;
+        size += 1;
+    }
+    arraySize = strlen(response);
+    i = 0;
+    while (i * 8 < arraySize) {
+        for (int j = 0; j < 8; j++) {
+            subset[j] = response[arraySize - (i + 1) * 8 + j];
+        }
+        i += 1;
+        bytes_array[4 + size - i] = binarioADecimal(subset, 8);
+        for (int i = 0; i < 8; i++) {
+            subset[i] = 0;
+        }
+    }
+    printf("-- %d %d %d %d \n", bytes_array[4], bytes_array[5], bytes_array[6], bytes_array[7]);
+    writeBytesMBT(entrada * 8, bytes_array, 8);
 }
 
 
