@@ -2,7 +2,7 @@
 #include "ent_ar.h"
 
 typedef struct directory {
-    unsigned long int indentificador_bloque;
+    unsigned int indentificador_bloque;
     EntAr** entradas_archivos;
     int cantidad_archivos;
     int cantidad_bloques_bitmap;
@@ -10,9 +10,9 @@ typedef struct directory {
 
 // FUNCTIONS
 
-Directory* directory_init(unsigned long int indentificador_bloque, int cantidad_bloques_bitmap);
+Directory* directory_init(unsigned int indentificador_bloque, int cantidad_bloques_bitmap);
 
-void set_directory_data(Directory* directory, char* diskname, long int initial);
+void set_directory_data(Directory* directory, char* diskname, unsigned int initial);
 
 void directory_clean(Directory* directory);
 
