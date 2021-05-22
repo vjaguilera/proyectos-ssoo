@@ -24,7 +24,7 @@ void os_mount(char* diskname, int partition) {
     // - edito el primer byte y le pongo un 129 -> particion válida de id 1
     // - directorio en 200 y tamaño particion 9000
 
-    // char bytes_to_modify[13] = "\x01\x00\x03\xE8\x68\x6f\x6c\x61\x2e\x74\x78\x74\x00";
+    // unsigned char bytes_to_modify[13] = "\x01\x00\x03\xE8\x68\x6f\x6c\x61\x2e\x74\x78\x74\x00";
     // writeBytes(200, 32, bytes_to_modify, 13);
     // - edito el bloque con id 200 y escribo a partir
     // - del byte 32, es decir, la segunda entrada de archivos
@@ -50,7 +50,12 @@ void os_ls() {
         printf("Archivos válidos: %d\n", directory -> cantidad_archivos);
         for (int i = 0; i < 64; i++) {
             if (directory -> entradas_archivos[i] -> validez == 1) {
-                printf(" %d.- Id. %d Nombre: %s\n", i, directory -> entradas_archivos[i]->identificador_relativo, directory -> entradas_archivos[i] -> nombre_archivo); 
+                printf(" %d.- Indice: %d Nombre: ", i, directory -> entradas_archivos[i]->identificador_relativo); 
+                for (int j = 0; j < 28; j ++) {
+                    EntAr* entar =  directory -> entradas_archivos[i];
+                    printf("%c", entar -> nombre_archivo[j]);
+                }
+                printf("\n");
             }
         }
     }

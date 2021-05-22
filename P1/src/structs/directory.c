@@ -1,5 +1,6 @@
 #include "directory.h"
 #include "../helpers/bitExtract.h"
+#include "../helpers/writeBytes.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -16,16 +17,53 @@ Directory* directory_init(unsigned int indentificador_bloque, int cantidad_bloqu
     return directory;
 };
 
-void get_bits1(int num) {
-    int i=0;
-    unsigned int size = sizeof(int);
-    unsigned int maxPow = 1<<(size*8-1);
-    for(;i<size*8;++i){
-        // print last bit and shift left.
-        printf("%u",num&maxPow ? 1 : 0);
-        num = num<<1;
+void write_file_directory(Directory* directory, EntAr* ent_ar) {
+    // Supone que el MBT tiene una entrada particion con la entrada indicada de 0 a 127
+    unsigned char bytes_array[32];
+    unsigned int size;
+    char* response;
+    // Primer byte
+    unsigned int nume = ent_ar -> validez;
+    unsigned char numero = (unsigned char) nume;
+    bytes_array[0] = numero;
+
+    // POSICION RELATIVA INDICE
+    int j = ent_ar -> identificador_relativo;
+    size = 1;
+    while (j > 255) {
+        size += 1;
+        j /= 255;
     }
-    printf("\n");
+    response = calloc(1, size);
+    get_bits(response, ent_ar -> identificador_relativo, 0);
+    while (size < 3) {
+        bytes_array[1 + 2 - size] = 0;
+        size += 1;
+    }
+    int arraySize = strlen(response);
+    int i = 0;
+    char subset[8];
+    while (i * 8 < arraySize) {
+        for (int j = 0; j < 8; j++) {
+            subset[j] = response[arraySize - (i + 1) * 8 + j];
+        }
+        i += 1;
+        bytes_array[1 + size - i] = binarioADecimal(subset, 8);
+        for (int i = 0; i < 8; i++) {
+            subset[i] = 0;
+        }
+    }
+    printf("-- %d %d %d %d \n", bytes_array[0], bytes_array[1], bytes_array[2], bytes_array[3]);
+
+    // NOMBRE
+    arraySize = 28;
+    i = 0;
+    for (i = 0; i < arraySize; i++) {
+        bytes_array[4 + i] = ent_ar -> nombre_archivo[i];
+    }
+    printf("-- %d %d %d %d \n", bytes_array[4], bytes_array[5], bytes_array[6], bytes_array[7]);
+    printf("-- %c %c %c %c \n", bytes_array[4], bytes_array[5], bytes_array[6], bytes_array[7]);
+    writeBytes(directory -> indentificador_bloque, ent_ar -> entrada * 32, bytes_array, 32);
 }
 
 void set_directory_data(Directory* directory, char* diskname, unsigned int initial) {
@@ -34,7 +72,6 @@ void set_directory_data(Directory* directory, char* diskname, unsigned int initi
 
     file = fopen(diskname, "r");  
     printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
-    // get_bits1(initial);
     long int initial_2 = (long int) initial * 2048 + 1024;
     fseek(file, initial_2, SEEK_SET); 
     printf("Posicion actual %ld %ld\n", ftell(file), initial_2);
@@ -73,7 +110,8 @@ void set_directory_data(Directory* directory, char* diskname, unsigned int initi
             validez,
             primer_bloque_relativo,
             primer_bloque_relativo + directory -> indentificador_bloque + directory ->cantidad_bloques_bitmap,
-            name
+            name,
+            entrada
         );
         directory -> entradas_archivos[entrada] = ent_ar;
 
@@ -82,8 +120,8 @@ void set_directory_data(Directory* directory, char* diskname, unsigned int initi
             printf("\tPrimer byte: %d\n", validez);
             printf("\tPrimer bloque relativo: %d\n", primer_bloque_relativo);
             printf("\tNombre archivo %s\n", name);
-            printf("\t%d %s %s\n", entrada, name, ent_ar -> nombre_archivo);
             directory -> cantidad_archivos += 1;
+            write_file_directory(directory, ent_ar);
         }
     }
 }
@@ -96,5 +134,3 @@ void directory_clean(Directory* directory) {
     free(directory -> entradas_archivos);
     free(directory);
 };
-
-

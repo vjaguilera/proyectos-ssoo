@@ -73,8 +73,8 @@ void set_mbt_data(MBT* mbt, char* diskname) {
         unsigned int primer_bloque = ((buffer[i + 1] << 16) | (buffer[i + 2] << 8) | (buffer[i + 3]));
         unsigned int primer_bloque2 = bitExtracted(primer_bloque, 21, 1); // der a izq
         if (primer_bloque2 != 0) {
-            printf("%d %d %d\n", buffer[i + 1], buffer[i + 2], buffer[i + 3]);
-            printf("%d %d\n", buffer[i], i / 8);
+            // printf("%d %d %d\n", buffer[i + 1], buffer[i + 2], buffer[i + 3]);
+            // printf("%d %d\n", buffer[i], i / 8);
             printf("\tPrimer bit: %d\n", validez);
             printf("\tParticion: %d\n", seven);
             printf("\tPrimer bloque 1: %d\n", primer_bloque2);
@@ -96,9 +96,9 @@ void set_mbt_data(MBT* mbt, char* diskname) {
             // printf("\tCantidad bloques G 8: %d\n", cantidad_bloques2);
         // }
         if (validez) {
-            EntDir* entdir = entdir_init(validez, seven, primer_bloque2, cantidad_bloques2);
+            EntDir* entdir = entdir_init(validez, seven, primer_bloque2, cantidad_bloques2, i / 8);
             assign_lista_de_particiones(mbt, entdir, seven);
-            write_partition_mbt(entdir, i / 8);
+            write_partition_mbt(entdir);
         }
     }
     printf("\n");
@@ -121,7 +121,7 @@ void mbt_clean(MBT* mbt) {
     free(mbt);
 }
 
-void write_partition_mbt(EntDir* ent_dir, int entrada) {
+void write_partition_mbt(EntDir* ent_dir) {
     // Supone que el MBT tiene una entrada particion con la entrada indicada de 0 a 127
     unsigned char bytes_array[8];
     // Primer byte
@@ -191,7 +191,7 @@ void write_partition_mbt(EntDir* ent_dir, int entrada) {
         }
     }
     printf("-- %d %d %d %d \n", bytes_array[4], bytes_array[5], bytes_array[6], bytes_array[7]);
-    writeBytesMBT(entrada * 8, bytes_array, 8);
+    writeBytesMBT(ent_dir -> entrada * 8, bytes_array, 8);
 }
 
 

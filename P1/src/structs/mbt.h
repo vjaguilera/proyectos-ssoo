@@ -14,4 +14,4 @@ void assign_lista_de_particiones(MBT* mbt, EntDir* entdir, int k);
 
 void mbt_clean(MBT* mbt);
 
-void write_partition_mbt(EntDir* ent_dir, int entrada);
+void write_partition_mbt(EntDir* ent_dir);
