@@ -186,20 +186,7 @@ void set_directory_data(Directory *directory, char *diskname, unsigned int initi
             // write_indice(indice); //  ---> PARA GUARDAR INDICE
 
             if (validez == 1) {
-                printf("[E] Ejemplo lectura DATA\n");
-                // file = fopen(diskname, "r");
-                // // Utilizar identificador absoluto de EntAr asociado para comenzar lectura
-                // unsigned int initial = (directory -> indentificador_bloque + indice -> lista_de_punteros[0]) * 2048 + 1024;
-                // printf("[E] \tData en bloque %u\n", (directory -> indentificador_bloque + indice -> lista_de_punteros[0]));
-
-                // fseek(file, initial, SEEK_SET);
-
-                // if (file != NULL)
-                // {
-                //     // Leer 5 bytes y guardarlos en el buffer
-                //     fread(buffer_data, 1, 40, file);
-                // }
-                // fclose(file);
+                printf("[E] Ejemplo lectura DATA %d\n", directory -> indentificador_bloque + indice -> lista_de_punteros[0]);
                 Data* data_ejemplo = data_init((directory -> indentificador_bloque + indice -> lista_de_punteros[0]));
                 set_data_block(data_ejemplo, diskname, directory -> indentificador_bloque + indice -> lista_de_punteros[0]);
                 printf("[E]\t");
@@ -208,11 +195,13 @@ void set_directory_data(Directory *directory, char *diskname, unsigned int initi
                 }
                 printf("\n");
                 
+                // Esto para guardar
                 char buffer_data[20] = "hola como estas juan";
-                for (int k = 0; i < 20; i++) {
+                for (int k = 0; k < 20; k++) {
                     data_ejemplo->byte_array[k] = buffer_data[k];
                 }
-                write_data(data_ejemplo);
+
+                // write_data(data_ejemplo); // ---> PARA GUARDAR Data
             }
         }
 
