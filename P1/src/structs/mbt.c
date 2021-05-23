@@ -130,6 +130,7 @@ void mbt_clean(MBT *mbt)
 
 void write_partition_mbt(EntDir *ent_dir)
 {
+    printf("[g] Guardar MBT\n");
     // Supone que el MBT tiene una entrada particion con la entrada indicada de 0 a 127
     unsigned char bytes_array[8];
     // Primer byte

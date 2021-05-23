@@ -40,6 +40,12 @@ void os_mount(char *diskname, int partition)
     // unsigned char bytes_to_modify[5] = "\x00\x00\x00\x00\x1E";
     // writeBytes(1202, 0, bytes_to_modify, 5);
     // - Edito el tamaño del indice en 1202
+    // - 1202 = 200 (inicial) + 1000 (relativo)
+
+    // unsigned char bytes_to_modify[20] = "\x68\x6f\x6c\x61\x20\x6d\x65\x20\x6c\x6c\x61\x6d\x6f\x20\x63\x61\x72\x6c\x6f\x73";
+    // writeBytes(2200, 0, bytes_to_modify, 20);
+    // - Edito el bloque 2200 con 20 bytes de texto
+    // - 2200 = 200 (inicial) + 2000 (relativo)
 };
 
 void os_bitmap(unsigned num)
@@ -104,7 +110,7 @@ void os_bitmap(unsigned num)
 
 int os_exists(char *filename)
 {
-    printf("Vamos a revisar los archivos y buscar el %s\n", filename);
+    // printf("Vamos a revisar los archivos y buscar el %s\n", filename);
     for (int i = 0; i < 64; i++)
     {
         if (directory->entradas_archivos[i]->validez == 1)
@@ -365,7 +371,7 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
     file = fopen(NOMBRE_DISCO, "r");
     // Utilizar identificador absoluto de EntAr asociado para comenzar lectura
     unsigned int initial = (file_desc->indice->identificador_absoluto * 2048 + 1024) + 5; // Identificador absoluto + 5 bytes de tamano de archivo
-    printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
+    printf("Iniciar en bloque %u\n", file_desc->indice->identificador_absoluto);
     // get_bits1(initial);
     // printf("---\n");
     fseek(file, initial, SEEK_SET);
@@ -374,7 +380,7 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
     if (file != NULL)
     {
         // Leer de 1 byte y guardar 2043 de estos en el buffer
-        fread(buffer, 1, 2043, file);
+        fread(data_buffer, 1, 2043, file);
     }
 
     // Iterar por los Bytes de Buffer generando struct Datas y Asignandolas al Indice

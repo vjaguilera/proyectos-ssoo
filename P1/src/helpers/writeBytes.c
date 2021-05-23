@@ -13,10 +13,10 @@ void set_disk_name(char* diskname) {
 void writeBytes(int bloque_inicial, int numero_byte_inicial, unsigned char* bytes_array, int cantidad) {
     FILE* file_write = fopen(DISKNAME, "r+");  
     int position = 1024 + bloque_inicial * 2048 + numero_byte_inicial;
-    printf("Set position %d %d\n", position, cantidad);
+    printf("[c] Set position %d %d\n", position, cantidad);
     if (file_write != NULL) {
-        // fseek(file_write, position, SEEK_SET);         // ---> PARA ESCRIBIR
-        // fwrite(bytes_array, cantidad, 1, file_write);  // ---> PARA ESCRIBIR
+        fseek(file_write, position, SEEK_SET);         // ---> PARA ESCRIBIR
+        fwrite(bytes_array, cantidad, 1, file_write);  // ---> PARA ESCRIBIR
         fclose(file_write);
     } else {
         perror("fopen");
@@ -26,7 +26,7 @@ void writeBytes(int bloque_inicial, int numero_byte_inicial, unsigned char* byte
 void writeBytesMBT(int numero_byte_inicial, unsigned char* bytes_array, int cantidad) {
     FILE* file_write = fopen(DISKNAME, "r+");  
     int position = numero_byte_inicial;
-    printf("Set position MBT %d %d %s\n", position, cantidad, DISKNAME);
+    printf("[c] Set position MBT %d %d %s\n", position, cantidad, DISKNAME);
     if (file_write != NULL) {
         // fseek(file_write, position, SEEK_SET);         //  ---> PARA ESCRIBIR
         // fwrite(bytes_array, cantidad, 1, file_write);  // ---> PARA ESCRIBIR
