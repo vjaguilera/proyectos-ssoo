@@ -71,13 +71,14 @@ void write_file_directory(Directory *directory, EntAr *ent_ar)
     }
     printf("-- %d %d %d %d \n", bytes_array[4], bytes_array[5], bytes_array[6], bytes_array[7]);
     printf("-- %c %c %c %c \n", bytes_array[4], bytes_array[5], bytes_array[6], bytes_array[7]);
-    writeBytes(directory->indentificador_bloque, ent_ar->entrada * 32, bytes_array, 32);
+    // writeBytes(directory->indentificador_bloque, ent_ar->entrada * 32, bytes_array, 32);
 }
 
 void set_directory_data(Directory *directory, char *diskname, unsigned int initial)
 {
     FILE *file = NULL;
     unsigned char buffer[2048]; // array of bytes, not pointers-to-bytes  => 1KB
+    unsigned char buffer_pointer[3]; // array of bytes
 
     file = fopen(diskname, "r");
     printf("[d] Directorio en bloque %u \n", initial);
@@ -133,40 +134,58 @@ void set_directory_data(Directory *directory, char *diskname, unsigned int initi
             printf("[d] \tNombre archivo %s\n", name);
             directory->cantidad_archivos += 1;
 
-            // write_file_directory(directory, ent_ar); ---> PARA GUARDAR EntAr
+            // CREAR INDICE
+            // Extraer indice absoluto desde el directorio
+            FILE *file = NULL;
+            char buffer[5]; // array of bytes, to store 5 bytes of file size
+
+            // Open disk to read bytes
+            file = fopen(diskname, "r");
+            // Utilizar identificador absoluto de EntAr asociado para comenzar lectura
+            unsigned int initial = ent_ar->identificador_absoluto;
+            printf("[d] \tIndice en bloque %u\n", initial);
+            // get_bits1(initial);
+            // printf("---\n");
+            fseek(file, initial, SEEK_SET);
+            // fseek(file, 1, SEEK_SET);
+            if (file != NULL)
+            {
+                // Leer 5 bytes y guardarlos en el buffer
+                fread(buffer, 1, 5, file);
+            }
+
+            // Convert buffer to unsigned int and assign it as tamano
+            unsigned long int tamano = (((unsigned long int)buffer[i + 1] << 32) | ((unsigned long int)buffer[i + 2] << 24) | ((unsigned long int)buffer[i + 3] << 16) | ((unsigned long int)buffer[i + 4] << 8) | ((unsigned long int)buffer[i + 5]));
+            printf("[d] \tTamaño %lu\n", tamano);
+
+            // Init Indice
+            Indice *indice = indice_init(tamano, ent_ar->identificador_relativo, initial);
+
+            // Assign pointers
+            unsigned int pointer;
+            for (int index = 0; index < 681; index++)
+            {
+                if (file != NULL)
+                {
+                    // Leer 3 bytes y guardarlos en el buffer
+                    fread(buffer_pointer, 1, 3, file);
+                    pointer = ((buffer_pointer[0] << 16) | (buffer_pointer[1] << 8) | (buffer_pointer[2]));
+                    if (pointer != 0) {
+                        printf("%d Pointer %d\n", index, pointer);
+                    }
+                    assign_pointer(indice, pointer, index);
+                }
+            }
+
+            fclose(file);
+
+            // Assign Indice to EntAr
+            assign_indice(ent_ar, indice);
+
+            write_indice(indice); //  ---> PARA GUARDAR INDICE
         }
 
-        // CREAR INDICE
-        // Extraer indice absoluto desde el directorio
-        FILE *file = NULL;
-        char buffer[5]; // array of bytes, to store 5 bytes of file size
-
-        // Open disk to read bytes
-        file = fopen(diskname, "r");
-        // Utilizar identificador absoluto de EntAr asociado para comenzar lectura
-        unsigned int initial = ent_ar->identificador_absoluto;
-        printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
-        // get_bits1(initial);
-        // printf("---\n");
-        fseek(file, initial, SEEK_SET);
-        printf("Posicion actual %ld\n", ftell(file));
-        // fseek(file, 1, SEEK_SET);
-        if (file != NULL)
-        {
-            // Leer 5 bytes y guardarlos en el buffer
-            fread(buffer, 1, 5, file);
-        }
-        fclose(file);
-
-        // Convert buffer to unsigned int and assign it as tamano
-        unsigned int tamano = ((buffer[i + 1] << 32) | (buffer[i + 2] << 24) | (buffer[i + 3] << 16) | (buffer[i + 4] << 8) | (buffer[i + 5]));
-        tamano = bitExtracted(tamano, 40, 1);
-
-        // Init Indice
-        Indice *indice = indice_init(tamano, ent_ar->identificador_relativo, initial);
-
-        // Assign Indice to EntAr
-        assign_indice(ent_ar, indice);
+        // write_file_directory(directory, ent_ar); ---> PARA GUARDAR EntAr
     }
 }
 

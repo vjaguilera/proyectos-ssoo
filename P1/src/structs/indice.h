@@ -14,9 +14,11 @@ typedef struct indice
 
 // FUNCTIONS
 
-Indice *indice_init(unsigned int tamano, unsigned int identificador_relativo, unsigned int identificador_absoluto);
+Indice *indice_init(unsigned long int tamano, unsigned int identificador_relativo, unsigned int identificador_absoluto);
 
 void assing_data_list(Indice *indice, Data *data, int index);
+
+void assign_pointer(Indice *indice, int pointer, int index);
 
 void indice_clean(Indice* indice);
 

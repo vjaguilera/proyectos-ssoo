@@ -1,10 +1,11 @@
-#include "os_API.h"
-#include "../helpers/writeBytes.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../helpers/sort.h"
+#include "os_API.h"
 #include "../structs/osFile.h"
+#include "../helpers/sort.h"
+#include "../helpers/writeBytes.h"
+#include "../helpers/bitExtract.h"
 
 // GENERALES
 
@@ -35,6 +36,10 @@ void os_mount(char *diskname, int partition)
     // - edito el bloque con id 200 y escribo a partir
     // - del byte 32, es decir, la segunda entrada de archivos
     // - archivo valido, indice en bloque 1000 nombre hola.txt
+
+    // unsigned char bytes_to_modify[5] = "\x00\x00\x00\x00\x1E";
+    // writeBytes(1202, 0, bytes_to_modify, 5);
+    // - Edito el tamaño del indice en 1202
 };
 
 void os_bitmap(unsigned num)
@@ -374,7 +379,7 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
 
     // Iterar por los Bytes de Buffer generando struct Datas y Asignandolas al Indice
     // Comenzando desde el last read byte
-    int x = 681;
+    int x = 681; // SE USARÁ?
     // Last read byte
     unsigned int LRB = file_desc->indice->last_read_byte;
     // Get starting point to read from the buffer
@@ -399,7 +404,7 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
         identificador_bloque_datos = bitExtracted(identificador_bloque_datos, 24, 1);
 
         // Inicializar Bloque de Datos y asignarlo al indice
-        Data *data_block = data_init();
+        Data *data_block = data_init(identificador_bloque_datos);
         // Assign 2048 bytes to data byte array
         set_data_block(data_block, NOMBRE_DISCO, identificador_bloque_datos);
         // Asignar bloque de datos al indice

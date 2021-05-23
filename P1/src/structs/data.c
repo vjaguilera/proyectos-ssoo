@@ -48,7 +48,11 @@ void data_clean(Data *data)
 
 void write_data(Data* data) {
     unsigned int size = sizeof(data -> byte_array);
-    
+    unsigned char bytes_array[size];
     printf("Guardar %d bytes de data\n", size);
-    writeBytes(data -> identificador_absoluto, 0, data -> byte_array, size);
+    for (int i = 0; i < size; i++)
+    {
+        bytes_array[i] = (unsigned char) data->byte_array[i];
+    }
+    // writeBytes(data -> identificador_absoluto, 0, bytes_array, size);
 }
