@@ -15,8 +15,8 @@ void writeBytes(int bloque_inicial, int numero_byte_inicial, unsigned char* byte
     int position = 1024 + bloque_inicial * 2048 + numero_byte_inicial;
     printf("[c] Set position %d %d\n", position, cantidad);
     if (file_write != NULL) {
-        fseek(file_write, position, SEEK_SET);         // ---> PARA ESCRIBIR
-        fwrite(bytes_array, cantidad, 1, file_write);  // ---> PARA ESCRIBIR
+        // fseek(file_write, position, SEEK_SET);         // ---> PARA ESCRIBIR
+        // fwrite(bytes_array, cantidad, 1, file_write);  // ---> PARA ESCRIBIR
         fclose(file_write);
     } else {
         perror("fopen");

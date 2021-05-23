@@ -12,6 +12,8 @@ typedef struct directory {
 
 Directory* directory_init(unsigned int indentificador_bloque, int cantidad_bloques_bitmap);
 
+void write_file_directory(Directory *directory, EntAr *ent_ar);
+
 void set_directory_data(Directory* directory, char* diskname, unsigned int initial);
 
 void directory_clean(Directory* directory);

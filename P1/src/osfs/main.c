@@ -18,13 +18,13 @@ int main(int argc, char **argv)
     // printf("Directorio particion 8 = %ld\n", mbt -> lista_de_particiones[8] -> identificador_directorio);
 
     // Montar
-    os_mount(nombre_disco, 1);
+    os_mount(nombre_disco, 2);
     printf("[=] ------------------------\n");
     os_mbt();
     printf("[=] ------------------------\n");
     os_ls();
     printf("[=] ------------------------\n");
-    os_exists("hola.txt");
+    os_exists("nene.txt");
     printf("[=] ------------------------\n");
     os_bitmap(2);
     printf("[=] ------------------------\n");

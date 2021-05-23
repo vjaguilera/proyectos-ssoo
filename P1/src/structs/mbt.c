@@ -73,14 +73,6 @@ void set_mbt_data(MBT *mbt, char *diskname)
         // printf("%d %d %d\n", buffer[i + 1], buffer[i + 2], buffer[i + 3]);
         unsigned int primer_bloque = ((buffer[i + 1] << 16) | (buffer[i + 2] << 8) | (buffer[i + 3]));
         unsigned int primer_bloque2 = bitExtracted(primer_bloque, 21, 1); // der a izq
-        if (primer_bloque2 != 0)
-        {
-            // printf("%d %d %d\n", buffer[i + 1], buffer[i + 2], buffer[i + 3]);
-            printf("[m] Entrada %d\n", i / 8);
-            printf("[m] \tPrimer bit: %d\n", validez);
-            printf("[m] \tParticion: %d\n", seven);
-            printf("[m] \tPrimer bloque 1: %d\n", primer_bloque2);
-        }
         // primer_bloque2 = bitExtracted(primer_bloque, 21, 4); // izq a derecha
         // if (primer_bloque2 != 0) {
         // printf("\tPrimer bloque 4: %d\n", primer_bloque2);
@@ -90,8 +82,14 @@ void set_mbt_data(MBT *mbt, char *diskname)
         // unsigned int cantidad_bloquesl = ((buffer[i + 4] << 16) | (buffer[i + 5] << 8) | buffer[i + 6]);
         unsigned int cantidad_bloquesg = ((buffer[i + 4] << 24) | (buffer[i + 5] << 16) | (buffer[i + 6] << 8) | buffer[i + 7]);
         unsigned cantidad_bloques2 = bitExtracted(cantidad_bloquesg, 17, 1); // der a izq 131.072 limite
-        if (cantidad_bloques2 != 0)
+
+        if (validez == 1)
         {
+            // printf("%d %d %d\n", buffer[i + 1], buffer[i + 2], buffer[i + 3]);
+            printf("[m] Entrada %d\n", i / 8);
+            printf("[m] \tPrimer bit: %d\n", validez);
+            printf("[m] \tParticion: %d\n", seven);
+            printf("[m] \tPrimer bloque 1: %d\n", primer_bloque2);
             printf("\tCantidad bloques G 1: %d\n", cantidad_bloques2);
         }
         // cantidad_bloques2 = bitExtracted(cantidad_bloquesg, 17, 8); // izq a der 131.072 limite

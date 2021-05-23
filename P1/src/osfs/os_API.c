@@ -21,6 +21,7 @@ void os_mount(char *diskname, int partition)
     PARTICION = partition;
     set_disk_name(diskname); // para escritura
     set_mbt();
+    printf("[*] Se asigna partición %d\n", partition);
     if (mbt->particiones_validas[partition] == 1)
     {
         set_directory();

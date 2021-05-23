@@ -18,63 +18,6 @@ Directory *directory_init(unsigned int indentificador_bloque, int cantidad_bloqu
     return directory;
 };
 
-void write_file_directory(Directory *directory, EntAr *ent_ar)
-{
-    printf("[g] Guardar directorio\n");
-    // Supone que el MBT tiene una entrada particion con la entrada indicada de 0 a 127
-    unsigned char bytes_array[32];
-    unsigned int size;
-    char *response;
-    // Primer byte
-    unsigned int nume = ent_ar->validez;
-    unsigned char numero = (unsigned char)nume;
-    bytes_array[0] = numero;
-
-    // POSICION RELATIVA INDICE
-    int j = ent_ar->identificador_relativo;
-    size = 1;
-    while (j > 255)
-    {
-        size += 1;
-        j /= 255;
-    }
-    response = calloc(1, size);
-    get_bits(response, ent_ar->identificador_relativo, 0);
-    while (size < 3)
-    {
-        bytes_array[1 + 2 - size] = 0;
-        size += 1;
-    }
-    int arraySize = strlen(response);
-    int i = 0;
-    char subset[8];
-    while (i * 8 < arraySize)
-    {
-        for (int j = 0; j < 8; j++)
-        {
-            subset[j] = response[arraySize - (i + 1) * 8 + j];
-        }
-        i += 1;
-        bytes_array[1 + size - i] = binarioADecimal(subset, 8);
-        for (int i = 0; i < 8; i++)
-        {
-            subset[i] = 0;
-        }
-    }
-    printf("-- %d %d %d %d \n", bytes_array[0], bytes_array[1], bytes_array[2], bytes_array[3]);
-
-    // NOMBRE
-    arraySize = 28;
-    i = 0;
-    for (i = 0; i < arraySize; i++)
-    {
-        bytes_array[4 + i] = ent_ar->nombre_archivo[i];
-    }
-    printf("-- %d %d %d %d \n", bytes_array[4], bytes_array[5], bytes_array[6], bytes_array[7]);
-    printf("-- %c %c %c %c \n", bytes_array[4], bytes_array[5], bytes_array[6], bytes_array[7]);
-    // writeBytes(directory->indentificador_bloque, ent_ar->entrada * 32, bytes_array, 32);
-}
-
 void set_directory_data(Directory *directory, char *diskname, unsigned int initial)
 {
     FILE *file = NULL;
@@ -185,7 +128,7 @@ void set_directory_data(Directory *directory, char *diskname, unsigned int initi
 
             // write_indice(indice); //  ---> PARA GUARDAR INDICE
 
-            if (validez == 1) {
+            if (validez == 1 && tamano != 0) {
                 printf("[E] Ejemplo lectura DATA %d\n", directory -> indentificador_bloque + indice -> lista_de_punteros[0]);
                 Data* data_ejemplo = data_init((directory -> indentificador_bloque + indice -> lista_de_punteros[0]));
                 set_data_block(data_ejemplo, diskname, directory -> indentificador_bloque + indice -> lista_de_punteros[0]);
@@ -218,3 +161,60 @@ void directory_clean(Directory *directory)
     free(directory->entradas_archivos);
     free(directory);
 };
+
+void write_file_directory(Directory *directory, EntAr *ent_ar)
+{
+    printf("[g] Guardar directorio\n");
+    // Supone que el MBT tiene una entrada particion con la entrada indicada de 0 a 127
+    unsigned char bytes_array[32];
+    unsigned int size;
+    char *response;
+    // Primer byte
+    unsigned int nume = ent_ar->validez;
+    unsigned char numero = (unsigned char)nume;
+    bytes_array[0] = numero;
+
+    // POSICION RELATIVA INDICE
+    int j = ent_ar->identificador_relativo;
+    size = 1;
+    while (j > 255)
+    {
+        size += 1;
+        j /= 255;
+    }
+    response = calloc(1, size);
+    get_bits(response, ent_ar->identificador_relativo, 0);
+    while (size < 3)
+    {
+        bytes_array[1 + 2 - size] = 0;
+        size += 1;
+    }
+    int arraySize = strlen(response);
+    int i = 0;
+    char subset[8];
+    while (i * 8 < arraySize)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            subset[j] = response[arraySize - (i + 1) * 8 + j];
+        }
+        i += 1;
+        bytes_array[1 + size - i] = binarioADecimal(subset, 8);
+        for (int i = 0; i < 8; i++)
+        {
+            subset[i] = 0;
+        }
+    }
+    printf("-- %d %d %d %d \n", bytes_array[0], bytes_array[1], bytes_array[2], bytes_array[3]);
+
+    // NOMBRE
+    arraySize = 28;
+    i = 0;
+    for (i = 0; i < arraySize; i++)
+    {
+        bytes_array[4 + i] = ent_ar->nombre_archivo[i];
+    }
+    printf("-- %d %d %d %d \n", bytes_array[4], bytes_array[5], bytes_array[6], bytes_array[7]);
+    printf("-- %c %c %c %c \n", bytes_array[4], bytes_array[5], bytes_array[6], bytes_array[7]);
+    // writeBytes(directory->indentificador_bloque, ent_ar->entrada * 32, bytes_array, 32);
+}
