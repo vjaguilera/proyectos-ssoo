@@ -29,18 +29,6 @@ void set_directory_data(Directory *directory, char *diskname, unsigned int initi
     printf("[d] Directorio en bloque %u \n", initial);
     long int initial_2 = (long int)initial * 2048 + 1024;
     fseek(file, initial_2, SEEK_SET);
-    // printf("Posicion actual %ld %ld\n", ftell(file), initial_2);
-    // fseek(file, 1, SEEK_SET);
-
-    // if (file != NULL) {
-    //     fread(buffer, 1, 1024, file); // avanzar 1024
-    //     for (int i = 0; i < initial; i++) {
-    //         // ir bloque a bloque
-    //         fread(buffer, 1, 2048, file); // ir bloque a bloque
-    //     }
-    //     // leer directorio
-    //     fread(buffer, 1, 2048, file);
-    // }
 
     if (file != NULL)
     {
@@ -130,6 +118,8 @@ void set_directory_data(Directory *directory, char *diskname, unsigned int initi
 
             if (validez == 1 && tamano != 0) {
                 printf("[E] Ejemplo lectura DATA %d\n", directory -> indentificador_bloque + indice -> lista_de_punteros[0]);
+
+                // ESTE EJEMPLO CONSIDERA QUE HAY UN PUNTERO
                 Data* data_ejemplo = data_init((directory -> indentificador_bloque + indice -> lista_de_punteros[0]));
                 set_data_block(data_ejemplo, diskname, directory -> indentificador_bloque + indice -> lista_de_punteros[0]);
                 printf("[E]\t");
@@ -216,5 +206,65 @@ void write_file_directory(Directory *directory, EntAr *ent_ar)
     }
     printf("-- %d %d %d %d \n", bytes_array[4], bytes_array[5], bytes_array[6], bytes_array[7]);
     printf("-- %c %c %c %c \n", bytes_array[4], bytes_array[5], bytes_array[6], bytes_array[7]);
-    // writeBytes(directory->indentificador_bloque, ent_ar->entrada * 32, bytes_array, 32);
+    writeBytes(directory->indentificador_bloque, ent_ar->entrada * 32, bytes_array, 32);
+}
+
+void write_bitmap(Directory* directory, BitMap* bitmap, int index_bitmap) {
+    printf("[g] Guardar bitmap %d en bloque %d\n", index_bitmap, directory -> indentificador_bloque + 1 + index_bitmap);
+    if (index_bitmap >= directory -> cantidad_bloques_bitmap) {
+        printf("[b] \tBitmap n°%d no existe\n", index_bitmap);
+    } else {
+
+        // Leer el bitmap a bytes
+        unsigned char bytes_array[2048];
+        int j = 8;
+        int bytes_array_index = 0;
+        char one_byte[8];
+        int tamano = bitmap -> cantidad_bloques / 8;
+        if (tamano * 8 < bitmap -> cantidad_bloques) {
+            tamano += 1;
+        }
+        printf("[b] \tCantidad de bloques a guardar %d que son %d bytes\n", bitmap -> cantidad_bloques, tamano);
+        int i = 0;
+        for (i = 0; i < bitmap -> cantidad_bloques; i++) {
+            // iterar sobre cada 1 o 0 del bitmap
+            if (j == 0) {
+                bytes_array[bytes_array_index] = binarioADecimal(one_byte, 8);
+                // if (bytes_array_index < 4) {
+                //     for (int k = 0; k < 8; k++) {
+                //         printf("%c", one_byte[k]);
+                //     }
+                //     printf("\n");
+                // }
+                j = 8;
+                bytes_array_index += 1;
+            }
+
+            // if (i == 5) {
+            //     bitmap -> bloques[i] = 1;
+            // } else if (i == 20) {
+            //     bitmap -> bloques[i] = 1;
+            // }
+            // printf("%d", bitmap -> bloques[i]);
+            one_byte[8 - j] = '0' + bitmap -> bloques[i];
+            j -= 1;
+        }
+
+        int entro_al_wh = 0;
+        while (j != 0) {
+            entro_al_wh = 1;
+            one_byte[8 - j] = '0';
+            j -= 1;
+        }
+        if (entro_al_wh == 1) {
+            bytes_array[bytes_array_index] = binarioADecimal(one_byte, 8);
+        }
+        // printf("%d %d\n", bytes_array_index, i);
+        // printf("%d %d %d %d\n", bytes_array[0], bytes_array[1], bytes_array[2], bytes_array[3]);
+        // }
+
+        // Guardar el bitmap
+
+        writeBytes(directory -> indentificador_bloque + 1 + index_bitmap, 0, bytes_array, 2048);
+    }
 }

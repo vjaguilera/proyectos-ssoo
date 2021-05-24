@@ -73,13 +73,6 @@ void set_mbt_data(MBT *mbt, char *diskname)
         // printf("%d %d %d\n", buffer[i + 1], buffer[i + 2], buffer[i + 3]);
         unsigned int primer_bloque = ((buffer[i + 1] << 16) | (buffer[i + 2] << 8) | (buffer[i + 3]));
         unsigned int primer_bloque2 = bitExtracted(primer_bloque, 21, 1); // der a izq
-        // primer_bloque2 = bitExtracted(primer_bloque, 21, 4); // izq a derecha
-        // if (primer_bloque2 != 0) {
-        // printf("\tPrimer bloque 4: %d\n", primer_bloque2);
-        // }
-        // printf("\n");
-        // unsigned int cantidad_bloquesr = ((buffer[i + 5] << 16) | (buffer[i + 6] << 8) | buffer[i + 7]);
-        // unsigned int cantidad_bloquesl = ((buffer[i + 4] << 16) | (buffer[i + 5] << 8) | buffer[i + 6]);
         unsigned int cantidad_bloquesg = ((buffer[i + 4] << 24) | (buffer[i + 5] << 16) | (buffer[i + 6] << 8) | buffer[i + 7]);
         unsigned cantidad_bloques2 = bitExtracted(cantidad_bloquesg, 17, 1); // der a izq 131.072 limite
 

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "os_API.h"
+#include "../structs/directory.h"
 #include "../structs/osFile.h"
 #include "../helpers/sort.h"
 #include "../helpers/writeBytes.h"
@@ -150,7 +151,7 @@ void os_ls()
         {
             if (directory->entradas_archivos[i]->validez == 1)
             {
-                printf(" %d.- Indice: %d Nombre: ", i, directory->entradas_archivos[i]->identificador_relativo);
+                printf(" %d.- Indice: %d | Tamaño: %d | Nombre: ", i, directory->entradas_archivos[i]->identificador_relativo, directory->entradas_archivos[i]->indice->tamano);
                 for (int j = 0; j < 28; j++)
                 {
                     EntAr *entar = directory->entradas_archivos[i];
@@ -172,6 +173,7 @@ void os_mbt()
         if (mbt->particiones_validas[i] == 1)
         {
             printf(" - %d - Tienen %d bitmaps\n", mbt->lista_de_particiones[i]->identificador_particion, mbt->lista_de_particiones[i]->cantidad_bitmaps);
+            // write_bitmap(directory, mbt->lista_de_particiones[i] -> lista_de_bitmaps[7], 7); // ---> PARA GUARDAR BitMap
         }
     }
 };
