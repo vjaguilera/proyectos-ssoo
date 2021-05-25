@@ -22,34 +22,22 @@ void set_bitmap_data(BitMap* bitmap, char* diskname, int initial, unsigned int b
     long int initial_2 = (long int) initial * 2048 + 1024;
     fseek(file, initial_2, SEEK_SET); 
     if (file != NULL) {
-        // fread(buffer, 1, 1024, file); // avanzar 1024
-        // for (int i = 0; i < initial; i++) {
-            // ir bloque a bloque
         fread(buffer, 1, 2048, file); // ir bloque a bloque
-        // }
-        // leer directorio
-        // fread(buffer, 1, 2048, file);
     }
     fclose(file);  
 
-    // fseek(file, initial, SEEK_SET); 
-    // // fseek(file, 1, SEEK_SET); 
-    // if (file != NULL) {
-    //     // read up to sizeof(buffer) bytes
-    //     fread(buffer, 1, sizeof(buffer), file);
-    // }
-    // fclose(file);
-    
-    // printf("Setear %ld bits en bitmap de %d bits\n", bits, bitmap -> cantidad_bloques);
+    // printf("Setear %d bits en bitmap de %d bits\n", bits, bitmap -> cantidad_bloques);
     int bytes_revisar = bits / 8;
-    for (int i = 0; i < bytes_revisar; i += 1 ) {
-        for (int j = 0; j < 8; j += 1 ) {
+    int i = 0;
+    int j = 0;
+    for (i = 0; i < bytes_revisar; i += 1 ) {
+        for (j = 0; j < 8; j += 1 ) {
             assign_bit_block(bitmap, ((buffer[i] >> j) & 0x01), i * 8 + j);
         }
     }
     int diff = bits - bytes_revisar * 8;
     if (diff > 0) {
-        for (int j = 0; j < diff; j += 1 ) {
+        for (j = 0; j < diff; j += 1 ) {
             assign_bit_block(bitmap, ((buffer[bytes_revisar + 1] >> j) & 0x01), (bytes_revisar) * 8 + j);
         }
     }

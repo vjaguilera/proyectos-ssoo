@@ -1,9 +1,12 @@
-#include "os_API.h"
-#include "../helpers/writeBytes.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "os_API.h"
+#include "../structs/directory.h"
+#include "../structs/osFile.h"
 #include "../helpers/sort.h"
+#include "../helpers/writeBytes.h"
+#include "../helpers/bitExtract.h"
 
 // GENERALES
 
@@ -19,6 +22,7 @@ void os_mount(char *diskname, int partition)
     PARTICION = partition;
     set_disk_name(diskname); // para escritura
     set_mbt();
+    printf("[*] Se asigna partición %d\n", partition);
     if (mbt->particiones_validas[partition] == 1)
     {
         set_directory();
@@ -34,6 +38,16 @@ void os_mount(char *diskname, int partition)
     // - edito el bloque con id 200 y escribo a partir
     // - del byte 32, es decir, la segunda entrada de archivos
     // - archivo valido, indice en bloque 1000 nombre hola.txt
+
+    // unsigned char bytes_to_modify[5] = "\x00\x00\x00\x00\x1E";
+    // writeBytes(1202, 0, bytes_to_modify, 5);
+    // - Edito el tamaño del indice en 1202
+    // - 1202 = 200 (inicial) + 1000 (relativo)
+
+    // unsigned char bytes_to_modify[20] = "\x68\x6f\x6c\x61\x20\x6d\x65\x20\x6c\x6c\x61\x6d\x6f\x20\x63\x61\x72\x6c\x6f\x73";
+    // writeBytes(2200, 0, bytes_to_modify, 20);
+    // - Edito el bloque 2200 con 20 bytes de texto
+    // - 2200 = 200 (inicial) + 2000 (relativo)
 };
 
 void os_bitmap(unsigned num)
@@ -98,7 +112,7 @@ void os_bitmap(unsigned num)
 
 int os_exists(char *filename)
 {
-    printf("Vamos a revisar los archivos y buscar el %s\n", filename);
+    // printf("Vamos a revisar los archivos y buscar el %s\n", filename);
     for (int i = 0; i < 64; i++)
     {
         if (directory->entradas_archivos[i]->validez == 1)
@@ -137,7 +151,7 @@ void os_ls()
         {
             if (directory->entradas_archivos[i]->validez == 1)
             {
-                printf(" %d.- Indice: %d Nombre: ", i, directory->entradas_archivos[i]->identificador_relativo);
+                printf(" %d.- Indice: %d | Tamaño: %d | Nombre: ", i, directory->entradas_archivos[i]->identificador_relativo, directory->entradas_archivos[i]->indice->tamano);
                 for (int j = 0; j < 28; j++)
                 {
                     EntAr *entar = directory->entradas_archivos[i];
@@ -159,6 +173,7 @@ void os_mbt()
         if (mbt->particiones_validas[i] == 1)
         {
             printf(" - %d - Tienen %d bitmaps\n", mbt->lista_de_particiones[i]->identificador_particion, mbt->lista_de_particiones[i]->cantidad_bitmaps);
+            // write_bitmap(directory, mbt->lista_de_particiones[i] -> lista_de_bitmaps[7], 7); // ---> PARA GUARDAR BitMap
         }
     }
 };
@@ -294,8 +309,9 @@ busca el archivo con nombre filename y retorna un osFile* que lo representa. Si 
 que el archivo no exista y se retorna un nuevo osFile* que lo representa.*/
 {
     // Check valid mode
-    if (mode != 'r' || mode != 'w')
+    if (mode != 'r' && mode != 'w')
     {
+        printf("INVALID MODE\n");
         return NULL;
     }
 
@@ -304,32 +320,59 @@ que el archivo no exista y se retorna un nuevo osFile* que lo representa.*/
     case 'r':
         // READ MODE
         printf("Buscando archivo de nombre %s:\n", filename);
+        // printf("Vamos a revisar los archivos y buscar el %s\n", filename);
         for (int i = 0; i < 64; i++)
         {
-            // Archivo encontrado en el directorio
-            if (directory->entradas_archivos[i]->nombre_archivo == filename)
+            if (directory->entradas_archivos[i]->validez == 1)
             {
-                printf("Archivo encontrado en el directorio \n");
-
-                // Init osFile
-                osFile *osFile = osfile_init(mode, filename);
-                // Assign Indice to osFile
-                assign_osfile_indice(osFile, directory->entradas_archivos[i]->indice);
-                return osFile;
+                printf("ARCHIVO: %s\n", directory->entradas_archivos[i]->nombre_archivo);
+                int ex = 1;
+                for (int j = 0; j < strlen(filename); j++)
+                {
+                    if (directory->entradas_archivos[i]->nombre_archivo[j] != filename[j])
+                    {
+                        ex = 0;
+                        break;
+                    }
+                }
+                if (ex == 1)
+                {
+                    printf("El archivo %s fue encontrado\n", filename);
+                    // Init osFile
+                    osFile *osFile = osfile_init(mode, filename);
+                    // Assign Indice to osFile
+                    assign_osfile_indice(osFile, directory->entradas_archivos[i]->indice);
+                    return osFile;
+                }
+                else if (ex == 0)
+                {
+                    printf("[ X ] - Archivo NO EXISTE en el directorio \n");
+                    return NULL;
+                }
             }
         }
-        break;
 
     case 'w':
         // WRITE MODE
         printf("Verificando que el archivo %s NO exista \n", filename);
         for (int i = 0; i < 64; i++)
         {
-            // Archivo encontrado en el directorio
-            if (directory->entradas_archivos[i]->nombre_archivo == filename)
+            if (directory->entradas_archivos[i]->validez == 1)
             {
-                printf("[ X ] - Archivo EXISTE en el directorio \n");
-                return NULL;
+                int ex = 1;
+                for (int j = 0; j < strlen(filename); j++)
+                {
+                    if (directory->entradas_archivos[i]->nombre_archivo[j] != filename[j])
+                    {
+                        ex = 0;
+                        break;
+                    }
+                }
+                if (ex == 1)
+                {
+                    printf("[ X ] - Archivo EXISTE en el directorio \n");
+                    return NULL;
+                }
             }
         }
         // Archivo no encontrado en el directorio, se puede crear uno nuevo
@@ -340,6 +383,7 @@ que el archivo no exista y se retorna un nuevo osFile* que lo representa.*/
     default:
         break;
     }
+    printf("MODE NOT RECOGNIZED\n");
     return NULL;
 };
 
@@ -359,7 +403,7 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
     file = fopen(NOMBRE_DISCO, "r");
     // Utilizar identificador absoluto de EntAr asociado para comenzar lectura
     unsigned int initial = (file_desc->indice->identificador_absoluto * 2048 + 1024) + 5; // Identificador absoluto + 5 bytes de tamano de archivo
-    printf("Iniciar en byte %u %ld\n", initial, sizeof(initial));
+    printf("Iniciar en bloque %u\n", file_desc->indice->identificador_absoluto);
     // get_bits1(initial);
     // printf("---\n");
     fseek(file, initial, SEEK_SET);
@@ -368,12 +412,12 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
     if (file != NULL)
     {
         // Leer de 1 byte y guardar 2043 de estos en el buffer
-        fread(buffer, 1, 2043, file);
+        fread(data_buffer, 1, 2043, file);
     }
 
     // Iterar por los Bytes de Buffer generando struct Datas y Asignandolas al Indice
     // Comenzando desde el last read byte
-    int x = 681;
+    int x = 681; // SE USARÁ?
     // Last read byte
     unsigned int LRB = file_desc->indice->last_read_byte;
     // Get starting point to read from the buffer
@@ -398,7 +442,7 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
         identificador_bloque_datos = bitExtracted(identificador_bloque_datos, 24, 1);
 
         // Inicializar Bloque de Datos y asignarlo al indice
-        Data *data_block = data_init();
+        Data *data_block = data_init(identificador_bloque_datos);
         // Assign 2048 bytes to data byte array
         set_data_block(data_block, NOMBRE_DISCO, identificador_bloque_datos);
         // Asignar bloque de datos al indice
@@ -436,6 +480,7 @@ int os_write(osFile *file_desc, void *buffer, int nbytes)
 
 int os_close(osFile *file_desc)
 {
+    // write_data(Data* data) ---> Guarda la información de Data en su bloque correspondiente
     return 0;
 };
 

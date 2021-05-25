@@ -1,10 +1,12 @@
 #include "data.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../helpers/writeBytes.h"
 
-Data *data_init()
+Data *data_init(int identificador)
 {
     Data *data = malloc(sizeof(Data));
+    data -> identificador_absoluto = identificador;
     return data;
 }
 
@@ -16,7 +18,7 @@ void set_data_block(Data *data_block, char *diskname, unsigned int initial)
     file = fopen(diskname, "r");
 
     fseek(file, (initial * 2048) + 1024, SEEK_SET);
-    printf("Posicion actual %ld\n", ftell(file));
+    // printf("Posicion actual %ld\n", ftell(file));
     // fseek(file, 1, SEEK_SET);
     if (file != NULL)
     {
@@ -42,4 +44,14 @@ void data_clean(Data *data)
 {
     free(data->byte_array);
     free(data);
+}
+
+void write_data(Data* data) {
+    printf("[g] Guardar data\n");
+    unsigned char bytes_array[2048];
+    for (int i = 0; i < 2048; i++)
+    {
+        bytes_array[i] = (unsigned char) data->byte_array[i];
+    }
+    writeBytes(data -> identificador_absoluto, 0, bytes_array, 2048);
 }
