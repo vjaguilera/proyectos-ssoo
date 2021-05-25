@@ -54,7 +54,7 @@ void set_directory_data(Directory *directory, char *diskname, unsigned int initi
         EntAr *ent_ar = entar_init(
             validez,
             primer_bloque_relativo,
-            primer_bloque_relativo + directory->indentificador_bloque + directory->cantidad_bloques_bitmap,
+            primer_bloque_relativo + directory->indentificador_bloque, // INDICE
             name,
             entrada);
         directory->entradas_archivos[entrada] = ent_ar;

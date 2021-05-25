@@ -31,22 +31,24 @@ void os_mount(char *diskname, int partition)
     // char bytes_to_modify[8] = "\x81\x00\x00\xC8\x00\x00\x4E\x20";
     // writeBytesMBT(0, bytes_to_modify, 8);
     // - edito el primer byte y le pongo un 129 -> particion válida de id 1
-    // - directorio en 200 y tamaño particion 9000
+    // - directorio en 200 y tamaño particion 20000
 
     // unsigned char bytes_to_modify[13] = "\x01\x00\x03\xE8\x68\x6f\x6c\x61\x2e\x74\x78\x74\x00";
     // writeBytes(200, 32, bytes_to_modify, 13);
     // - edito el bloque con id 200 y escribo a partir
     // - del byte 32, es decir, la segunda entrada de archivos
-    // - archivo valido, indice en bloque 1000 nombre hola.txt
+    // - archivo valido, indice en bloque relativo 1000 nombre hola.txt
 
-    // unsigned char bytes_to_modify[5] = "\x00\x00\x00\x00\x1E";
-    // writeBytes(1202, 0, bytes_to_modify, 5);
-    // - Edito el tamaño del indice en 1202
-    // - 1202 = 200 (inicial) + 1000 (relativo)
+    // unsigned char bytes_to_modify[8] = "\x00\x00\x00\x00\x1E\x00\x07\xD0";
+    // writeBytes(1200, 0, bytes_to_modify, 8);
+    // - Edito el tamaño del indice en 1202 y le pongo 30
+    // - Puntero a 2000
+    // - 1200 = 200 (inicial) + 1000 (relativo)
 
     // unsigned char bytes_to_modify[20] = "\x68\x6f\x6c\x61\x20\x6d\x65\x20\x6c\x6c\x61\x6d\x6f\x20\x63\x61\x72\x6c\x6f\x73";
     // writeBytes(2200, 0, bytes_to_modify, 20);
     // - Edito el bloque 2200 con 20 bytes de texto
+    // - Hola me llamo carlos
     // - 2200 = 200 (inicial) + 2000 (relativo)
 };
 
