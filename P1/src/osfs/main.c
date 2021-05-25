@@ -8,11 +8,10 @@
 //     return a & ((no_of_bits << 1) - 1);
 // }
 
-
 int main(int argc, char **argv)
 {
     // ./osfs /mnt/d/SSOO/simdiskfilled.bin
-    char* nombre_disco = argv[1];
+    char *nombre_disco = argv[1];
     printf("Nombre disco: %s\n", nombre_disco);
 
     // printf("Directorio particion 8 = %ld\n", mbt -> lista_de_particiones[8] -> identificador_directorio);
@@ -26,12 +25,22 @@ int main(int argc, char **argv)
     printf("[=] ------------------------\n");
     os_exists("nene.txt");
     printf("[=] ------------------------\n");
-    os_bitmap(2);
-    printf("[=] ------------------------\n");
-    os_delete_partition(5); // No tiene archivos
-    printf("[=] ------------------------\n");
-    os_mbt();
-    printf("[=] ------------------------\n");
+    osFile *osfile = os_open("nene.txt", 'r');
+    if (osfile == NULL)
+    {
+        printf("[=] FILE NOT FOUND ------------------------\n");
+    }
+    else
+    {
+        osfile_print(osfile);
+        printf("[=] ------------------------\n");
+    }
+    // os_bitmap(2);
+    // printf("[=] ------------------------\n");
+    // os_delete_partition(5); // No tiene archivos
+    // printf("[=] ------------------------\n");
+    // os_mbt();
+    // printf("[=] ------------------------\n");
 
     return 0;
 }
