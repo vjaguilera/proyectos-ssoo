@@ -3,9 +3,9 @@
 **Integrantes:**
 
 - 16637860 | Vicente Aguilera
-- 16666666 | Sebastian Calderon
+- 15624439 | Sebastian Calderon
 - 16666666 | Tomas Castro
-- 16666666 | Ignacio Contreras
+- 16635264 | Ignacio Contreras
 - 16666666 | Jan Siegel
 
 ## Descripcion del proyecto
