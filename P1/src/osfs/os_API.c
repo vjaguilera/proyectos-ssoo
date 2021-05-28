@@ -497,32 +497,37 @@ int os_close(osFile *file_desc)
     return 0;
 };
 
-int os_rm(char *filename)
-{
-    for (int i = 0; i < directory->cantidad_archivos; i++)
-    {
-        if (directory->entradas_archivos[i]->nombre_archivo == filename)
-        {
+int os_rm(char* filename) {
+    for (int i = 0; i < directory -> cantidad_archivos; i++){
+        if (directory -> entradas_archivos[i]->nombre_archivo == filename){
             // Este es el archivo a eliminar
             // Los bloques que estaban siendo usados por el archivo deben quedar libres.
             directory->cantidad_archivos -= 1;
-            directory->entradas_archivos[i]->validez = 0;
-            for (int j = 0; j < directory->entradas_archivos[i]->indice->cantidad_bloques; j++)
-            {
+            directory->entradas_archivos[i] -> validez = 0;
+            // int cantidad_bitmaps = directory->cantidad_bloques_bitmap;
 
-                // El indice apunta a las mismas direcciones del bitmap
-                // Ahi si se pasa, esta en el siguiente
+            // se busca el primer y ultimo bloque asociado al archivo
+            int cantidad_bitmaps = directory->entradas_archivos[i] -> indice -> cantidad_bloques;
+            int inicio = directory ->entradas_archivos[i] -> indice -> identificador_relativo;
+            int ultimo_bloque = cantidad_bitmaps + inicio;
 
-                // id del bitmap va a ser indice -> iden relat + j - k * cantidad de bloques en un bitmap
-                // Nos falta conocer el k, el bitmap que
-                // mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[k] -> bloques[iden relat + j];
+            // en este for debemos buscar los bitmaps y cambiarlos a 0
+            for (int j = inicio; j < cantidad_bitmaps; j++){\
+                // para ver que bitmap se utiliza para 
+                float aux_bitmap = j / 2048;
+                int que_bitmap;
+                que_bitmap = (int)aux_bitmap;
+
+                int que_bloque = j - 2048 * que_bitmap;
+
+                mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[que_bitmap] -> bloques[que_bloque] = 0;
             }
-
-            // entar_clean(directory -> entradas_archivos[i]);
+            printf("Se encontro el %s\n", filename);
+            return 0;
         }
     }
-
-    return 0;
+    printf("No se encontro el %s\n", filename);
+    return 1;
 };
 
 // HELPERS
