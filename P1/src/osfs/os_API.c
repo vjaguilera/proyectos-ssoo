@@ -12,6 +12,7 @@
 
 char *NOMBRE_DISCO;
 int PARTICION;
+int RESET;
 MBT *mbt;
 Directory *directory;
 
@@ -20,6 +21,7 @@ void os_mount(char *diskname, int partition)
     printf("Se ha montado la partición %d del disco %s.\n", partition, diskname);
     NOMBRE_DISCO = diskname;
     PARTICION = partition;
+    RESET = 0;
     set_disk_name(diskname); // para escritura
     set_mbt();
     printf("[*] Se asigna partición %d\n", partition);
@@ -55,6 +57,7 @@ void os_mount(char *diskname, int partition)
 void os_bitmap(unsigned num)
 {
     // Revisar foro https://github.com/IIC2333/Foro-2021-1/discussions/211
+    printf("Número bitmap seleccionado %d\n", num);
     if (num >= mbt->lista_de_particiones[PARTICION]->cantidad_bitmaps + 1)
     {
         // El input debe ser menor a la cantidad de bloques de bitmaps de la particion
@@ -66,6 +69,7 @@ void os_bitmap(unsigned num)
         // Es posible que se pida el binario completo de todos los bloques de bitmap
         for (int i = 0; i < mbt->lista_de_particiones[PARTICION]->cantidad_bitmaps; i++)
         {
+            printf("Bitmap n° %d\n", i + 1);
             int ocupado = 0;
             char *estado_bloque = calloc(1, 1);
             int largo_bitmap = mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[i]->cantidad_bloques;
@@ -187,7 +191,7 @@ void os_create_partition(int id, int size)
     // Revisar si el id está disponible
     if (mbt->particiones_validas[id])
     {
-        printf("El id ingresado ya existe, entregue uno valido");
+        printf("El id ingresado ya existe, entregue uno válido\n");
         return;
     }
 
@@ -258,7 +262,7 @@ void os_create_partition(int id, int size)
                         }
                         else
                         {
-                            printf("No cabe en ningun lado");
+                            printf("No cabe en ningun lado\n");
                             return;
                         }
                     }
@@ -275,12 +279,16 @@ void os_create_partition(int id, int size)
             }
         }
     }
-    printf("No se pudo crear la particion, no cabe en ninguna parte");
+    printf("No se pudo crear la particion, no cabe en ninguna parte\n");
 };
 
 void os_delete_partition(int id)
 {
     printf("Eliminar particion %d.\n", id);
+    if (RESET == 0 && PARTICION == id) {
+        printf("Estás usando esta partición\n");
+        return;
+    }
     if (mbt->particiones_validas[id] == 1)
     {
         mbt->particiones_validas[id] = 0;
@@ -290,6 +298,7 @@ void os_delete_partition(int id)
 
 void os_reset_mbt()
 {
+    RESET = 1;
     // Por cada particion válida del mbt
     // Se llama a os_delete_partition de esta, con el identificador de la particion dada
     for (int i = 0; i < 128; i++)
@@ -299,6 +308,8 @@ void os_reset_mbt()
             os_delete_partition(mbt->lista_de_particiones[i]->identificador_particion);
         }
     };
+    os_mbt();
+    exit(0);
 };
 
 // ====================
