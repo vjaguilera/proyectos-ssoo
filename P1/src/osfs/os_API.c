@@ -487,11 +487,21 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
 };
 
 int os_write(osFile *file_desc, void *buffer, int nbytes)
+/* Función para escribir archivos.
+Escribe en el archivo descrito por file desc los nbytes que se encuentren en la dirección indicada
+por buffer. Retorna la cantidad de Bytes escritos en el archivo. Si se produjo un error porque no pudo seguir
+escribiendo, ya sea porque el disco se llen´o o porque el archivo no puede crecer más, este número puede ser
+menor a nbytes (incluso 0). Cabe recalcar que los archivos parten con tama˜no 0 y crecen a medida que se
+escribe en estos.*/
 {
+    unsigned int initial = (file_desc->indice->identificador_absoluto * 2048 + 1024) + 5; // Identificador absoluto + 5 bytes de tamano de archivo
+
     return 0;
 };
 
 int os_close(osFile *file_desc)
+/*Función para cerrar archivos. Cierra el archivo indicado por
+file desc. Debe garantizar que cuando esta función retorna, el archivo se encuentra actualizado en disco.*/
 {
     // write_data(Data* data) ---> Guarda la información de Data en su bloque correspondiente
     return 0;
