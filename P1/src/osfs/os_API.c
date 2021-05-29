@@ -493,10 +493,131 @@ por buffer. Retorna la cantidad de Bytes escritos en el archivo. Si se produjo u
 escribiendo, ya sea porque el disco se llen´o o porque el archivo no puede crecer más, este número puede ser
 menor a nbytes (incluso 0). Cabe recalcar que los archivos parten con tama˜no 0 y crecen a medida que se
 escribe en estos.*/
-
 {
-    unsigned int initial = (file_desc->indice->identificador_absoluto * 2048 + 1024) + 5; // Identificador absoluto + 5 bytes de tamano de archivo
+    // unsigned int initial = (file_desc->indice->identificador_absoluto * 2048 + 1024) + 5; // Identificador absoluto + 5 bytes de tamano de archivo
 
+    if (directory->cantidad_archivos == 64){
+        printf("EL directorio está lleno");
+        return 1;
+    }
+
+    FILE *file = NULL;
+    unsigned char buffer_aux[3]; // array of bytes, not pointers-to-bytes  => 3 Bytes
+
+    file = fopen(NOMBRE_DISCO, "r");
+    if (file != NULL)
+    {
+        // read up to sizeof(buffer) bytes
+        fread(buffer_aux, 1, sizeof(buffer_aux), file);
+    }
+
+
+    EntAr* this_entar;
+    int entrada;
+    Indice* this_indice;
+
+    for (int i = 0; i < 64; i++){
+        if (!directory->entradas_archivos[i]->validez){
+            // El primero que no sea válido
+            printf("cantidad de archivos inicial: %d\n", directory->cantidad_archivos);
+            // Identificadores de la ENT AR
+            // unsigned int iden_absoluto = (directory->indentificador_bloque * 2048 + 1024) + i * 32;
+            // unsigned int iden_relativo = i * 32;
+            entrada = i;
+
+            // Crear el Indice
+            unsigned int identificador_en_bits = ((buffer_aux[0] << 16) | (buffer_aux[1] << 8) | (buffer_aux[2]));
+            unsigned int identificador_en_int = bitExtracted(identificador_en_bits, 17, 1); // der a izq
+
+            unsigned int iden_relativo_indice = identificador_en_int;
+            unsigned int iden_absoluto_indice = identificador_en_int + directory->indentificador_bloque;
+
+            this_indice = indice_init(nbytes, iden_relativo_indice, iden_absoluto_indice);
+
+            // Asociar el EntAr con el identificador del indice
+            this_entar = entar_init("1", iden_relativo_indice, iden_absoluto_indice, file_desc->nombre_archivo, entrada);
+
+            // Asignar indice al Ent Ar
+            assign_indice(this_entar, this_indice);
+
+            // Cambios en el directorio
+            directory->cantidad_archivos += 1;
+            directory->entradas_archivos[i]->validez = 1;
+
+            printf("cantidad de archivos final: %d\n", directory->cantidad_archivos);
+            printf("identificador del directorio: %d\n", directory->indentificador_bloque);
+            printf("entrada: %i\nidentificador relativo: %i\nidentificador absoluto: %i\n", entrada, iden_relativo_indice, iden_absoluto_indice);
+            break;
+        }
+    }
+    // asignarlo al OsFile 
+    assign_osfile_indice(file_desc, this_indice);
+
+    // Crear los Data del indice
+    // revisar en cada uno si cabe el siguiente
+
+    // Assign pointers
+    unsigned int pointer;
+    unsigned char buffer_pointer[3]; // array of bytes
+
+    // Nos paramos donde comienza el ent ar + 5 bytes de tamaño
+    fseek(file, this_entar->identificador_absoluto * 2048 + 1024 + 5, SEEK_SET); 
+    
+    // Asignar punteros al indice
+    for (int index = 0; index < 681; index++){
+        if (file != NULL){
+            // Leer 3 bytes y guardarlos en el buffer
+            fread(buffer_pointer, 1, 3, file);
+            pointer = ((buffer_pointer[0] << 16) | (buffer_pointer[1] << 8) | (buffer_pointer[2]));
+            if (pointer != 0) {
+                printf("[i]\tPointer %d\n", pointer);
+            }
+            assign_pointer(this_indice, pointer, index);
+        }
+    }
+    fclose(file);
+    
+    // Crear los Data
+    int cant_bloques_data = (int)nbytes / 2048 + 1;
+    int contador_bytes_escritos = 0;
+    int contador_bytes_por_escribir = nbytes;
+
+    char* buffer_copy;
+    buffer_copy= (char*)buffer;
+
+    for (int i = 0; i < cant_bloques_data; i++){
+        // ESTE EJEMPLO CONSIDERA QUE HAY UN PUNTERO
+        Data* data_ejemplo = data_init((directory -> indentificador_bloque + this_indice -> lista_de_punteros[0]));
+        set_data_block(data_ejemplo, NOMBRE_DISCO, directory -> indentificador_bloque + this_indice -> lista_de_punteros[0]);
+        
+        // Esto para guardar
+
+        // Asignar data array al Data
+        // Este seria el ultimo Data
+        if(contador_bytes_por_escribir < 2043){
+            for (int k = 0; k < contador_bytes_por_escribir; k++) {
+                // printf("%c\n", buffer_copy[k + i * 2043]);
+                data_ejemplo->byte_array[k] = buffer_copy[k + i * 2043];
+            }
+            contador_bytes_escritos += contador_bytes_por_escribir;
+            contador_bytes_por_escribir = 0;
+        }
+
+        // Aun cabe en mas de un Data
+        else{
+            for (int k = 0; k < 2043; k++) {
+                data_ejemplo->byte_array[k] = buffer_copy[k + i * 2043];
+            }
+            contador_bytes_escritos += 2043;
+            contador_bytes_por_escribir -= 2043;
+        }
+        printf("[E]\t");
+        for (int d = 0; d < 166; d++) {
+            printf("%c", data_ejemplo->byte_array[d]);
+        }
+        printf("\n");
+        assing_data_list(this_indice, data_ejemplo, i);
+    }
     return 0;
 };
 
@@ -504,6 +625,7 @@ int os_close(osFile *file_desc)
 /*Función para cerrar archivos. Cierra el archivo indicado por
 file desc. Debe garantizar que cuando esta función retorna, el archivo se encuentra actualizado en disco.*/
 {
+    // write_data(data_ejemplo); // ---> PARA GUARDAR Data
     // write_data(Data* data) ---> Guarda la información de Data en su bloque correspondiente
     return 0;
 };
