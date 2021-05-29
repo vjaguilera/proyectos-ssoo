@@ -493,6 +493,7 @@ por buffer. Retorna la cantidad de Bytes escritos en el archivo. Si se produjo u
 escribiendo, ya sea porque el disco se llen´o o porque el archivo no puede crecer más, este número puede ser
 menor a nbytes (incluso 0). Cabe recalcar que los archivos parten con tama˜no 0 y crecen a medida que se
 escribe en estos.*/
+
 {
     unsigned int initial = (file_desc->indice->identificador_absoluto * 2048 + 1024) + 5; // Identificador absoluto + 5 bytes de tamano de archivo
 
