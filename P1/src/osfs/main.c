@@ -15,16 +15,18 @@ int main(int argc, char **argv)
     printf("Nombre disco: %s\n", nombre_disco);
 
 
-    int case_1 = 1;
+    int case_1 = 0;
     int case_2 = 0;
     int case_3 = 0;
     int case_4 = 0;
     int case_5 = 0;
+    int case_6 = 1;
 
     // ---------------------------- CASO 1 ----------------------------------
 
     if (case_1 == 1)
     {
+        printf("estoy en el caso 1\n");
         os_mount(nombre_disco, 2);
         printf("[=] ----------------------------------\n");
         os_mbt();
@@ -58,6 +60,7 @@ int main(int argc, char **argv)
 
     else if (case_2 == 1)
     {
+        printf("estoy en el caso 2\n");
         os_mount(nombre_disco, 3);
         printf("[=] ----------------------------------\n");
         os_mbt();
@@ -78,6 +81,7 @@ int main(int argc, char **argv)
 
     else if (case_3 == 1)
     {
+        printf("estoy en el caso 3\n");
         os_mount(nombre_disco, 3);
         printf("[=] ----------------------------------\n");
         osFile* file_desc = os_open("test.txt", 'w');
@@ -108,6 +112,7 @@ int main(int argc, char **argv)
 
     else if (case_4 == 1)
     {
+        printf("estoy en el caso 4\n");
         os_mount(nombre_disco, 67);
         printf("[=] ----------------------------------\n");
         os_bitmap(0);
@@ -118,6 +123,7 @@ int main(int argc, char **argv)
 
     else if (case_5 == 1)
     {
+        printf("estoy en el caso 5\n");
         os_mount(nombre_disco, 3);
         printf("[=] ----------------------------------\n");
         os_mbt();
@@ -134,6 +140,23 @@ int main(int argc, char **argv)
         printf("[=] ----------------------------------\n");
         os_reset_mbt();
     }
-
+    else if (case_6 == 1)
+    {
+        printf("estoy en el caso 6\n");
+        os_mount(nombre_disco, 2);
+        printf("[=] ----------------------------------\n");
+        os_mbt();
+        printf("[=] ----------------------------------\n");
+        osFile* file_desc = os_open("test.txt", 'w');
+        printf("[=] ----------------------------------\n");
+        char* buffer_write =
+            "Esta herramienta online se utiliza"
+            " para contar caracteres de un texto"
+            " y cantidad de palabras, calcula también"
+            " la densidad de palabras claves quitando"
+            " las stop words.\n";
+        os_write(file_desc, buffer_write, 300); // Escribe el archivo en el disco.
+        printf("Sali de os write\n\n");
+    }
     return 0;
 }
