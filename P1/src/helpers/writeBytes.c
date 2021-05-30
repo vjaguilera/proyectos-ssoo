@@ -12,8 +12,9 @@ void set_disk_name(char* diskname) {
 
 void writeBytes(int bloque_inicial, int numero_byte_inicial, unsigned char* bytes_array, int cantidad) {
     FILE* file_write = fopen(DISKNAME, "r+");  
-    int position = 1024 + bloque_inicial * 2048 + numero_byte_inicial;
-    printf("[c] Set position %d and write %d bytes\n", position, cantidad);
+    printf("el bloque inicial es %i\nnumero bute inicial es %d\n", bloque_inicial, numero_byte_inicial);
+    unsigned long long int position = 1024 + bloque_inicial * 2048 + numero_byte_inicial;
+    printf("[c] Set position %llu and write %d bytes\n", position, cantidad);
     if (file_write != NULL) {
         // fseek(file_write, position, SEEK_SET);         // ---> PARA ESCRIBIR
         // fwrite(bytes_array, cantidad, 1, file_write);  // ---> PARA ESCRIBIR

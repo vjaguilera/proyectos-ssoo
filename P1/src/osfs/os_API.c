@@ -7,6 +7,7 @@
 #include "../helpers/sort.h"
 #include "../helpers/writeBytes.h"
 #include "../helpers/bitExtract.h"
+#include <math.h>
 
 // GENERALES
 
@@ -71,46 +72,84 @@ void os_bitmap(unsigned num)
         {
             printf("Bitmap n° %d\n", i + 1);
             int ocupado = 0;
-            char *estado_bloque = calloc(1, 1);
             int largo_bitmap = mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[i]->cantidad_bloques;
-            for (int j = 0; j < largo_bitmap; j++)
-            {
+            printf("El largo bitmap es %d\n", largo_bitmap); // Revisar largo bitmap n8   !!!!!!!!!!!!!!!!!!!!!
+            char estado_bloque[largo_bitmap + 1]; 
+            for (int j = 0; j < largo_bitmap; j++){
                 ocupado += mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[i]->bloques[j];
                 // sprintf(estado_bloque, "%d", mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> bloques[j]);
-                estado_bloque[0] = (char)mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[num]->bloques[j];
+                if(mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[i]->bloques[j]){
+                    estado_bloque[j] = *"1"; // Tata crack
+                }
+                else{
+                    estado_bloque[j] = *"0"; // Tata crack
+                }
             }
             int desocupado = largo_bitmap - ocupado;
-            int value = (int)strtol(estado_bloque, NULL, 2);
-            // convert integer to hex string
-            char hexString[32768]; // 32768 = 2048 * 8 * 8 / 4
-            sprintf(hexString, "%x", value);
-            fprintf(stderr, "%s\n", hexString);
-            printf("Bits ocupados: %i\nBits desocupados: %i\n", ocupado, desocupado);
+            // int value = (int)strtol(estado_bloque, NULL, 2);
+            // // convert integer to hex string
+            // char hexString[32768]; // 32768 = 2048 * 8 * 8 / 4
+            // char result[largo_bitmap + 1]; // where SIZE is big enough to hold any converted value
+            long long int val;
+            for (int i = 0; i < 512; i++){
+                // lista[32*i: 32* i + 32]
+                char estado_bloque_aux[32];
+                for (int j = 0; j < 32; j++){
+                    // printf("la posicion es %d\n", 32 * i + j);
+                    estado_bloque_aux[j] = estado_bloque[32 * i + j];
+                }
+                val += (int) strtol(estado_bloque_aux, NULL, 0);
+                // printf("El val actual es %d\n", val);
+            }
+            // printf("El val es %d\n", val);
+            // sprintf(result, "%x", val);
+            printf("Estado bloque: %s\n", estado_bloque);
+            // printf("Value: %x\n", val);
+            // sprintf(hexString, "%x", value);
+            fprintf(stderr, "Estado bitmap en Hexa: %llx\n", val); 
+            printf("Bits ocupados: %i\nBits desocupados: %i\n\n", ocupado, desocupado);
         }
         // fprintf( stderr, "El bitmap es %p\n", "string format", 30);
     }
-    else
-    {
+    else{
         // Retorna solo el estado actual
         // Se asume que lo que se quiere es la info del estado del bloque bitmap[num] de la particion actual
         // Y no el bit correspondiente a num
         int ocupado = 0;
         num -= 1;
         int largo_bitmap = mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[num]->cantidad_bloques;
-        char *estado_bloque = calloc(1, 1);
+        char estado_bloque[largo_bitmap];
         for (int j = 0; j < largo_bitmap; j++)
         {
             ocupado += mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[num]->bloques[j];
             // sprintf(estado_bloque, "%d", mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[num] -> bloques[j]);
-            estado_bloque[0] = (char)mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[num]->bloques[j];
+            // estado_bloque[0] = (char)mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[num]->bloques[j];
+            if(mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[num]->bloques[j]){
+                estado_bloque[j] = *"1"; // Tata crack
+            }
+            else{
+                estado_bloque[j] = *"0"; // Tata crack
+            }
         }
         // estado_bloque se espera que termine como un char "0100101"
-
-        int value = (int)strtol(estado_bloque, NULL, 2);
-        // convert integer to hex string
-        char hexString[32768];              // 32768 = 2048 * 8 * 8 / 4
-        sprintf(hexString, "%x", value);    // ¿QUÉ HACE ESTO?
-        fprintf(stderr, "%s\n", hexString); // ¿QUÉ HACE ESTO?
+        // char result[largo_bitmap + 1]; // where SIZE is big enough to hold any converted value
+        long long int val;
+        for (int i = 0; i < 512; i++){
+            // lista[32*i: 32* i + 32]
+            char estado_bloque_aux[32];
+            for (int j = 0; j < 32; j++){
+                // printf("la posicion es %d\n", 32 * i + j);
+                estado_bloque_aux[j] = estado_bloque[32 * i + j];
+            }
+            // val += pow(2, 511-i) * (int) strtol(estado_bloque_aux, NULL, 0); // se esta elevando a la potencia correspondiente 
+            val += (int) strtol(estado_bloque_aux, NULL, 0);
+            // printf("El val actual es %d\n", val);
+        }
+        // sprintf(result, "%x", val);
+        printf("Estado bloque: %s\n", estado_bloque);
+        // printf("Value: %x\n", val); 
+        // sprintf(hexString, "%x", value);
+        fprintf(stderr, "Estado bitmap en Hexa: %llx\n", val); 
         int desocupado = largo_bitmap - ocupado;
         printf("Bits ocupados: %i\nBits desocupados: %i\n", ocupado, desocupado);
     }
@@ -119,47 +158,36 @@ void os_bitmap(unsigned num)
 int os_exists(char *filename)
 {
     // printf("Vamos a revisar los archivos y buscar el %s\n", filename);
-    for (int i = 0; i < 64; i++)
-    {
-        if (directory->entradas_archivos[i]->validez == 1)
-        {
+    for (int i = 0; i < 64; i++){
+        if (directory->entradas_archivos[i]->validez == 1){
             int ex = 1;
-            for (int j = 0; j < strlen(filename); j++)
-            {
-                if (directory->entradas_archivos[i]->nombre_archivo[j] != filename[j])
-                {
+            for (int j = 0; j < strlen(filename); j++){
+                if (directory->entradas_archivos[i]->nombre_archivo[j] != filename[j]){
                     ex = 0;
                     break;
                 }
             }
-            if (ex == 1)
-            {
+            if (ex == 1){
                 printf("El archivo %s existe\n", filename);
                 return 1;
             }
-            else
-            {
-                printf("El archivo %s no existe\n", filename);
+            else{
+                printf("El archivo %s NO existe\n", filename);
                 return 0;
             }
         }
     }
-    printf("El archivo %s no existe\n", filename);
+    printf("El archivo %s NO existe\n", filename);
     return 0;
 };
 
-void os_ls()
-{
-    if (directory != NULL)
-    {
+void os_ls(){
+    if (directory != NULL){
         printf("Archivos válidos: %d\n", directory->cantidad_archivos);
-        for (int i = 0; i < 64; i++)
-        {
-            if (directory->entradas_archivos[i]->validez == 1)
-            {
+        for (int i = 0; i < 64; i++){
+            if (directory->entradas_archivos[i]->validez == 1){
                 printf(" %d.- Indice: %d | Tamaño: %d | Nombre: ", i, directory->entradas_archivos[i]->identificador_relativo, directory->entradas_archivos[i]->indice->tamano);
-                for (int j = 0; j < 28; j++)
-                {
+                for (int j = 0; j < 28; j++){
                     EntAr *entar = directory->entradas_archivos[i];
                     printf("%c", entar->nombre_archivo[j]);
                 }
@@ -586,6 +614,10 @@ escribe en estos.*/
 
     for (int i = 0; i < cant_bloques_data; i++){
         // ESTE EJEMPLO CONSIDERA QUE HAY UN PUNTERO
+        printf("\nQue es esto parte 1 %d\n", (directory -> indentificador_bloque));
+        printf("\nQue es esto parte 2 %d\n", (this_indice -> identificador_absoluto));
+        printf("\nQue es esto parte 3 %d\n", (this_indice -> identificador_relativo));
+
         Data* data_ejemplo = data_init((directory -> indentificador_bloque + this_indice -> lista_de_punteros[0]));
         set_data_block(data_ejemplo, NOMBRE_DISCO, directory -> indentificador_bloque + this_indice -> lista_de_punteros[0]);
         
@@ -593,10 +625,10 @@ escribe en estos.*/
 
         // Asignar data array al Data
         // Este seria el ultimo Data
-        if(contador_bytes_por_escribir < 2043){
+        if(contador_bytes_por_escribir < 2048){
             for (int k = 0; k < contador_bytes_por_escribir; k++) {
                 // printf("%c\n", buffer_copy[k + i * 2043]);
-                data_ejemplo->byte_array[k] = buffer_copy[k + i * 2043];
+                data_ejemplo->byte_array[k] = buffer_copy[k + i * 2048];
             }
             contador_bytes_escritos += contador_bytes_por_escribir;
             contador_bytes_por_escribir = 0;
@@ -604,11 +636,11 @@ escribe en estos.*/
 
         // Aun cabe en mas de un Data
         else{
-            for (int k = 0; k < 2043; k++) {
-                data_ejemplo->byte_array[k] = buffer_copy[k + i * 2043];
+            for (int k = 0; k < 2048; k++) {
+                data_ejemplo->byte_array[k] = buffer_copy[k + i * 2048];
             }
-            contador_bytes_escritos += 2043;
-            contador_bytes_por_escribir -= 2043;
+            contador_bytes_escritos += 2048;
+            contador_bytes_por_escribir -= 2048;
         }
         printf("[E]\t");
         for (int d = 0; d < 166; d++) {
@@ -616,16 +648,24 @@ escribe en estos.*/
         }
         printf("\n");
         assing_data_list(this_indice, data_ejemplo, i);
+        this_indice->cantidad_bloques += 1; // Se suma uno por cada iteracion
+        printf("[os_write]La cantidad de bloques es %d\n", file_desc -> indice->cantidad_bloques);
     }
-    return 0;
+    this_indice->tamano += contador_bytes_escritos;
+    return contador_bytes_escritos;
 };
 
 int os_close(osFile *file_desc)
 /*Función para cerrar archivos. Cierra el archivo indicado por
 file desc. Debe garantizar que cuando esta función retorna, el archivo se encuentra actualizado en disco.*/
 {
+
+    // file_desc->indice->
+
     // write_data(data_ejemplo); // ---> PARA GUARDAR Data
-    for (int i = 0; i < file_desc -> indice->cantidad_bloques; i++){
+    printf("LA cantidad de bloques es %d\n", file_desc -> indice->cantidad_bloques);
+    printf("El tamano final es %d\n", file_desc -> indice->tamano);
+    for (int i = 0; i < file_desc -> indice->cantidad_bloques - 1; i++){
         write_data(file_desc -> indice -> lista_de_datos[i]); // ---> Guarda la información de Data en su bloque correspondiente
     }
     return 0;

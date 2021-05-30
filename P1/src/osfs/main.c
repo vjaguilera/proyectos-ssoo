@@ -8,6 +8,7 @@
 //     return a & ((no_of_bits << 1) - 1);
 // }
 
+// https://www.rapidtables.com/convert/number/ascii-hex-bin-dec-converter.html
 int main(int argc, char **argv)
 {
     // ./osfs /mnt/d/SSOO/simdiskfilled.bin
@@ -20,7 +21,9 @@ int main(int argc, char **argv)
     int case_3 = 0;
     int case_4 = 0;
     int case_5 = 0;
-    int case_6 = 1;
+    int case_6 = 0;
+    int case_7 = 0;
+    int case_8 = 1;
 
     // ---------------------------- CASO 1 ----------------------------------
 
@@ -157,6 +160,38 @@ int main(int argc, char **argv)
             " las stop words.\n";
         os_write(file_desc, buffer_write, 300); // Escribe el archivo en el disco.
         printf("Sali de os write\n\n");
+    }
+    else if (case_7 == 1)
+    {
+        printf("estoy en el caso 6\n");
+        os_mount(nombre_disco, 2);
+        printf("[=] ----------------------------------\n");
+        os_mbt();
+        printf("[=] ----------------------------------\n");
+        osFile* file_desc = os_open("test.txt", 'w');
+        printf("[=] ----------------------------------\n");
+        char* buffer_write =
+            "Esta herramienta online se utiliza"
+            " para contar caracteres de un texto"
+            " y cantidad de palabras, calcula también"
+            " la densidad de palabras claves quitando"
+            " las stop words.\n";
+        os_write(file_desc, buffer_write, 300); // Escribe el archivo en el disco.
+        os_close(file_desc);
+        // Revisar porque la suma del identificador del data init es asi
+        // linea 593 os_API
+        printf("Sali de os write\n\n");
+    }
+        else if (case_8 == 1)
+    {
+        printf("estoy en el caso 6\n");
+        os_mount(nombre_disco, 2);
+        printf("[=] ----------------------------------\n");
+        os_mbt();
+        printf("[=] ----------------------------------\n");
+        // os_ls(); // Tira tamano 0 para los archivos que estan creados
+        // os_exists("nensaaae.txt"); // Funciona de pana
+        os_bitmap(0);
     }
     return 0;
 }
