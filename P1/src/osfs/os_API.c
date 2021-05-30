@@ -197,7 +197,6 @@ void os_create_partition(int id, int size)
 
     unsigned int *lista_id_particiones = malloc(sizeof(unsigned int) * 128);
     int cant_particiones_validas = 0;
-    int prox_part; // SE USARÁ?
     int flag = 0;
     for (int i = 0; i < 128; i++)
     {
@@ -214,7 +213,7 @@ void os_create_partition(int id, int size)
         {
             if (flag == 0)
             {
-                prox_part = i;
+                // int prox_part = i;
                 flag = 1;
             }
         }
@@ -430,7 +429,7 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
 
     // Iterar por los Bytes de Buffer generando struct Datas y Asignandolas al Indice
     // Comenzando desde el last read byte
-    int x = 681; // SE USARÁ?
+    // int x = 681; // SE USARÁ?
     // Last read byte
     unsigned int LRB = file_desc->indice->last_read_byte;
     // Get starting point to read from the buffer
@@ -535,7 +534,7 @@ escribe en estos.*/
             this_indice = indice_init(nbytes, iden_relativo_indice, iden_absoluto_indice);
 
             // Asociar el EntAr con el identificador del indice
-            this_entar = entar_init("1", iden_relativo_indice, iden_absoluto_indice, file_desc->nombre_archivo, entrada);
+            this_entar = entar_init(1, iden_relativo_indice, iden_absoluto_indice, file_desc->nombre_archivo, entrada);
 
             // Asignar indice al Ent Ar
             assign_indice(this_entar, this_indice);
@@ -626,7 +625,9 @@ int os_close(osFile *file_desc)
 file desc. Debe garantizar que cuando esta función retorna, el archivo se encuentra actualizado en disco.*/
 {
     // write_data(data_ejemplo); // ---> PARA GUARDAR Data
-    // write_data(Data* data) ---> Guarda la información de Data en su bloque correspondiente
+    for (int i = 0; i < file_desc -> indice->cantidad_bloques; i++){
+        write_data(file_desc -> indice -> lista_de_datos[i]); // ---> Guarda la información de Data en su bloque correspondiente
+    }
     return 0;
 };
 
@@ -642,7 +643,7 @@ int os_rm(char* filename) {
             // se busca el primer y ultimo bloque asociado al archivo
             int cantidad_bitmaps = directory->entradas_archivos[i] -> indice -> cantidad_bloques;
             int inicio = directory ->entradas_archivos[i] -> indice -> identificador_relativo;
-            int ultimo_bloque = cantidad_bitmaps + inicio;
+            // int ultimo_bloque = cantidad_bitmaps + inicio;
 
             // en este for debemos buscar los bitmaps y cambiarlos a 0
             for (int j = inicio; j < cantidad_bitmaps; j++){\
