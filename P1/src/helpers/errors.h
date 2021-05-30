@@ -6,7 +6,6 @@ typedef enum errors {
     ENOENT, // NO SUCH FILE OR DIRECTORY: os_exists
     ENODATA, // NO DATA AVAILABLE
     ENOMEM, // OUT OF MEMORY: os_create_partition, os_write   
-    EEXIST, // FILE EXISTS: os_exists
     EMFILE, // TOO MANY OPEN FILES: os_open
     EROFS, // READ ONLY FILE: os_open
     ENAMETOOLONG, // FILENAME TOO LONG: os_open

@@ -1,25 +1,14 @@
 # Errores
 
-Se definieron los siguientes errores:
-
-EPERM, // OPERACION NO PERMITIDA: os_mount, os_bitmap
-ENOENT, // NO SUCH FILE OR DIRECTORY: os_exists
-ENODATA, // NO DATA AVAILABLE
-ENOMEM, // OUT OF MEMORY: os_create_partition, os_write   
-EEXIST, // FILE EXISTS: os_exists
-EMFILE, // TOO MANY OPEN FILES: os_open
-EROFS, // READ ONLY FILE: os_open
-ENAMETOOLONG, // FILENAME TOO LONG: os_open
-ENOTUNIQ, // NAME NOT UNIQUE: os_open
+Todas las funciones de la API_OS tienen algún uso de estos errores. Se definieron los siguientes errores:
 
 | Error  | Explicación  | Mensaje | Casos  |
 |---|---|---|---|
-| EPERM  | Operación no permitida: Se utilizará cuando el llamado a una función con un identificador podría causar la falla directamente.  | Operación no permitida |  |
-| ENOENT  |   | No existe directorio  |   |
-| ENODATA  |   | No hay data disponible  |   |
-| ENOMEM  |   |  No hay memoria disponible |   |
-| EEXIST  |   |  Archivo ya existe |   |
-| EMFILE  |   |  Muchos archivos abiertos |   |
-| EROFS  |   | Archivo solo de lectura  |   |
-| ENAMETOOLONG  |   | Nombre archivo muy largo  |   |
-| ENOTUNIQ  |   | Nombre archivo no es único  |   |
+| EPERM  | Se utilizará cuando el llamado a una función con un identificador podría causar la falla directamente.  | Operación no permitida %s |  |
+| ENOENT  | Cuando no existe archivo o un directorio se entrega este error. | No existe archivo o directorio %s |   |
+| ENODATA  | Cuando no se puede leer información del disco.   | No hay data disponible  |   |
+| ENOMEM  | Cuando no hay memoria disponible para crear particiones o archivos.  |  No hay memoria disponible |   |
+| EEXIST  | Cuando el archivo ya existe y no se puede reemplazar.  |  Archivo ya existe |   |
+| EROFS  | Cuando el archivo es solo de lectura y se quiere escribir.  | Archivo solo de lectura  |   |
+| ENAMETOOLONG  | Cuando el nombre de archivo supera los 28 caracteres.  | Nombre archivo muy largo %s  |   |
+| ENOTUNIQ  | Cuando ya existe un archivo con el mismo nombre.  | Nombre archivo no es único %s  |   |

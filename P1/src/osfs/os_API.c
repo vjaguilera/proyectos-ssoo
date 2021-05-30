@@ -143,7 +143,6 @@ int os_exists(char *filename)
                 }
                 if (ex == 1)
                 {
-                    OS_ERROR = EEXIST;
                     printf("El archivo %s existe\n", filename);
                     return 1;
                 }
@@ -406,7 +405,6 @@ que el archivo no exista y se retorna un nuevo osFile* que lo representa.*/
                 }
                 if (ex == 1)
                 {
-                    OS_ERROR = EEXIST;
                     printf("El archivo %s fue encontrado\n", filename);
                     // Init osFile
                     osFile *osFile = osfile_init(mode, filename);

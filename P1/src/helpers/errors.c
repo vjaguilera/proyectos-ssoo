@@ -15,9 +15,6 @@ void os_strerror(Error error, char* description) {
     case ENODATA:
         printf("[E] Error: No hay data disponible\n");
         break;
-    case EEXIST:
-        printf("[E] Error: Archivo '%s' ya existe\n", description);
-        break;
     case EMFILE:
         printf("[E] Error: Muchos archivos abiertos\n");
         break;
@@ -28,7 +25,7 @@ void os_strerror(Error error, char* description) {
         printf("[E] Error: Nombre archivo '%s' muy largo\n", description);
         break;
     case ENOTUNIQ:
-        printf("[E] Error: Identificador '%s' no es único\n", description);
+        printf("[E] Error: Archivo '%s' no es único\n", description);
         break;
     default:
         printf("[E] Error code not supported: %d\n", error);
