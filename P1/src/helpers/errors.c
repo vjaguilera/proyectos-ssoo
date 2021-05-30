@@ -1,22 +1,22 @@
 #include "errors.h"
 
-void os_strerror(Error error) {
+void os_strerror(Error error, char* description) {
     switch (error)
     {
     case EPERM:
-        printf("[E] Error: Operación no permitida\n");
+        printf("[E] Error: Operación no permitida '%s'\n", description);
         break;
     case ENOENT:
-        printf("[E] Error: No existe directorio\n");
+        printf("[E] Error: No existe archivo o directorio '%s'\n", description);
         break;
     case ENOMEM:
-        printf("[E] Error: Sin memoria\n");
+        printf("[E] Error: No hay memoria disponible\n");
         break;
     case ENODATA:
         printf("[E] Error: No hay data disponible\n");
         break;
     case EEXIST:
-        printf("[E] Error: Archivo existe\n");
+        printf("[E] Error: Archivo '%s' ya existe\n", description);
         break;
     case EMFILE:
         printf("[E] Error: Muchos archivos abiertos\n");
@@ -25,10 +25,10 @@ void os_strerror(Error error) {
         printf("[E] Error: Archivo solo de lectura\n");
         break;
     case ENAMETOOLONG:
-        printf("[E] Error: Nombre archivo muy largo\n");
+        printf("[E] Error: Nombre archivo '%s' muy largo\n", description);
         break;
     case ENOTUNIQ:
-        printf("[E] Error: Nombre archivo no es único\n");
+        printf("[E] Error: Identificador '%s' no es único\n", description);
         break;
     default:
         printf("[E] Error code not supported: %d\n", error);

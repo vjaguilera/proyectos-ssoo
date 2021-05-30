@@ -16,4 +16,4 @@ typedef enum errors {
 
 Error OS_ERROR;
 
-void os_strerror(Error error);
+void os_strerror(Error error, char* description);
