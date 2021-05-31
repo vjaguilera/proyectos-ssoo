@@ -171,13 +171,10 @@ int os_exists(char *filename)
                 printf("El archivo %s existe\n", filename);
                 return 1;
             }
-            else{
-                printf("El archivo %s NO existe\n", filename);
-                return 0;
-            }
         }
     }
-    printf("El archivo %s NO existe\n", filename);
+    
+    printf("El archivo %s NO existe os_exists\n", filename);
     return 0;
 };
 
@@ -187,11 +184,7 @@ void os_ls(){
         for (int i = 0; i < 64; i++){
             if (directory->entradas_archivos[i]->validez == 1){
                 printf(" %d.- Indice: %d | Tamaño: %d | Nombre: ", i, directory->entradas_archivos[i]->identificador_relativo, directory->entradas_archivos[i]->indice->tamano);
-                for (int j = 0; j < 28; j++){
-                    EntAr *entar = directory->entradas_archivos[i];
-                    printf("%c", entar->nombre_archivo[j]);
-                }
-                printf("\n");
+                printf("%s\n", directory->entradas_archivos[i]->nombre_archivo);
             }
         }
     }
@@ -384,13 +377,11 @@ que el archivo no exista y se retorna un nuevo osFile* que lo representa.*/
                     assign_osfile_indice(osFile, directory->entradas_archivos[i]->indice);
                     return osFile;
                 }
-                else if (ex == 0)
-                {
-                    printf("[ X ] - Archivo NO EXISTE en el directorio \n");
-                    return NULL;
-                }
             }
-        }
+        }            
+        printf("[ X ] - Archivo NO EXISTE en el directorio \n");
+        return NULL;
+                
 
     case 'w':
         // WRITE MODE
@@ -479,12 +470,13 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
         //printf("\tSegundo byte: %d\n", buffer[i + 1]);
         //printf("\tTercer byte: %d\n", buffer[i + 2]);
         unsigned int identificador_bloque_datos = ((data_buffer[i] << 16) | (data_buffer[i + 1] << 8) | (data_buffer[i + 2]));
-        identificador_bloque_datos = bitExtracted(identificador_bloque_datos, 24, 1);
+        identificador_bloque_datos = bitExtracted(identificador_bloque_datos, 21, 1);
 
         // Inicializar Bloque de Datos y asignarlo al indice
-        Data *data_block = data_init(identificador_bloque_datos);
+        Data *data_block = data_init(identificador_bloque_datos + directory->indentificador_bloque);
+        // printf("La posicion absoluta del Data os_read %d\n", data_block->identificador_absoluto);
         // Assign 2048 bytes to data byte array
-        set_data_block(data_block, NOMBRE_DISCO, identificador_bloque_datos);
+        set_data_block(data_block, NOMBRE_DISCO, data_block->identificador_absoluto);
         // Asignar bloque de datos al indice
         // ES NECESARIO???
 
@@ -554,22 +546,22 @@ escribe en estos.*/
 
             // Crear el Indice
             unsigned int identificador_en_bits = ((buffer_aux[0] << 16) | (buffer_aux[1] << 8) | (buffer_aux[2]));
-            unsigned int identificador_en_int = bitExtracted(identificador_en_bits, 17, 1); // der a izq
+            unsigned int identificador_en_int = bitExtracted(identificador_en_bits, 21, 1); // der a izq
 
             unsigned int iden_relativo_indice = identificador_en_int;
             unsigned int iden_absoluto_indice = identificador_en_int + directory->indentificador_bloque;
 
-            this_indice = indice_init(nbytes, iden_relativo_indice, iden_absoluto_indice);
+            this_indice = indice_init(0, iden_relativo_indice, iden_absoluto_indice);
 
             // Asociar el EntAr con el identificador del indice
             this_entar = entar_init(1, iden_relativo_indice, iden_absoluto_indice, file_desc->nombre_archivo, entrada);
-
+            // assign_ent_ar(this_entar, this_indice);
             // Asignar indice al Ent Ar
             assign_indice(this_entar, this_indice);
 
             // Cambios en el directorio
             directory->cantidad_archivos += 1;
-            directory->entradas_archivos[i]->validez = 1;
+            directory->entradas_archivos[i] = this_entar;
 
             printf("cantidad de archivos final: %d\n", directory->cantidad_archivos);
             printf("identificador del directorio: %d\n", directory->indentificador_bloque);
@@ -611,16 +603,17 @@ escribe en estos.*/
 
     char* buffer_copy;
     buffer_copy= (char*)buffer;
-
+    this_indice -> lista_de_punteros[0] = 15; // Se deberia definir por bitmap
     for (int i = 0; i < cant_bloques_data; i++){
         // ESTE EJEMPLO CONSIDERA QUE HAY UN PUNTERO
-        printf("\nQue es esto parte 1 %d\n", (directory -> indentificador_bloque));
-        printf("\nQue es esto parte 2 %d\n", (this_indice -> identificador_absoluto));
-        printf("\nQue es esto parte 3 %d\n", (this_indice -> identificador_relativo));
+        // printf("\nidentificador del bloque%d\n", (directory -> indentificador_bloque));
+        // printf("\nIdentificador del indice %d\n", (this_indice -> identificador_absoluto));
+        // printf("\nLista de puntero %d\n", (this_indice -> lista_de_punteros[i]));
+        // printf("\nidentificador del Ent Ar %d\n", (this_entar -> indice -> tamano));
 
-        Data* data_ejemplo = data_init((directory -> indentificador_bloque + this_indice -> lista_de_punteros[0]));
-        set_data_block(data_ejemplo, NOMBRE_DISCO, directory -> indentificador_bloque + this_indice -> lista_de_punteros[0]);
-        
+        Data* data_ejemplo = data_init((directory -> indentificador_bloque + this_indice -> lista_de_punteros[i]));
+        // set_data_block(data_ejemplo, NOMBRE_DISCO, directory -> indentificador_bloque + this_indice -> lista_de_punteros[i]);
+        // data_ejemplo->byte_array = buffer;
         // Esto para guardar
 
         // Asignar data array al Data
@@ -648,10 +641,14 @@ escribe en estos.*/
         }
         printf("\n");
         assing_data_list(this_indice, data_ejemplo, i);
-        this_indice->cantidad_bloques += 1; // Se suma uno por cada iteracion
-        printf("[os_write]La cantidad de bloques es %d\n", file_desc -> indice->cantidad_bloques);
+        // this_indice->cantidad_bloques += 1; // Se suma uno por cada iteracion
+        // printf("[os_write]La cantidad de bloques es %d\n", file_desc -> indice->cantidad_bloques);
     }
     this_indice->tamano += contador_bytes_escritos;
+    this_indice->cantidad_bloques = this_indice->tamano / 2048;
+    if (this_indice -> cantidad_bloques * 2048 < this_indice->tamano) {
+        this_indice -> cantidad_bloques += 1;
+    }
     return contador_bytes_escritos;
 };
 
@@ -659,15 +656,39 @@ int os_close(osFile *file_desc)
 /*Función para cerrar archivos. Cierra el archivo indicado por
 file desc. Debe garantizar que cuando esta función retorna, el archivo se encuentra actualizado en disco.*/
 {
-
-    // file_desc->indice->
-
-    // write_data(data_ejemplo); // ---> PARA GUARDAR Data
-    printf("LA cantidad de bloques es %d\n", file_desc -> indice->cantidad_bloques);
+    if(file_desc->mode == 'r'){
+        printf("Se cierra el archivo que se leyo\n");
+        return 0;
+    }
+    // printf("LA cantidad de bloques es %d\n", file_desc -> indice->cantidad_bloques);
     printf("El tamano final es %d\n", file_desc -> indice->tamano);
-    for (int i = 0; i < file_desc -> indice->cantidad_bloques - 1; i++){
+    for (int i = 0; i < file_desc -> indice->cantidad_bloques; i++){
+        // printf("Data identificador absoluto os_close %d\n", file_desc->indice->lista_de_datos[i]->identificador_absoluto);
         write_data(file_desc -> indice -> lista_de_datos[i]); // ---> Guarda la información de Data en su bloque correspondiente
     }
+    // Guardar el indice
+    write_indice(file_desc->indice);
+
+    // Guardar el Ent Ar
+    for (int i = 0; i < 64; i++){
+        printf("%d", i);
+        if (directory->entradas_archivos[i]->validez != 0){
+            int ex = 1;
+            printf("El nombre es %s\n", file_desc->nombre_archivo);
+            for (int j = 0; j < strlen(file_desc->nombre_archivo); j++){
+                if (directory->entradas_archivos[i]->nombre_archivo[j] != file_desc->nombre_archivo[j]){
+                    ex = 0;
+                    break;
+                }
+            }
+            if (ex == 1){
+                printf("El archivo %s existe en la posicion %d\n", file_desc->nombre_archivo, i);
+                write_file_directory(directory, directory->entradas_archivos[i]);
+                break;
+            }
+        }
+    }
+    printf("El archivo %s NO existe os_close\n", file_desc->nombre_archivo);
     return 0;
 };
 

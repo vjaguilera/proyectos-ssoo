@@ -15,16 +15,18 @@ int main(int argc, char **argv)
     char *nombre_disco = argv[1];
     printf("Nombre disco: %s\n", nombre_disco);
 
-
-    int case_1 = 0;
+    // int case_7 = 1;
+    // int case_1 = 0;
+    
     int case_2 = 0;
     int case_3 = 0;
     int case_4 = 0;
     int case_5 = 0;
     int case_6 = 0;
-    int case_7 = 0;
-    int case_8 = 1;
+    int case_8 = 0;
 
+    int case_7 = 0;
+    int case_1 = 1;
     // ---------------------------- CASO 1 ----------------------------------
 
     if (case_1 == 1)
@@ -163,7 +165,7 @@ int main(int argc, char **argv)
     }
     else if (case_7 == 1)
     {
-        printf("estoy en el caso 6\n");
+        printf("estoy en el caso 7\n");
         os_mount(nombre_disco, 2);
         printf("[=] ----------------------------------\n");
         os_mbt();
@@ -177,20 +179,30 @@ int main(int argc, char **argv)
             " la densidad de palabras claves quitando"
             " las stop words.\n";
         os_write(file_desc, buffer_write, 300); // Escribe el archivo en el disco.
-        os_close(file_desc);
+        os_close(file_desc);  // revisar write_file_directory en directory.c
+        os_ls();
         // Revisar porque la suma del identificador del data init es asi
         // linea 593 os_API
-        printf("Sali de os write\n\n");
+        // printf("Sali de os write\n\n");
+        osFile* file_desc_2 = os_open("test.txt", 'r');
+        char buffer[165];
+        os_read(file_desc_2, buffer, 166); 
+        // printf("Hola mundo\n");
+        for (int i = 0; i < 166; i++) {
+            printf("%c", buffer[i]);
+        }
+        printf("\n");
+        os_close(file_desc_2);
     }
         else if (case_8 == 1)
     {
-        printf("estoy en el caso 6\n");
+        printf("estoy en el caso 8\n");
         os_mount(nombre_disco, 2);
         printf("[=] ----------------------------------\n");
         os_mbt();
         printf("[=] ----------------------------------\n");
         // os_ls(); // Tira tamano 0 para los archivos que estan creados
-        // os_exists("nensaaae.txt"); // Funciona de pana
+        // os_exists("nene.txt"); // Funciona de pana
         os_bitmap(0);
     }
     return 0;
