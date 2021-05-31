@@ -7,11 +7,13 @@ Data *data_init(int identificador)
 {
     Data *data = malloc(sizeof(Data));
     data -> identificador_absoluto = identificador;
+    data -> byte_array = malloc(2048);
     return data;
 }
 
 void set_data_block(Data *data_block, char *diskname, unsigned int initial)
 {
+    printf("Initial en set data block %d\n", initial);
     FILE *file = NULL;
     char buffer[2048]; // array of bytes, not pointers-to-bytes  => 2KB
 
@@ -26,11 +28,17 @@ void set_data_block(Data *data_block, char *diskname, unsigned int initial)
         fread(buffer, 1, sizeof(buffer), file);
     }
     // Assign data buffer to Data struct
-    data_block->byte_array = buffer;
+    for (int i = 0; i < 2048; i++){
+        // printf("%c", buffer[i]);
+        data_block->byte_array[i] = buffer[i];
+    }
+    // printf("\n");
 }
 
 void read_bytes(Data *data_block, char *buffer, int buffer_pos, int bytes_to_read, unsigned int initial)
 {
+    // printf("EL initial es %d\n", initial);
+    // printf("Data block byte array %s\n", data_block->byte_array);
     for (int i = 0; i < bytes_to_read; i++)
     {
         // Actualizar buffer con los datos del bloque de datos
@@ -53,5 +61,7 @@ void write_data(Data* data) {
     {
         bytes_array[i] = (unsigned char) data->byte_array[i];
     }
+    // printf("El byte array de write data es %s\n", bytes_array);
+    // printf("La posicion absoluta es %d\n", data->identificador_absoluto);
     writeBytes(data -> identificador_absoluto, 0, bytes_array, 2048);
 }
