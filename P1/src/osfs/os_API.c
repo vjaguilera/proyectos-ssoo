@@ -586,6 +586,12 @@ escribe en estos.*/
 {
     // unsigned int initial = (file_desc->indice->identificador_absoluto * 2048 + 1024) + 5; // Identificador absoluto + 5 bytes de tamano de archivo
 
+    if (file_desc -> mode == 'r') {
+        OS_ERROR = EROFS;
+        os_strerror(EROFS, "");
+        return 0;
+    }
+
     if (directory->cantidad_archivos == 64){
         OS_ERROR = ENOMEM;
         os_strerror(ENOMEM, "");
