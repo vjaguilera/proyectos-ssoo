@@ -215,6 +215,7 @@ int main(int argc, char **argv)
     {
         os_mount(nombre_disco, 2);
         printf("[=] ----------------------------------\n");
+        osFile* file_desc_3 = os_open("tesñhasdlkjsahdlkjsahdlkjsahdkljhaslkdhkt.txt", 'r');
         osFile* file_desc_2 = os_open("test.txt", 'r');
         if (file_desc_2 != NULL) {
             char buffer[165];
