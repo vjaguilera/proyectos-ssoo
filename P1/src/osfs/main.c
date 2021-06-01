@@ -141,9 +141,9 @@ int main(int argc, char **argv)
         printf("[=] ----------------------------------\n");
         os_mbt();
         printf("[=] ----------------------------------\n");
-        os_bitmap(0);
+        // os_bitmap(0);
         printf("[=] ----------------------------------\n");
-        os_reset_mbt();
+        // os_reset_mbt();
     }
     else if (case_6 == 1)
     {
@@ -170,7 +170,11 @@ int main(int argc, char **argv)
         printf("[=] ----------------------------------\n");
         os_mbt();
         printf("[=] ----------------------------------\n");
+        os_rm("test.txt");
         osFile* file_desc = os_open("test.txt", 'w');
+        if (file_desc == NULL) {
+            return 0;
+        }
         printf("[=] ----------------------------------\n");
         char* buffer_write =
             "Esta herramienta online se utiliza"

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include "../helpers/bitExtract.h"
 #include "../helpers/writeBytes.h"
 
@@ -71,10 +72,10 @@ void set_mbt_data(MBT *mbt, char *diskname)
         int seven = buffer[i] & mask;
         // printf("\tParticion: %d\n", seven);
         // printf("%d %d %d\n", buffer[i + 1], buffer[i + 2], buffer[i + 3]);
-        unsigned int primer_bloque = ((buffer[i + 1] << 16) | (buffer[i + 2] << 8) | (buffer[i + 3]));
-        unsigned int primer_bloque2 = bitExtracted(primer_bloque, 21, 1); // der a izq
-        unsigned int cantidad_bloquesg = ((buffer[i + 4] << 24) | (buffer[i + 5] << 16) | (buffer[i + 6] << 8) | buffer[i + 7]);
-        unsigned cantidad_bloques2 = bitExtracted(cantidad_bloquesg, 17, 1); // der a izq 131.072 limite
+        uint32_t primer_bloque2 = ((buffer[i + 1] << 16) | (buffer[i + 2] << 8) | (buffer[i + 3]));
+        // unsigned int primer_bloque2 = bitExtracted(primer_bloque, 21, 1); // der a izq
+        uint32_t cantidad_bloques2 = ((buffer[i + 4] << 24) | (buffer[i + 5] << 16) | (buffer[i + 6] << 8) | buffer[i + 7]);
+        // unsigned cantidad_bloques2 = bitExtracted(cantidad_bloquesg, 17, 1); // der a izq 131.072 limite
 
         if (validez == 1)
         {
