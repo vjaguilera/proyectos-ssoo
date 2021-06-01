@@ -278,6 +278,7 @@ void os_create_partition(int id, int size)
         {
             EntDir *entdir = entdir_init('1', id, 0, size, 10); // ESE 10 DEBERIA SER EL NÚMERO DE LA ENTRADA DEL MBT ENTRE 0 Y 127
             assign_lista_de_particiones(mbt, entdir, id);
+            write_partition_mbt(entdir);
             printf("Crear particion %d de tamaño %d.\n", id, size);
             return;
         }
@@ -304,6 +305,7 @@ void os_create_partition(int id, int size)
                         { // ultimo bloque posible
                             EntDir *entdir = entdir_init('1', id, posicion_total, size, 10);
                             assign_lista_de_particiones(mbt, entdir, id);
+                            write_partition_mbt(entdir);
                             printf("Crear particion %d de tamaño %d.\n", id, size);
                             return;
                         }
@@ -316,6 +318,7 @@ void os_create_partition(int id, int size)
                         }
                     }
                     unsigned long int inicio_sig_part = lista_id_particiones[j + 1]; // revisar caso borde del final
+                    // REVISARSI
                     printf("%ld %ld %ld %d\n", inicio_sig_part, posicion_total, inicio_sig_part - posicion_total, inicio_sig_part - posicion_total > 0);
                     if (inicio_sig_part - posicion_total > 0 && inicio_sig_part - posicion_total >= size)
                     {
@@ -615,7 +618,7 @@ escribe en estos.*/
             entrada = i;
 
             // Crear el Indice
-            // REVISAR
+            // REVISARIND
             unsigned int identificador_en_bits = ((buffer_aux[0] << 16) | (buffer_aux[1] << 8) | (buffer_aux[2]));
             unsigned int identificador_en_int = bitExtracted(identificador_en_bits, 21, 1); // der a izq
             unsigned int iden_relativo_indice = identificador_en_int;
@@ -672,6 +675,7 @@ escribe en estos.*/
 
     char* buffer_copy;
     buffer_copy= (char*)buffer;
+    // REVISARPU
     this_indice -> lista_de_punteros[0] = 15; // Se deberia definir por bitmap
     for (int i = 0; i < cant_bloques_data; i++){
         // ESTE EJEMPLO CONSIDERA QUE HAY UN PUNTERO
@@ -789,7 +793,7 @@ int os_rm(char* filename) {
             // int ultimo_bloque = cantidad_bitmaps + inicio;
             // en este for debemos buscar los bitmaps y cambiarlos a 0
 
-            /// REVISAR
+            /// REVISARRM
             // for (int j = inicio; j < cantidad_bitmaps; j++){
             //     // para ver que bitmap se utiliza para 
             //     float aux_bitmap = j / 2048;
