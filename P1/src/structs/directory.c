@@ -185,7 +185,10 @@ void write_file_directory(Directory *directory, EntAr *ent_ar)
     // printf("Primer byte %c\n", bytes_array[0]);
     // POSICION RELATIVA INDICE
     int j = ent_ar->identificador_relativo;
-    printf("Posicion relativa indice %d\n", j);
+    // int j = 1000;
+    printf("********* Validez %d\n", ent_ar->validez);
+    printf("********* Posicion relativa indice %d\n", j);
+    printf("********* Nombre %s\n", ent_ar->nombre_archivo);
     size = 1;
     while (j > 255)
     {
@@ -203,6 +206,8 @@ void write_file_directory(Directory *directory, EntAr *ent_ar)
     // printf("El len del binario es %ld\n", strlen("000000100000000000000000"));
     int i = 0;
     char subset[8];
+    // REVISAR ENTAR
+    int k = 0;
     while (i * 8 < size * 8)
     {
         for (int j = 0; j < 8; j++)
@@ -210,7 +215,14 @@ void write_file_directory(Directory *directory, EntAr *ent_ar)
             subset[j] = response[size * 8 - (i + 1) * 8 + j];
         }
         i += 1;
-        bytes_array[1 + size - i] = binarioADecimal(subset, 8);
+        printf("subset %s %d\n", subset, 1 + size - i);
+        printf("%d %d\n", size, i);
+        if (subset[0] == '0' || subset[0] == '1') {
+        } else {
+            k += 1;
+            continue;
+        }
+        bytes_array[1 + size - i + k] = binarioADecimal(subset, 8);
         for (int i = 0; i < 8; i++)
         {
             subset[i] = 0;

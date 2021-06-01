@@ -30,8 +30,8 @@ void writeBytesMBT(int numero_byte_inicial, unsigned char* bytes_array, int cant
     int position = numero_byte_inicial;
     printf("[c] Set position MBT %d %d %s\n", position, cantidad, DISKNAME);
     if (file_write != NULL) {
-        // fseek(file_write, position, SEEK_SET);         //  ---> PARA ESCRIBIR
-        // fwrite(bytes_array, cantidad, 1, file_write);  // ---> PARA ESCRIBIR
+        fseek(file_write, position, SEEK_SET);         //  ---> PARA ESCRIBIR
+        fwrite(bytes_array, cantidad, 1, file_write);  // ---> PARA ESCRIBIR
         fclose(file_write);  
     } else {
         perror("fopen");

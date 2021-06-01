@@ -15,8 +15,8 @@ int main(int argc, char **argv)
     char *nombre_disco = argv[1];
     printf("Nombre disco: %s\n", nombre_disco);
 
-    // int case_7 = 1;
-    // int case_1 = 0;
+    int case_7 = 0;
+    int case_1 = 0;
     
     int case_2 = 0;
     int case_3 = 0;
@@ -24,9 +24,10 @@ int main(int argc, char **argv)
     int case_5 = 0;
     int case_6 = 0;
     int case_8 = 0;
+    int case_9 = 1;
 
-    int case_7 = 0;
-    int case_1 = 1;
+    // int case_7 = 0;
+    // int case_1 = 1;
     // ---------------------------- CASO 1 ----------------------------------
 
     if (case_1 == 1)
@@ -76,9 +77,9 @@ int main(int argc, char **argv)
         printf("[=] ----------------------------------\n");
         os_mbt();
         printf("[=] ----------------------------------\n");
-        os_bitmap(4);
+        // os_bitmap(4);
         printf("[=] ----------------------------------\n");
-        os_bitmap(0);
+        // os_bitmap(0);
         printf("[=] ----------------------------------\n");
     }
 
@@ -135,7 +136,7 @@ int main(int argc, char **argv)
         printf("[=] ----------------------------------\n");
         os_create_partition(3, 500);
         printf("[=] ----------------------------------\n");
-        os_create_partition(67, 100000000);
+        os_create_partition(67, 1000000);
         printf("[=] ----------------------------------\n");
         os_create_partition(67, 1000);
         printf("[=] ----------------------------------\n");
@@ -169,8 +170,9 @@ int main(int argc, char **argv)
         os_mount(nombre_disco, 2);
         printf("[=] ----------------------------------\n");
         os_mbt();
-        printf("[=] ----------------------------------\n");
+        printf("[=] ----------BORRAR------------------------\n");
         os_rm("test.txt");
+        printf("[=] ----------------------------------\n");
         osFile* file_desc = os_open("test.txt", 'w');
         if (file_desc == NULL) {
             return 0;
@@ -208,6 +210,22 @@ int main(int argc, char **argv)
         // os_ls(); // Tira tamano 0 para los archivos que estan creados
         // os_exists("nene.txt"); // Funciona de pana
         os_bitmap(0);
+    }
+        else if (case_9 == 1)
+    {
+        os_mount(nombre_disco, 2);
+        printf("[=] ----------------------------------\n");
+        osFile* file_desc_2 = os_open("test.txt", 'r');
+        if (file_desc_2 != NULL) {
+            char buffer[165];
+            os_read(file_desc_2, buffer, 166); 
+            // printf("Hola mundo\n");
+            for (int i = 0; i < 166; i++) {
+                printf("%c", buffer[i]);
+            }
+            printf("\n");
+            os_close(file_desc_2);
+        }
     }
     return 0;
 }

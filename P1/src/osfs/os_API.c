@@ -9,6 +9,7 @@
 #include "../helpers/writeBytes.h"
 #include "../helpers/bitExtract.h"
 #include "../helpers/errors.h"
+#include "../helpers/bitmap_read.h"
 #include <math.h>
 
 // GENERALES
@@ -292,7 +293,7 @@ void os_create_partition(int id, int size)
             if (mbt->particiones_validas[p])
             {
                 // revisar si la particion es valida para buscar el identificador
-                unsigned long int posicion_total;
+                int posicion_total;
                 if (mbt->lista_de_particiones[p]->identificador_directorio == lista_id_particiones[j])
                 {
                     // aqui se suma el identificador con la cantidad de bloques
@@ -317,10 +318,10 @@ void os_create_partition(int id, int size)
                             return;
                         }
                     }
-                    unsigned long int inicio_sig_part = lista_id_particiones[j + 1]; // revisar caso borde del final
+                    int inicio_sig_part = lista_id_particiones[j + 1]; // revisar caso borde del final
                     // REVISARSI
-                    printf("%ld %ld %ld %d\n", inicio_sig_part, posicion_total, inicio_sig_part - posicion_total, inicio_sig_part - posicion_total > 0);
-                    if (inicio_sig_part - posicion_total > 0 && inicio_sig_part - posicion_total >= size)
+                    // printf("%d %d %d %d %d\n", inicio_sig_part, posicion_total, inicio_sig_part - posicion_total, inicio_sig_part - posicion_total > size, size);
+                    if (inicio_sig_part - posicion_total > (unsigned long int) 0 && inicio_sig_part - posicion_total >= size)
                     {
                         // crear la nueva particion
                         EntDir *entdir = entdir_init('1', id, posicion_total, size, 10);
@@ -624,9 +625,9 @@ escribe en estos.*/
             entrada = i;
 
             // Crear el Indice
-            // REVISARIND
-            unsigned int identificador_en_bits = ((buffer_aux[0] << 16) | (buffer_aux[1] << 8) | (buffer_aux[2]));
-            unsigned int identificador_en_int = bitExtracted(identificador_en_bits, 21, 1); // der a izq
+            // REVISARIND LISTO
+            // unsigned int identificador_en_bits = ((buffer_aux[0] << 16) | (buffer_aux[1] << 8) | (buffer_aux[2]));
+            unsigned int identificador_en_int = get_pos_bitmap(directory, mbt, PARTICION); //bitExtracted(identificador_en_bits, 21, 1); // der a izq
             unsigned int iden_relativo_indice = identificador_en_int;
             unsigned int iden_absoluto_indice = identificador_en_int + directory->indentificador_bloque;
 
@@ -661,17 +662,17 @@ escribe en estos.*/
     fseek(file, this_entar->identificador_absoluto * 2048 + 1024 + 5, SEEK_SET); 
     
     // Asignar punteros al indice
-    for (int index = 0; index < 681; index++){
-        if (file != NULL){
-            // Leer 3 bytes y guardarlos en el buffer
-            fread(buffer_pointer, 1, 3, file);
-            pointer = ((buffer_pointer[0] << 16) | (buffer_pointer[1] << 8) | (buffer_pointer[2]));
-            if (pointer != 0) {
-                printf("[i]\tAssign pointer %d\n", pointer);
-            }
-            assign_pointer(this_indice, pointer, index);
-        }
-    }
+    // for (int index = 0; index < 681; index++){
+    //     if (file != NULL){
+    //         // Leer 3 bytes y guardarlos en el buffer
+    //         fread(buffer_pointer, 1, 3, file);
+    //         pointer = ((buffer_pointer[0] << 16) | (buffer_pointer[1] << 8) | (buffer_pointer[2]));
+    //         if (pointer != 0) {
+    //             printf("[i]\tAssign pointer %d\n", pointer);
+    //         }
+    //         assign_pointer(this_indice, pointer, index);
+    //     }
+    // }
     fclose(file);
     
     // Crear los Data
@@ -681,9 +682,10 @@ escribe en estos.*/
 
     char* buffer_copy;
     buffer_copy= (char*)buffer;
-    // REVISARPU
-    this_indice -> lista_de_punteros[0] = 15; // Se deberia definir por bitmap
+    // REVISARPU LISTO
     for (int i = 0; i < cant_bloques_data; i++){
+        this_indice -> lista_de_punteros[i] = get_pos_bitmap(directory, mbt, PARTICION); // Se deberia definir por bitmap
+        printf("Puntero asignado en %d\n", this_indice -> lista_de_punteros[i]);
         // ESTE EJEMPLO CONSIDERA QUE HAY UN PUNTERO
         // printf("\nidentificador del bloque%d\n", (directory -> indentificador_bloque));
         // printf("\nIdentificador del indice %d\n", (this_indice -> identificador_absoluto));
@@ -799,15 +801,18 @@ int os_rm(char* filename) {
             // int ultimo_bloque = cantidad_bitmaps + inicio;
             // en este for debemos buscar los bitmaps y cambiarlos a 0
 
-            /// REVISARRM
-            // for (int j = inicio; j < cantidad_bitmaps; j++){
-            //     // para ver que bitmap se utiliza para 
-            //     float aux_bitmap = j / 2048;
-            //     int que_bitmap;
-            //     que_bitmap = (int)aux_bitmap;
-            //     int que_bloque = j - 2048 * que_bitmap;
-            //     mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[que_bitmap] -> bloques[que_bloque] = 0;
-            // }
+            // REVISARRM CHECK
+            for (int j = inicio; j < cantidad_bitmaps; j++){
+                // para ver que bitmap se utiliza para 
+                float aux_bitmap = j / 2048;
+                int que_bitmap;
+                que_bitmap = (int)aux_bitmap;
+                int que_bloque = j - 2048 * que_bitmap;
+                mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[que_bitmap] -> bloques[que_bloque] = 0;
+            }
+            for (int b = 0; b < mbt -> lista_de_particiones[PARTICION] -> cantidad_bitmaps; b++) {
+                write_bitmap(directory, mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[b], b);
+            }
             printf("Se encontro el %s\n", filename);
             return 0;
         }

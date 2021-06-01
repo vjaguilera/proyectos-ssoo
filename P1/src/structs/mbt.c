@@ -123,9 +123,16 @@ void mbt_clean(MBT *mbt)
 void write_partition_mbt(EntDir *ent_dir)
 {
     printf("[g] Guardar MBT\n");
+    // 10000100
+    // 1 0000100
+    // 0 // 4
     // Supone que el MBT tiene una entrada particion con la entrada indicada de 0 a 127
     unsigned char bytes_array[8];
     // Primer byte
+    printf("Validez %d\n", ent_dir->validez);
+    printf("Particion %d\n", ent_dir->identificador_particion);
+    printf("Directorio %d\n", ent_dir->identificador_directorio);
+    printf("Tamaño %d\n", ent_dir->cantidad_bloques_particion);
     char primer[8];
     unsigned int size = sizeof(ent_dir->identificador_particion) / sizeof(int);
     char *response = calloc(1, size);
@@ -156,11 +163,11 @@ void write_partition_mbt(EntDir *ent_dir)
     int arraySize = strlen(response);
     int i = 0;
     char subset[8];
-    while (i * 8 < arraySize)
+    while (i * 8 < size * 8)
     {
         for (int j = 0; j < 8; j++)
         {
-            subset[j] = response[arraySize - (i + 1) * 8 + j];
+            subset[j] = response[size * 8 - (i + 1) * 8 + j];
         }
         i += 1;
         bytes_array[1 + size - i] = binarioADecimal(subset, 8);
