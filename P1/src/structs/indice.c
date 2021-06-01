@@ -5,7 +5,7 @@
 #include "../helpers/writeBytes.h"
 #include "../helpers/bitExtract.h"
 
-Indice *indice_init(unsigned long int tamano, unsigned int identificador_relativo, unsigned int identificador_absoluto)
+Indice *indice_init(unsigned int tamano, unsigned int identificador_relativo, unsigned int identificador_absoluto)
 {
     Indice *indice = malloc(sizeof(Indice));
     indice->tamano = tamano;

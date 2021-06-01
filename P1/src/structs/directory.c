@@ -137,6 +137,12 @@ void set_directory_data(Directory *directory, char *diskname, unsigned int initi
                 // write_data(data_ejemplo); // ---> PARA GUARDAR Data
             }
         }
+        else{
+            printf("[d] Entrada %d:\n", entrada);
+            printf("[d] \tPrimer byte: %d\n", validez);
+            printf("[d] \tPrimer bloque relativo: %d\n", primer_bloque_relativo);
+            printf("[d] \tNombre archivo %s\n", name);
+        }
 
         // write_file_directory(directory, ent_ar); ---> PARA GUARDAR EntAr
     }
@@ -161,8 +167,15 @@ void write_file_directory(Directory *directory, EntAr *ent_ar)
     char *response;
     // Primer byte
     unsigned int nume = ent_ar->validez;
-    unsigned char numero = (unsigned char)nume;
-    bytes_array[0] = numero;
+    // unsigned char numero = (unsigned char)nume;
+    char str[1];
+    sprintf(str, "%d", nume);
+    // unsigned char numero = (unsigned char)nume;
+    // bytes_array[0] = numero;
+    bytes_array[0] = *str;
+    printf("La validez es %d\n", ent_ar->validez);
+    printf("El numero es %s\n", str);
+    // printf("El byte array 0 es %s\n", bytes_array[0]);
 
     // POSICION RELATIVA INDICE
     int j = ent_ar->identificador_relativo;
@@ -179,16 +192,20 @@ void write_file_directory(Directory *directory, EntAr *ent_ar)
         bytes_array[1 + 2 - size] = 0;
         size += 1;
     }
-    int arraySize = strlen(response);
+    long int arraySize = strlen(response);
+    printf("El len del binario es %ld\n", strlen("000000100000000000000000"));
     int i = 0;
     char subset[8];
-    while (i * 8 < arraySize)
+    printf("Array size %d\n",size * 8);
+    printf("Response %s\n",response);
+    while (i * 8 < size * 8)
     {
         for (int j = 0; j < 8; j++)
         {
-            subset[j] = response[arraySize - (i + 1) * 8 + j];
+            subset[j] = response[size * 8 - (i + 1) * 8 + j];
         }
         i += 1;
+        printf("__________%d\n", 1 + size - i);
         bytes_array[1 + size - i] = binarioADecimal(subset, 8);
         for (int i = 0; i < 8; i++)
         {
@@ -268,3 +285,7 @@ void write_bitmap(Directory* directory, BitMap* bitmap, int index_bitmap) {
         writeBytes(directory -> indentificador_bloque + 1 + index_bitmap, 0, bytes_array, 2048);
     }
 }
+
+// void assign_ent_ar(EntAr* ent_ar, Indice* this_indice){
+//     this_indice->entAr = ent_ar;
+// }

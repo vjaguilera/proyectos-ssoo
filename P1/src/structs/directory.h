@@ -21,6 +21,7 @@ void directory_clean(Directory* directory);
 
 void write_bitmap(Directory* directory, BitMap* bitmap, int index_bitmap);
 
+// void assign_ent_ar(EntAr* ent_ar, Indice* this_indice);
 
 
 
