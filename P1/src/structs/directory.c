@@ -203,8 +203,6 @@ void write_file_directory(Directory *directory, EntAr *ent_ar)
     // printf("El len del binario es %ld\n", strlen("000000100000000000000000"));
     int i = 0;
     char subset[8];
-    // printf("Array size %d\n",size * 8);
-    // printf("Response %s\n",response);
     while (i * 8 < size * 8)
     {
         for (int j = 0; j < 8; j++)

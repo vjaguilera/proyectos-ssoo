@@ -8,6 +8,7 @@
 #include "../helpers/sort.h"
 #include "../helpers/writeBytes.h"
 #include "../helpers/bitExtract.h"
+#include "../helpers/errors.h"
 #include <math.h>
 
 // GENERALES
@@ -31,6 +32,11 @@ void os_mount(char *diskname, int partition)
     {
         set_directory();
         set_bitmap();
+    }
+    else
+    {
+        OS_ERROR = EPERM;
+        os_strerror(EPERM, "Partición inválida");
     }
     // char bytes_to_modify[8] = "\x81\x00\x00\xC8\x00\x00\x4E\x20";
     // writeBytesMBT(0, bytes_to_modify, 8);
@@ -63,6 +69,8 @@ void os_bitmap(unsigned num)
     if (num >= mbt->lista_de_particiones[PARTICION]->cantidad_bitmaps + 1)
     {
         // El input debe ser menor a la cantidad de bloques de bitmaps de la particion
+        OS_ERROR = EPERM;
+        os_strerror(EPERM, "Bitmap inválido");
         printf("Ingrese valor menor o igual %d\n", mbt->lista_de_particiones[PARTICION]->cantidad_bitmaps);
     }
     else if (num == 0)
@@ -174,7 +182,8 @@ int os_exists(char *filename)
             }
         }
     }
-    
+    OS_ERROR = ENOENT;
+    os_strerror(ENOENT, filename);
     printf("El archivo %s NO existe os_exists\n", filename);
     return 0;
 };
@@ -182,12 +191,21 @@ int os_exists(char *filename)
 void os_ls(){
     if (directory != NULL){
         printf("Archivos válidos: %d\n", directory->cantidad_archivos);
+        int val = 0;
         for (int i = 0; i < 64; i++){
             if (directory->entradas_archivos[i]->validez == 1){
+                val += 1;
                 printf(" %d.- Indice: %d | Tamaño: %d | Nombre: ", i, directory->entradas_archivos[i]->identificador_relativo, directory->entradas_archivos[i]->indice->tamano);
                 printf("%s\n", directory->entradas_archivos[i]->nombre_archivo);
             }
         }
+        if (val == 0) {
+            OS_ERROR = ENOENT;
+            os_strerror(ENOENT, "Directorio");
+        }
+    } else {
+        OS_ERROR = EPERM;
+        os_strerror(EPERM, "No hay directorio");
     }
 };
 
@@ -195,14 +213,20 @@ void os_ls(){
 
 void os_mbt()
 {
+    int val = 0;
     printf("Particiones válidas:\n");
     for (int i = 0; i < 128; i++)
     {
         if (mbt->particiones_validas[i] == 1)
         {
+            val += 1;
             printf(" - %d - Tienen %d bitmaps\n", mbt->lista_de_particiones[i]->identificador_particion, mbt->lista_de_particiones[i]->cantidad_bitmaps);
             // write_bitmap(directory, mbt->lista_de_particiones[i] -> lista_de_bitmaps[7], 7); // ---> PARA GUARDAR BitMap
         }
+    }
+    if (val == 0) {
+        OS_ERROR = ENODATA;
+        os_strerror(ENODATA, "");
     }
 };
 
@@ -213,6 +237,8 @@ void os_create_partition(int id, int size)
     // Revisar si el id está disponible
     if (mbt->particiones_validas[id])
     {
+        OS_ERROR = EPERM;
+        os_strerror(EPERM, "Id ingresado existe");
         printf("El id ingresado ya existe, entregue uno válido\n");
         return;
     }
@@ -283,6 +309,8 @@ void os_create_partition(int id, int size)
                         }
                         else
                         {
+                            OS_ERROR = ENOMEM;
+                            os_strerror(ENOMEM, "");
                             printf("No cabe en ningun lado\n");
                             return;
                         }
@@ -302,6 +330,8 @@ void os_create_partition(int id, int size)
             }
         }
     }
+    OS_ERROR = ENOMEM;
+    os_strerror(ENOMEM, "");
     printf("No se pudo crear la particion, no cabe en ninguna parte\n");
 };
 
@@ -309,8 +339,15 @@ void os_delete_partition(int id)
 {
     printf("Eliminar particion %d.\n", id);
     if (RESET == 0 && PARTICION == id) {
+        OS_ERROR = EPERM;
+        os_strerror(EPERM, "Partición siendo utilizada");
         printf("Estás usando esta partición\n");
         return;
+    }
+    if (id < 0 || id > 127) {
+        OS_ERROR = EPERM;
+        os_strerror(EPERM, "Número partición no es válido");
+        printf("Número no es válido: %d\n", id);
     }
     if (mbt->particiones_validas[id] == 1)
     {
@@ -333,7 +370,6 @@ void os_reset_mbt()
         }
     };
     os_mbt();
-    exit(0);
 };
 
 // ====================
@@ -348,7 +384,21 @@ que el archivo no exista y se retorna un nuevo osFile* que lo representa.*/
     // Check valid mode
     if (mode != 'r' && mode != 'w')
     {
+        OS_ERROR = EPERM;
+        os_strerror(EPERM, "Modo incorrecto");
         printf("INVALID MODE\n");
+        return NULL;
+    }
+
+    if (strlen(filename) > 28) {
+        OS_ERROR = ENAMETOOLONG;
+        os_strerror(ENAMETOOLONG, filename);
+        return NULL;
+    }
+
+    if (directory == NULL) {
+        OS_ERROR = EPERM;
+        os_strerror(EPERM, "No hay directorio");
         return NULL;
     }
 
@@ -382,7 +432,9 @@ que el archivo no exista y se retorna un nuevo osFile* que lo representa.*/
                     return osFile;
                 }
             }
-        }            
+        }        
+        OS_ERROR = ENOENT;
+        os_strerror(ENOENT, filename);    
         printf("[ X ] - Archivo NO EXISTE en el directorio \n");
         return NULL;
                 
@@ -405,19 +457,23 @@ que el archivo no exista y se retorna un nuevo osFile* que lo representa.*/
                 }
                 if (ex == 1)
                 {
+                    OS_ERROR = ENOTUNIQ;
+                    os_strerror(ENOTUNIQ, filename);
                     printf("[ X ] - Archivo EXISTE en el directorio \n");
                     return NULL;
                 }
             }
         }
         // Archivo no encontrado en el directorio, se puede crear uno nuevo
-
+        OS_ERROR = ENOENT;
         // Init osFile without Indice
         osFile *osFile = osfile_init(mode, filename);
         return osFile;
     default:
         break;
     }
+    OS_ERROR = EPERM;
+    os_strerror(EPERM, "Modo incorrecto");
     printf("MODE NOT RECOGNIZED\n");
     return NULL;
 };
@@ -442,16 +498,20 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
     file = fopen(NOMBRE_DISCO, "r");
     // Utilizar identificador absoluto de EntAr asociado para comenzar lectura
     unsigned int initial = (file_desc->indice->identificador_absoluto * 2048 + 1024) + 5; // Identificador absoluto + 5 bytes de tamano de archivo
-    printf("Iniciar en bloque %u\n", file_desc->indice->identificador_absoluto);
+    // printf("Iniciar en bloque %u\n", file_desc->indice->identificador_absoluto);
     // get_bits1(initial);
     // printf("---\n");
     fseek(file, initial, SEEK_SET);
-    printf("Posicion actual %ld\n", ftell(file));
+    // printf("Posicion actual %ld\n", ftell(file));
     // fseek(file, 1, SEEK_SET);
     if (file != NULL)
     {
         // Leer de 1 byte y guardar 2043 de estos en el buffer
         fread(data_buffer, 1, 2043, file);
+    } else {
+        OS_ERROR = ENODATA;
+        os_strerror(ENODATA, "");
+        return 0;
     }
 
     // Iterar por los Bytes de Buffer generando struct Datas y Asignandolas al Indice
@@ -524,6 +584,8 @@ escribe en estos.*/
     // unsigned int initial = (file_desc->indice->identificador_absoluto * 2048 + 1024) + 5; // Identificador absoluto + 5 bytes de tamano de archivo
 
     if (directory->cantidad_archivos == 64){
+        OS_ERROR = ENOMEM;
+        os_strerror(ENOMEM, "");
         printf("EL directorio está lleno");
         return 1;
     }
@@ -596,7 +658,7 @@ escribe en estos.*/
             fread(buffer_pointer, 1, 3, file);
             pointer = ((buffer_pointer[0] << 16) | (buffer_pointer[1] << 8) | (buffer_pointer[2]));
             if (pointer != 0) {
-                printf("[i]\tPointer %d\n", pointer);
+                printf("[i]\tAssign pointer %d\n", pointer);
             }
             assign_pointer(this_indice, pointer, index);
         }
@@ -695,11 +757,18 @@ file desc. Debe garantizar que cuando esta función retorna, el archivo se encue
             }
         }
     }
+    OS_ERROR = ENOENT;
+    os_strerror(ENOENT, file_desc->nombre_archivo);
     printf("El archivo %s NO existe os_close\n", file_desc->nombre_archivo);
     return 0;
 };
 
 int os_rm(char* filename) {
+    if (directory == NULL) {
+        OS_ERROR = EPERM;
+        os_strerror(EPERM, "No hay directorio");
+        return 0;
+    }
     for (int i = 0; i < directory -> cantidad_archivos; i++){
         int ex = 1;
         for (int j = 0; j < strlen(filename); j++) {
@@ -733,6 +802,8 @@ int os_rm(char* filename) {
             return 0;
         }
     }
+    OS_ERROR = ENOENT;
+    os_strerror(ENOENT, filename);
     printf("No se encontro el %s\n", filename);
     return 1;
 };
