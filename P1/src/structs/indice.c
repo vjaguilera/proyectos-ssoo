@@ -79,7 +79,7 @@ void write_indice(Indice *indice)
             subset[i] = 0;
         }
     }
-    // printf("-- %d %d %d %d %d\n", bytes_array[0], bytes_array[1], bytes_array[2], bytes_array[3], bytes_array[4]);
+    printf("-- INDICIE-- %d %d %d %d %d\n", bytes_array[0], bytes_array[1], bytes_array[2], bytes_array[3], bytes_array[4]);
 
     // PUNTEROS
     // Guardar punteros

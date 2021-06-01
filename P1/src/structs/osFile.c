@@ -6,7 +6,10 @@ osFile *osfile_init(char mode, char *nombre_archivo)
 {
     osFile *osfile = malloc(sizeof(osFile));
     osfile->mode = mode;
-    osfile->nombre_archivo = nombre_archivo;
+    osfile->nombre_archivo = malloc(28);
+    for (int i = 0; i < 28; i++) {
+        osfile -> nombre_archivo[i] = nombre_archivo[i];
+    }
     return osfile;
 }
 

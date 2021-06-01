@@ -287,11 +287,13 @@ void os_create_partition(int id, int size)
                         }
                     }
                     unsigned long int inicio_sig_part = lista_id_particiones[j + 1]; // revisar caso borde del final
-                    if (inicio_sig_part - posicion_total >= size)
+                    printf("%ld %ld %ld %d\n", inicio_sig_part, posicion_total, inicio_sig_part - posicion_total, inicio_sig_part - posicion_total > 0);
+                    if (inicio_sig_part - posicion_total > 0 && inicio_sig_part - posicion_total >= size)
                     {
                         // crear la nueva particion
                         EntDir *entdir = entdir_init('1', id, posicion_total, size, 10);
                         assign_lista_de_particiones(mbt, entdir, id);
+                        write_partition_mbt(entdir);
                         printf("Crear particion %d de tamaño %d.\n", id, size);
                         return;
                     }
@@ -313,6 +315,7 @@ void os_delete_partition(int id)
     {
         mbt->particiones_validas[id] = 0;
         mbt->lista_de_particiones[id]->validez = 0;
+        write_partition_mbt(mbt->lista_de_particiones[id]);
     }
 };
 
@@ -425,6 +428,10 @@ por buffer. Debe retornar la cantidad de Bytes efectivamente leı́dos desde el 
 nbytes es mayor a la cantidad de Bytes restantes en el archivo. La lectura de read se efectúa desde la posición
 del archivo inmediatamente posterior a la última posición leı́da por un llamado a read.*/
 {
+    if (file_desc->indice->tamano == 0) {
+        printf("Esta vacío\n");
+        return 0;
+    }
     // Utilizar Indice apuntando por osFile para hacer lectura de Datas
     // Extraer indice absoluto desde el directorio
     FILE *file = NULL;
@@ -547,12 +554,10 @@ escribe en estos.*/
             // Crear el Indice
             unsigned int identificador_en_bits = ((buffer_aux[0] << 16) | (buffer_aux[1] << 8) | (buffer_aux[2]));
             unsigned int identificador_en_int = bitExtracted(identificador_en_bits, 21, 1); // der a izq
-
             unsigned int iden_relativo_indice = identificador_en_int;
             unsigned int iden_absoluto_indice = identificador_en_int + directory->indentificador_bloque;
 
             this_indice = indice_init(0, iden_relativo_indice, iden_absoluto_indice);
-
             // Asociar el EntAr con el identificador del indice
             this_entar = entar_init(1, iden_relativo_indice, iden_absoluto_indice, file_desc->nombre_archivo, entrada);
             // assign_ent_ar(this_entar, this_indice);
@@ -671,7 +676,7 @@ file desc. Debe garantizar que cuando esta función retorna, el archivo se encue
 
     // Guardar el Ent Ar
     for (int i = 0; i < 64; i++){
-        printf("%d", i);
+        printf("Entrada %d\n", i);
         if (directory->entradas_archivos[i]->validez != 0){
             int ex = 1;
             printf("El nombre es %s\n", file_desc->nombre_archivo);
@@ -694,29 +699,34 @@ file desc. Debe garantizar que cuando esta función retorna, el archivo se encue
 
 int os_rm(char* filename) {
     for (int i = 0; i < directory -> cantidad_archivos; i++){
-        if (directory -> entradas_archivos[i]->nombre_archivo == filename){
-            // Este es el archivo a eliminar
-            // Los bloques que estaban siendo usados por el archivo deben quedar libres.
+        int ex = 1;
+        for (int j = 0; j < strlen(filename); j++) {
+            if (directory -> entradas_archivos[i]->nombre_archivo[j] != filename[j]){
+                ex = 0;
+                break;
+            }
+        }
+        // Este es el archivo a eliminar
+        // Los bloques que estaban siendo usados por el archivo deben quedar libres.
+        if (ex == 1) {
             directory->cantidad_archivos -= 1;
             directory->entradas_archivos[i] -> validez = 0;
             // int cantidad_bitmaps = directory->cantidad_bloques_bitmap;
-
             // se busca el primer y ultimo bloque asociado al archivo
             int cantidad_bitmaps = directory->entradas_archivos[i] -> indice -> cantidad_bloques;
             int inicio = directory ->entradas_archivos[i] -> indice -> identificador_relativo;
             // int ultimo_bloque = cantidad_bitmaps + inicio;
-
             // en este for debemos buscar los bitmaps y cambiarlos a 0
-            for (int j = inicio; j < cantidad_bitmaps; j++){\
-                // para ver que bitmap se utiliza para 
-                float aux_bitmap = j / 2048;
-                int que_bitmap;
-                que_bitmap = (int)aux_bitmap;
 
-                int que_bloque = j - 2048 * que_bitmap;
-
-                mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[que_bitmap] -> bloques[que_bloque] = 0;
-            }
+            /// REVISAR
+            // for (int j = inicio; j < cantidad_bitmaps; j++){
+            //     // para ver que bitmap se utiliza para 
+            //     float aux_bitmap = j / 2048;
+            //     int que_bitmap;
+            //     que_bitmap = (int)aux_bitmap;
+            //     int que_bloque = j - 2048 * que_bitmap;
+            //     mbt -> lista_de_particiones[PARTICION] -> lista_de_bitmaps[que_bitmap] -> bloques[que_bloque] = 0;
+            // }
             printf("Se encontro el %s\n", filename);
             return 0;
         }
