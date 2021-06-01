@@ -100,15 +100,27 @@ void os_bitmap(unsigned num)
             // // convert integer to hex string
             // char hexString[32768]; // 32768 = 2048 * 8 * 8 / 4
             // char result[largo_bitmap + 1]; // where SIZE is big enough to hold any converted value
-            long long int val;
-            for (int i = 0; i < 512; i++){
+            long long int val = 0;
+            printf("bloques a leer %d\n", mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[i]->cantidad_bloques);
+            int a_leer = mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[i]->cantidad_bloques / 32;
+            if (a_leer * 32 < mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[i]->cantidad_bloques) {
+                a_leer += 1;
+            }
+            for (int i = 0; i < a_leer; i++){
                 // lista[32*i: 32* i + 32]
+                val = 0;
                 char estado_bloque_aux[32];
                 for (int j = 0; j < 32; j++){
                     // printf("la posicion es %d\n", 32 * i + j);
                     estado_bloque_aux[j] = estado_bloque[32 * i + j];
                 }
-                val += (int) strtol(estado_bloque_aux, NULL, 0);
+                // printf("Caso %s\n", estado_bloque_aux);
+                // val += pow(2, 511-i) * (int) strtol(estado_bloque_aux, NULL, 0); // se esta elevando a la potencia correspondiente 
+                for (int k = 0; k < 32; k++) {
+                    val += ((int)estado_bloque_aux[k] - 48) * pow(2, 32 - k - 1);
+                }
+                // val += (int) strtol(estado_bloque_aux, NULL, 0);
+                printf("%lld\n", val);
                 // printf("El val actual es %d\n", val);
             }
             // printf("El val es %d\n", val);
@@ -143,23 +155,83 @@ void os_bitmap(unsigned num)
         }
         // estado_bloque se espera que termine como un char "0100101"
         // char result[largo_bitmap + 1]; // where SIZE is big enough to hold any converted value
-        long long int val;
-        for (int i = 0; i < 512; i++){
+        long long int val = 0;
+        printf("bloques a leer %d\n", mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[num]->cantidad_bloques);
+        int a_leer = mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[num]->cantidad_bloques / 32;
+        if (a_leer * 32 < mbt->lista_de_particiones[PARTICION]->lista_de_bitmaps[num]->cantidad_bloques) {
+            a_leer += 1;
+        }
+        char concatenacion[a_leer * 4];
+        int size = 0;
+        char *response;
+        for (int i = 0; i < a_leer; i++){
             // lista[32*i: 32* i + 32]
+            val = 0;
             char estado_bloque_aux[32];
             for (int j = 0; j < 32; j++){
                 // printf("la posicion es %d\n", 32 * i + j);
                 estado_bloque_aux[j] = estado_bloque[32 * i + j];
             }
+            // printf("Caso %s\n", estado_bloque_aux);
             // val += pow(2, 511-i) * (int) strtol(estado_bloque_aux, NULL, 0); // se esta elevando a la potencia correspondiente 
-            val += (int) strtol(estado_bloque_aux, NULL, 0);
+            for (int k = 0; k < 32; k++) {
+                val += ((int)estado_bloque_aux[k] - 48) * pow(2, 32 - k - 1);
+            }
+            // val += (int) strtol(estado_bloque_aux, NULL, 0);
+            printf("%lld\n", val);
+            
+            
+            // int prueba = val;
+            // size = 1;
+            // while (prueba > 255)
+            // {
+            //     size += 1;
+            //     prueba /= 255;
+            // }
+            // response = calloc(1, size);
+            // get_bits(response, val, 0);
+            // while (size < 4)
+            // {
+            //     concatenacion[1 + 2 - size] = 0;
+            //     size += 1;
+            // }
+            // int i = 0;
+            // char subset[8];
+            // int k = 0;
+            // int p = 0;
+            // while (p * 8 < size * 8)
+            // {
+            //     for (int j = 0; j < 8; j++)
+            //     {
+            //         subset[j] = response[size * 8 - (p + 1) * 8 + j];
+            //     }
+            //     p += 1;
+            //     if (subset[0] == '0' || subset[0] == '1') {
+            //     } else {
+            //         k += 1;
+            //         continue;
+            //     }
+            //     concatenacion[i + size - p + k] = binarioADecimal(subset, 8);
+            //     for (int f = 0; f < 8; f++)
+            //     {
+            //         subset[f] = 0;
+            //     }
+            // }
+
+
             // printf("El val actual es %d\n", val);
         }
         // sprintf(result, "%x", val);
         printf("Estado bloque: %s\n", estado_bloque);
         // printf("Value: %x\n", val); 
         // sprintf(hexString, "%x", value);
-        fprintf(stderr, "Estado bitmap en Hexa: %llx\n", val); 
+        printf("Estado bitmap en Hexa: ");
+        for (int x = 0; x < a_leer * 4; x ++)
+        {
+            printf("%x", concatenacion[x]);
+            // fprintf(stderr, "%x", concatenacion[x]); 
+        }
+        printf("\n");
         int desocupado = largo_bitmap - ocupado;
         printf("Bits ocupados: %i\nBits desocupados: %i\n", ocupado, desocupado);
     }

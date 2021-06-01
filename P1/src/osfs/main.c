@@ -18,13 +18,13 @@ int main(int argc, char **argv)
     int case_7 = 0;
     int case_1 = 0;
     
-    int case_2 = 0;
+    int case_2 = 1;
     int case_3 = 0;
     int case_4 = 0;
     int case_5 = 0;
     int case_6 = 0;
     int case_8 = 0;
-    int case_9 = 1;
+    int case_9 = 0;
 
     // int case_7 = 0;
     // int case_1 = 1;
@@ -71,13 +71,13 @@ int main(int argc, char **argv)
         printf("[=] ----------------------------------\n");
         os_mbt();
         printf("[=] ----------------------------------\n");
-        os_delete_partition(3);
+        // os_delete_partition(3);
         printf("[=] ----------------------------------\n");
-        os_delete_partition(4);
+        // os_delete_partition(4);
         printf("[=] ----------------------------------\n");
-        os_mbt();
+        // os_mbt();
         printf("[=] ----------------------------------\n");
-        // os_bitmap(4);
+        os_bitmap(4);
         printf("[=] ----------------------------------\n");
         // os_bitmap(0);
         printf("[=] ----------------------------------\n");
