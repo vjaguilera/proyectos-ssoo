@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdint.h>
 
 // FUNCTIONS
 
@@ -42,8 +43,9 @@ void set_directory_data(Directory *directory, char *diskname, unsigned int initi
         char name[28];
         int entrada = i / 32;
         unsigned char validez = buffer[i];
-        unsigned int primer_bloque_relativo = (buffer[i + 1] << 16) | (buffer[i + 2] << 8) | (buffer[i + 3]);
-        primer_bloque_relativo = bitExtracted(primer_bloque_relativo, 17, 1);
+        uint32_t primer_bloque_relativo = (buffer[i + 1] << 16) | ( buffer[i + 2] << 8) | (buffer[i + 3]);
+        // printf("numero %d\n", primer_bloque_relativo);
+        // primer_bloque_relativo = bitExtracted(primer_bloque_relativo, 17, 1);
 
         for (int j = 0; j < 28; j++)
         {
@@ -86,9 +88,9 @@ void set_directory_data(Directory *directory, char *diskname, unsigned int initi
             }
 
             // Convert buffer to unsigned int and assign it as tamano
-            unsigned long int tamano = (((unsigned long int)buffer_size[0] << 32) | ((unsigned long int)buffer_size[1] << 24) | ((unsigned long int)buffer_size[2] << 16) | ((unsigned long int)buffer_size[3] << 8) | ((unsigned long int)buffer_size[4]));
+            uint32_t tamano = (((unsigned long int)buffer_size[0] << 32) | ((unsigned long int)buffer_size[1] << 24) | ((unsigned long int)buffer_size[2] << 16) | ((unsigned long int)buffer_size[3] << 8) | ((unsigned long int)buffer_size[4]));
             // tamano = 20;
-            printf("[d] \tTamaño %lu\n", tamano);
+            printf("[d] \tTamaño %u\n", tamano);
 
             // Init Indice
             Indice *indice = indice_init(tamano, ent_ar->identificador_relativo, ent_ar->identificador_absoluto);
@@ -103,7 +105,7 @@ void set_directory_data(Directory *directory, char *diskname, unsigned int initi
                     fread(buffer_pointer, 1, 3, file);
                     pointer = ((buffer_pointer[0] << 16) | (buffer_pointer[1] << 8) | (buffer_pointer[2]));
                     if (pointer != 0) {
-                        printf("[i]\tPointer %d\n", pointer);
+                        // printf("[i]\tPointer %d\n", pointer);
                     }
                     assign_pointer(indice, pointer, index);
                 }
@@ -138,10 +140,12 @@ void set_directory_data(Directory *directory, char *diskname, unsigned int initi
             }
         }
         else{
-            printf("[d] Entrada %d:\n", entrada);
-            printf("[d] \tPrimer byte: %d\n", validez);
-            printf("[d] \tPrimer bloque relativo: %d\n", primer_bloque_relativo);
-            printf("[d] \tNombre archivo %s\n", name);
+            if (entrada == -1) {
+                printf("[d] Entrada %d:\n", entrada);
+                printf("[d] \tPrimer byte: %d\n", validez);
+                printf("[d] \tPrimer bloque relativo: %d\n", primer_bloque_relativo);
+                printf("[d] \tNombre archivo %s\n", name);
+            }
         }
 
         // write_file_directory(directory, ent_ar); ---> PARA GUARDAR EntAr
@@ -168,17 +172,20 @@ void write_file_directory(Directory *directory, EntAr *ent_ar)
     // Primer byte
     unsigned int nume = ent_ar->validez;
     // unsigned char numero = (unsigned char)nume;
-    char str[1];
-    sprintf(str, "%d", nume);
+    // // char str[1];
+    // // sprintf(str, "%d", nume);
     // unsigned char numero = (unsigned char)nume;
     // bytes_array[0] = numero;
-    bytes_array[0] = *str;
-    printf("La validez es %d\n", ent_ar->validez);
-    printf("El numero es %s\n", str);
+    // // bytes_array[0] = *str;
+    // printf("[g] La validez es %d\n", ent_ar->validez);
+    // printf("[g] El identificador es %d\n", ent_ar->identificador_relativo);
+    // // printf("El numero es %s\n", str);
     // printf("El byte array 0 es %s\n", bytes_array[0]);
-
+    bytes_array[0] = ent_ar->validez;
+    // printf("Primer byte %c\n", bytes_array[0]);
     // POSICION RELATIVA INDICE
     int j = ent_ar->identificador_relativo;
+    printf("Posicion relativa indice %d\n", j);
     size = 1;
     while (j > 255)
     {
@@ -193,11 +200,9 @@ void write_file_directory(Directory *directory, EntAr *ent_ar)
         size += 1;
     }
     long int arraySize = strlen(response);
-    printf("El len del binario es %ld\n", strlen("000000100000000000000000"));
+    // printf("El len del binario es %ld\n", strlen("000000100000000000000000"));
     int i = 0;
     char subset[8];
-    printf("Array size %d\n",size * 8);
-    printf("Response %s\n",response);
     while (i * 8 < size * 8)
     {
         for (int j = 0; j < 8; j++)
@@ -205,7 +210,6 @@ void write_file_directory(Directory *directory, EntAr *ent_ar)
             subset[j] = response[size * 8 - (i + 1) * 8 + j];
         }
         i += 1;
-        printf("__________%d\n", 1 + size - i);
         bytes_array[1 + size - i] = binarioADecimal(subset, 8);
         for (int i = 0; i < 8; i++)
         {
