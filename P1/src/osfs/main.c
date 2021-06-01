@@ -15,8 +15,8 @@ int main(int argc, char **argv)
     char *nombre_disco = argv[1];
     printf("Nombre disco: %s\n", nombre_disco);
 
-    int case_7 = 1;
-    int case_1 = 0;
+    // int case_7 = 1;
+    // int case_1 = 0;
     
     int case_2 = 0;
     int case_3 = 0;
@@ -25,8 +25,8 @@ int main(int argc, char **argv)
     int case_6 = 0;
     int case_8 = 0;
 
-    // int case_7 = 0;
-    // int case_1 = 0;
+    int case_7 = 0;
+    int case_1 = 1;
     // ---------------------------- CASO 1 ----------------------------------
 
     if (case_1 == 1)

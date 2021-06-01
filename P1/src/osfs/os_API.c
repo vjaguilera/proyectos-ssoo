@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include "os_API.h"
 #include "../structs/directory.h"
 #include "../structs/osFile.h"
@@ -476,8 +477,8 @@ del archivo inmediatamente posterior a la última posición leı́da por un llam
         //printf("\tPrimer byte: %d\n", buffer[i]);
         //printf("\tSegundo byte: %d\n", buffer[i + 1]);
         //printf("\tTercer byte: %d\n", buffer[i + 2]);
-        unsigned int identificador_bloque_datos = ((data_buffer[i] << 16) | (data_buffer[i + 1] << 8) | (data_buffer[i + 2]));
-        identificador_bloque_datos = bitExtracted(identificador_bloque_datos, 21, 1);
+        uint32_t identificador_bloque_datos = ((data_buffer[i] << 16) | (data_buffer[i + 1] << 8) | (data_buffer[i + 2]));
+        // identificador_bloque_datos = bitExtracted(identificador_bloque_datos, 21, 1);
 
         // Inicializar Bloque de Datos y asignarlo al indice
         Data *data_block = data_init(identificador_bloque_datos + directory->indentificador_bloque);
@@ -552,6 +553,7 @@ escribe en estos.*/
             entrada = i;
 
             // Crear el Indice
+            // REVISAR
             unsigned int identificador_en_bits = ((buffer_aux[0] << 16) | (buffer_aux[1] << 8) | (buffer_aux[2]));
             unsigned int identificador_en_int = bitExtracted(identificador_en_bits, 21, 1); // der a izq
             unsigned int iden_relativo_indice = identificador_en_int;
