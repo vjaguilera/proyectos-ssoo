@@ -17,14 +17,15 @@ int main(int argc, char **argv)
 
     int case_7 = 0;
     int case_1 = 0;
-    
-    int case_2 = 1;
+
+    int case_2 = 0;
     int case_3 = 0;
     int case_4 = 0;
     int case_5 = 0;
     int case_6 = 0;
     int case_8 = 0;
     int case_9 = 0;
+    int case_10 = 1;
 
     // int case_7 = 0;
     // int case_1 = 1;
@@ -54,13 +55,13 @@ int main(int argc, char **argv)
             printf("[=] ----------------------------------\n");
             char buffer[20];
             os_read(osfile, buffer, 20);
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < 20; i++)
+            {
                 printf("%c", buffer[i]);
             }
             printf("\n[=] ----------------------------------\n");
         }
     }
-
 
     // ---------------------------- CASO 2 ----------------------------------
 
@@ -90,9 +91,9 @@ int main(int argc, char **argv)
         printf("estoy en el caso 3\n");
         os_mount(nombre_disco, 3);
         printf("[=] ----------------------------------\n");
-        osFile* file_desc = os_open("test.txt", 'w');
+        osFile *file_desc = os_open("test.txt", 'w');
         printf("[=] ----------------------------------\n");
-        char* buffer_write =
+        char *buffer_write =
             "Esta herramienta online se utiliza"
             " para contar caracteres de un texto"
             " y cantidad de palabras, calcula también"
@@ -104,17 +105,18 @@ int main(int argc, char **argv)
         printf("[=] ----------------------------------\n");
         os_close(file_desc); // Cierra el archivo. Ahora deberíaa estar actualizado en el disco.
         printf("[=] ----------------------------------\n");
-        osFile* file_desc_2 = os_open("test.txt", 'r');
+        osFile *file_desc_2 = os_open("test.txt", 'r');
         printf("[=] ----------------------------------\n");
         char buffer[165];
         os_read(file_desc_2, buffer, 165);
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 20; i++)
+        {
             printf("%c", buffer[i]);
         }
         printf("\n[=] ----------------------------------\n");
     }
 
-    // ---------------------------- CASO 4 ----------------------------------    
+    // ---------------------------- CASO 4 ----------------------------------
 
     else if (case_4 == 1)
     {
@@ -153,9 +155,9 @@ int main(int argc, char **argv)
         printf("[=] ----------------------------------\n");
         os_mbt();
         printf("[=] ----------------------------------\n");
-        osFile* file_desc = os_open("test.txt", 'w');
+        osFile *file_desc = os_open("test.txt", 'w');
         printf("[=] ----------------------------------\n");
-        char* buffer_write =
+        char *buffer_write =
             "Esta herramienta online se utiliza"
             " para contar caracteres de un texto"
             " y cantidad de palabras, calcula también"
@@ -173,34 +175,36 @@ int main(int argc, char **argv)
         printf("[=] ----------BORRAR------------------------\n");
         os_rm("test.txt");
         printf("[=] ----------------------------------\n");
-        osFile* file_desc = os_open("test.txt", 'w');
-        if (file_desc == NULL) {
+        osFile *file_desc = os_open("test.txt", 'w');
+        if (file_desc == NULL)
+        {
             return 0;
         }
         printf("[=] ----------------------------------\n");
-        char* buffer_write =
+        char *buffer_write =
             "Esta herramienta online se utiliza"
             " para contar caracteres de un texto"
             " y cantidad de palabras, calcula también"
             " la densidad de palabras claves quitando"
             " las stop words.\n";
         os_write(file_desc, buffer_write, 300); // Escribe el archivo en el disco.
-        os_close(file_desc);  // revisar write_file_directory en directory.c
+        os_close(file_desc);                    // revisar write_file_directory en directory.c
         os_ls();
         // Revisar porque la suma del identificador del data init es asi
         // linea 593 os_API
         // printf("Sali de os write\n\n");
-        osFile* file_desc_2 = os_open("test.txt", 'r');
+        osFile *file_desc_2 = os_open("test.txt", 'r');
         char buffer[165];
-        os_read(file_desc_2, buffer, 166); 
+        os_read(file_desc_2, buffer, 166);
         // printf("Hola mundo\n");
-        for (int i = 0; i < 166; i++) {
+        for (int i = 0; i < 166; i++)
+        {
             printf("%c", buffer[i]);
         }
         printf("\n");
         os_close(file_desc_2);
     }
-        else if (case_8 == 1)
+    else if (case_8 == 1)
     {
         printf("estoy en el caso 8\n");
         os_mount(nombre_disco, 2);
@@ -211,18 +215,47 @@ int main(int argc, char **argv)
         // os_exists("nene.txt"); // Funciona de pana
         os_bitmap(0);
     }
-        else if (case_9 == 1)
+    else if (case_9 == 1)
     {
         os_mount(nombre_disco, 2);
         printf("[=] ----------------------------------\n");
-        osFile* file_desc_3 = os_open("tesñhasdlkjsahdlkjsahdlkjsahdkljhaslkdhkt.txt", 'r');
-        osFile* file_desc_2 = os_open("test.txt", 'r');
-        if (file_desc_2 != NULL) {
+        osFile *file_desc_3 = os_open("tesñhasdlkjsahdlkjsahdlkjsahdkljhaslkdhkt.txt", 'r');
+        osFile *file_desc_2 = os_open("test.txt", 'r');
+        if (file_desc_2 != NULL)
+        {
             char buffer[165];
-            os_read(file_desc_2, buffer, 166); 
+            os_read(file_desc_2, buffer, 166);
             // printf("Hola mundo\n");
-            for (int i = 0; i < 166; i++) {
+            for (int i = 0; i < 166; i++)
+            {
                 printf("%c", buffer[i]);
+            }
+            printf("\n");
+            os_close(file_desc_2);
+        }
+    }
+    else if (case_10 == 1)
+    {
+        os_mount(nombre_disco, 2);
+        printf("[=] ----------------------------------\n");
+        osFile *file_desc_2 = os_open("test.txt", 'r');
+        if (file_desc_2 != NULL)
+        {
+            // First Read
+            char buffer[15];
+            os_read(file_desc_2, buffer, 15);
+            // printf("Hola mundo\n");
+            for (int i = 0; i < 16; i++)
+            {
+                printf("%c", buffer[i]);
+            }
+            printf("\n");
+            char buffer_2[150];
+            os_read(file_desc_2, buffer_2, 150);
+            // printf("Hola mundo\n");
+            for (int i = 0; i < 151; i++)
+            {
+                printf("%c", buffer_2[i]);
             }
             printf("\n");
             os_close(file_desc_2);
