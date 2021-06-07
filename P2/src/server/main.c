@@ -58,6 +58,10 @@ int main(int argc, char *argv[]){
 
       server_send_message(sockets_array[my_attention], 2, client_message);
     }
+
+    else if (msg_code == 0) {
+      return 0;
+    }
     printf("------------------\n");
   }
 

@@ -52,7 +52,6 @@ int main (int argc, char *argv[]){
 
     // Se prepara el socket
     int server_socket = prepare_socket(IP, PORT);
-    printf("%d server socket\n", server_socket);
 
     // Se inicializa un loop para recibir todo tipo de paquetes y tomar una acción al respecto
     while (1){
@@ -96,9 +95,6 @@ int main (int argc, char *argv[]){
     }
 
     // Se cierra el socket
-    if (server_socket != 3) {
-        close(server_socket);
-    }
     close(server_socket);
 
     return 0;
