@@ -15,17 +15,17 @@ int main(int argc, char **argv)
     char *nombre_disco = argv[1];
     printf("Nombre disco: %s\n", nombre_disco);
 
-    int case_7 = 0;
-    int case_1 = 0;
 
+    int case_1 = 0;
     int case_2 = 0;
     int case_3 = 0;
-    int case_4 = 0;
+    int case_4 = 1;
     int case_5 = 0;
     int case_6 = 0;
+    int case_7 = 0;
     int case_8 = 0;
     int case_9 = 0;
-    int case_10 = 1;
+    int case_10 = 0;
 
     // int case_7 = 0;
     // int case_1 = 1;
@@ -123,8 +123,8 @@ int main(int argc, char **argv)
         printf("estoy en el caso 4\n");
         os_mount(nombre_disco, 67);
         printf("[=] ----------------------------------\n");
-        os_bitmap(0);
-        printf("[=] ----------------------------------\n");
+        // os_bitmap(1);
+        // printf("[=] ----------------------------------\n");
     }
 
     // ---------------------------- CASO 5 ----------------------------------

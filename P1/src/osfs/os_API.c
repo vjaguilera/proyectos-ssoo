@@ -349,7 +349,7 @@ void os_create_partition(int id, int size)
     {
         if (lista_id_particiones[0] > size)
         {
-            EntDir *entdir = entdir_init('1', id, 0, size, 10); // ESE 10 DEBERIA SER EL NÚMERO DE LA ENTRADA DEL MBT ENTRE 0 Y 127
+            EntDir *entdir = entdir_init(1, id, 0, size, 10); // ESE 10 DEBERIA SER EL NÚMERO DE LA ENTRADA DEL MBT ENTRE 0 Y 127
             assign_lista_de_particiones(mbt, entdir, id);
             write_partition_mbt(entdir);
             printf("Crear particion %d de tamaño %d.\n", id, size);
@@ -376,7 +376,7 @@ void os_create_partition(int id, int size)
                         // si no entra aca, no cabe en ningun lado
                         if (posicion_total + size <= 2097151)
                         { // ultimo bloque posible
-                            EntDir *entdir = entdir_init('1', id, posicion_total, size, 10);
+                            EntDir *entdir = entdir_init(1, id, posicion_total, size, 10);
                             assign_lista_de_particiones(mbt, entdir, id);
                             write_partition_mbt(entdir);
                             printf("Crear particion %d de tamaño %d.\n", id, size);
@@ -396,7 +396,7 @@ void os_create_partition(int id, int size)
                     if (inicio_sig_part - posicion_total > (unsigned long int) 0 && inicio_sig_part - posicion_total >= size)
                     {
                         // crear la nueva particion
-                        EntDir *entdir = entdir_init('1', id, posicion_total, size, 10);
+                        EntDir *entdir = entdir_init(1, id, posicion_total, size, 10);
                         assign_lista_de_particiones(mbt, entdir, id);
                         write_partition_mbt(entdir);
                         printf("Crear particion %d de tamaño %d.\n", id, size);
