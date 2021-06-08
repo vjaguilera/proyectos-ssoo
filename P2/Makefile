@@ -7,7 +7,7 @@
 ###############################################################################
 
 # El compilador a usar: Gnu C Compiler, Standard 2011 with GNU extensions
-CC=gcc -std=gnu11
+CC=gcc -pthread -std=gnu11
 
 # La carpeta donde va todo el código
 SRC=src
