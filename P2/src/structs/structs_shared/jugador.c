@@ -49,7 +49,17 @@ void listen_client(Jugador* jugador, int socket) {
         } else if (msg_code == 3) {
             // mensage general
             printf("%s\n", message);
+
+        } else if (msg_code == 4) {
+            show_menu(message, 0);
+            show_menu("Si", 1);
+            show_menu("No", 2);
+            int option = pick_option();
+            char response[2];
+            sprintf(response, "%d", option);
+            send_msg(jugador, 1, response);
         }
+        
         
         else if (msg_code == 10 || msg_code == 20) 
         {   
