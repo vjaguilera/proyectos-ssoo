@@ -1,10 +1,13 @@
 #include "server.h"
+// #include "../structs/monster.h"
+#include "../structs/structs_server/conection.h"
 
 Server* init_server(int socket) {
     Server* server = malloc(sizeof(Server));
     server -> clientes = malloc(sizeof(Jugador) * 5);
     server -> cantidad_clientes = 0;
     server -> socket = socket;
+    server -> monster = malloc(sizeof(Monster));
     return server;
 }
 
@@ -126,4 +129,73 @@ void * leader_start(void *args) {
   }
   printf("Termine la función del lider\n");
   pthread_exit(NULL);
+}
+
+void start_playing(Server* server, Jugador* jugadores){
+  // Se asume que recibe una lista de Jugadores 
+
+  // Se instancia el mounstro
+  server -> monster = Monster_init()
+
+  // Le enviamos al primer cliente un mensaje de bienvenida 
+  // char * welcome = "Bienvenido Cliente 1!!";
+  // server_send_message(players_info->socket_c1, 1, welcome);
+
+
+  // Guardaremos los sockets en un arreglo e iremos alternando a quién escuchar.
+  int sockets_array[2] = {players_info->sockets_array[0], players_info->socket_c2};
+
+  int rounds = 1;
+  while (1){
+    for (int turn = 0; turn < server->cantidad_clientes; turn++)
+    {
+      // Juega cada jugador en orden de llegada
+      // El jugadador 0 es el lider
+      char * welcome = "Bienvenido Cliente !!";
+      char * currentTurn = "Es el turno del jugador XX";
+      // server_send_message(players_info->socket_c1, 1, welcome);
+      notify_players(currentTurn);
+      char * options = "Escoge una opcion\n1) Realizar una habilidad\n2) Rendirse\n";
+      server_send_message(server -> clientes[turn] -> socket , turn, options);
+
+      int msg_code = server_receive_id(sockets_array[turn]);
+    }
+    
+    // Se obtiene el paquete del cliente 1
+    int msg_code = server_receive_id(sockets_array[turn]);
+
+    if (msg_code == 1) //El cliente me envió un mensaje a mi (servidor)
+    {
+      char * client_message = server_receive_payload(sockets_array[turn]);
+      printf("El cliente %d dice: %s\n", turn+1, client_message);
+
+      // Le enviaremos el mismo mensaje invertido jeje
+      char * response = revert(client_message);
+
+      // Le enviamos la respuesta
+      server_send_message(sockets_array[turn], 1, response);
+    }
+    else if (msg_code == 2){ //El cliente le envía un mensaje al otro cliente
+      char * client_message = server_receive_payload(sockets_array[turn]);
+      printf("Servidor traspasando desde %d a %d el mensaje: %s\n", turn+1, ((turn+1)%2)+1, client_message);
+
+      // Mi atención cambia al otro socket
+      turn = (turn + 1) % 2;
+
+      server_send_message(sockets_array[turn], 2, client_message);
+    }
+
+    else if (msg_code == 0) {
+      return 0;
+    }
+    printf("------------------\n");
+    
+  }
+}
+
+void notify_players(char* message){
+  // Funcion que recibe un mensaje y lo envia a todos los jugadores
+  for (int jugador = 0; jugador < server->cantidad_clientes; jugador++){
+    server_send_message(server -> clientes[jugador] -> socket , jugador, message);
+  }
 }

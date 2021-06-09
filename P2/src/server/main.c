@@ -20,12 +20,12 @@ int main(int argc, char *argv[]){
   printf("Servidor iniciado\n");
   
   // Se inicializa una estructura propia para guardar los n°s de sockets de los clientes.
-  // PlayersInfo * players_info = malloc(sizeof(PlayersInfo));
+  PlayersInfo * players_info = malloc(sizeof(PlayersInfo));
 
   initial_listen(server);
-
-  return 0;
-
+  // Comienzan los turnos
+  // _____________________________________________
+  start_playing(server);
 
   // // Le enviamos al primer cliente un mensaje de bienvenida
   // char * welcome = "Bienvenido Cliente 1!!";
@@ -34,8 +34,8 @@ int main(int argc, char *argv[]){
   // // Guardaremos los sockets en un arreglo e iremos alternando a quién escuchar.
   // int sockets_array[2] = {players_info->socket_c1, players_info->socket_c2};
   // int my_attention = 0;
-  // while (1)
-  // {
+  // int clientsConnecting = 1;
+  // while (clientsConnecting){
   //   // Se obtiene el paquete del cliente 1
   //   int msg_code = server_receive_id(sockets_array[my_attention]);
 
@@ -64,7 +64,9 @@ int main(int argc, char *argv[]){
   //     return 0;
   //   }
   //   printf("------------------\n");
+    
   // }
 
   return 0;
 }
+

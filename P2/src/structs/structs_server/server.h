@@ -2,12 +2,14 @@
 #include <pthread.h>
 #include "../structs_shared/jugador.h"
 #include "../structs_server/comunication.h"
+// #include "../structs/monster.h"
 
 typedef struct server{
     Jugador* lider;
     Jugador** clientes;
     int cantidad_clientes;
     int socket;
+    // Monster monster;
 } Server;
 
 typedef struct thread_arguments {

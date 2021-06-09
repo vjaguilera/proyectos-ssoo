@@ -105,3 +105,4 @@ int pick_option() {
 void clean_jugador(Jugador* jugador) {
     free(jugador);
 }
+
