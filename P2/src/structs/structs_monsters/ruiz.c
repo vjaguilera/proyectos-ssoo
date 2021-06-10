@@ -2,22 +2,24 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include "../structs_shared/jugador.h"
+#include "../structs_server/server.h"
 
-Ruiz *Ruiz_init()
+Ruiz *ruiz_init()
 {
     Ruiz *ruiz = malloc(sizeof(Ruiz));
     ruiz->initial_life = 25000;
     return ruiz;
 }
 
-void copycase_hability(Ruiz *ruiz, Player *copy_player, Player *obj_player)
+void copycase_hability(Ruiz *ruiz, Jugador *copy_player, Jugador *obj_player)
 {
     // Ruiz rompe el Código de Honor y copia de forma aleatoria una de las habilidades de
     // algún jugador y la usa contra alguno de los jugadores causando los efectos asociados. Si la habilidad normal-
     // mente involucra ayudar a un jugador aliado, Ruiz recibe el efecto sobre si mismo.
 }
 
-void reprobatron_hability(Ruiz *ruiz, Player *player)
+void reprobatron_hability(Ruiz *ruiz, Jugador *player)
 {
     // Ruiz reprueba instantáneamente a un jugador. El jugador queda con estado repro-
     // bado hasta el fin del siguiente turno de Ruiz. Un jugador con estado reprobado está desmoralizado y recibe
@@ -25,19 +27,21 @@ void reprobatron_hability(Ruiz *ruiz, Player *player)
     // curar o dañar
 
     // Champion desmoralization
-    player->champion->demoralized = true;
+    if (player -> is_cazador) {
+        // player->cazador->demoralized = true;
+    }
 
     // Add demoralized player to a list in Server
 }
 
-void sudormrf_hability(Ruiz *ruiz, Server *server, Player **players, int players_amount)
+void sudormrf_hability(Ruiz *ruiz, Server *server, Jugador **players, int players_amount)
 {
     // Ruiz borra todas las rondas ocurridas hasta ahora para infligir daño a todos los jugadores.
     // Hace 100·(número de rondas desde el inicio del combate hasta ahora, sin considerar usos anteriores de esta
     // habilidad) de daño a todos los jugadores.
 
     // Get rounds until now and get damage
-    int rounds = server->rouds_without_sudo; // Rounds from the beginning til now without usage of sudo rmrf
+    int rounds = server->rounds_without_sudo; // Rounds from the beginning til now without usage of sudo rmrf
 
     int damage = 100 * rounds;
 
@@ -48,25 +52,25 @@ void sudormrf_hability(Ruiz *ruiz, Server *server, Player **players, int players
     }
 
     // Set server rounds to 0
-    server->current_round = 0;
+    server->ronda_actual = 0;
 }
 
-int choose_hability()
+int choose_hability_ruiz()
 {
     // 2: copycase
     // 1: reprobatron
     // 0: sudo rmrf
     float random_num;
 
-    random_num = ((float)rand()) / RAND_MAX;
+    random_num = rand() % 10;
     printf("%f\n", random_num);
 
-    if (random_num < 0.4)
+    if (random_num < 4)
     {
         // Copycase
         return 2;
     }
-    else if (random_num >= 0.4 && random_num < 0.6)
+    else if (random_num >= 4 && random_num < 6)
     {
         // Reprobatron
         return 1;

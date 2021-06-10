@@ -1,10 +1,5 @@
 #include "jagruz.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-
-unsigned int seed = 0;
-srand(seed);
+#include "../structs_shared/jugador.h"
 
 JagRuz *jagruz_init()
 {
@@ -13,14 +8,14 @@ JagRuz *jagruz_init()
     return jagruz;
 }
 
-void ruzgar_hability(JagRuz *jagruz, Player *player)
+void ruzgar_hability(JagRuz *jagruz, Jugador *player)
 {
     // El JagRuz ocupa sus poderosas garRaz para atacar a un enemigo 1000 puntos de daño"""
     int damage = 1000;
     update_player_life(player, -damage); // Update -damage player life
 }
 
-void coletazo_hability(JagRuz *jagruz, Player **players, int players_amount)
+void coletazo_hability(JagRuz *jagruz, Jugador **players, int players_amount)
 {
     int damage = 500;
     // El JagRuz golpea a todos los objetivos con su cola 500 puntos de daño
@@ -30,15 +25,15 @@ void coletazo_hability(JagRuz *jagruz, Player **players, int players_amount)
     }
 }
 
-int choose_hability()
+int choose_hability_jagruz()
 {
     // 1: ruzgar
     // 0: coletazo
     float random_num;
 
-    random_num = ((float)rand()) / RAND_MAX;
+    random_num = rand() % 10;
     printf("%f\n", random_num);
-    return random_num > 0.5;
+    return random_num > 5;
 }
 
 void jagruz_clean(JagRuz *jagruz)
