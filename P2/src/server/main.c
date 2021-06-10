@@ -23,8 +23,10 @@ int main(int argc, char *argv[]){
   PlayersInfo * players_info = malloc(sizeof(PlayersInfo));
 
   initial_listen(server);
+  
   // Comienzan los turnos
   // _____________________________________________
+  // turnos_listen(server);
 
   start_playing(server, Jugador* jugadores);
 

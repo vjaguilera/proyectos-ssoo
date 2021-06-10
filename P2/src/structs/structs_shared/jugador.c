@@ -60,6 +60,16 @@ void listen_client(Jugador* jugador, int socket) {
             sprintf(response, "%d", option);
             send_msg(jugador, 1, response);
         }
+
+
+
+        else if (msg_code == 5) {
+            show_menu(message, 0);
+            show_menu("Ataque 1", 1);
+            show_menu("Ataque 2", 2);
+            int option = pick_option();
+            send_msg(jugador, option, "Texto");
+        }
         
         
         else if (msg_code == 10 || msg_code == 20) 

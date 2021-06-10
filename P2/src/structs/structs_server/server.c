@@ -18,7 +18,7 @@ void notify_all_clients(Server* server, char* msg) {
 }
 
 void initial_listen(Server* server) {
-    int new_socket;
+  int new_socket;
   int pos;
   int msg_code;
   char response[50];
@@ -320,4 +320,37 @@ void notify_players(char* message){
   for (int jugador = 0; jugador < server->cantidad_clientes; jugador++){
     server_send_message(server -> clientes[jugador] -> socket , jugador, message);
   }
+}
+
+void turnos_listen(Server* server) {
+  int my_attention = 0;
+  server -> turno_actual = my_attention;
+  server -> active_match = 1;
+  char message[70];
+  while (server -> active_match)
+  {
+
+    printf("Turno de %d\n", server -> turno_actual);
+    server -> cliente_actual = server -> clientes[server -> turno_actual];
+    printf("Nombre: %s\n", server -> cliente_actual -> nombre);
+    sprintf(message, "Es el turno de %s", server -> cliente_actual -> nombre);
+    notify_all_clients(server, message);
+    server_send_message(server -> cliente_actual -> socket, 5, "¿Qué desea hacer?");
+    // Se obtiene el paquete del cliente 1
+    int msg_code = server_receive_id(server -> cliente_actual -> socket);
+    char * client_message = server_receive_payload(server -> cliente_actual -> socket);
+    printf("Se recibe %d: %s\n", msg_code, client_message);
+    printf("------------------\n");
+    change_turn(server);
+  }
+}
+
+void change_turn(Server* server) {
+  printf("-Turno de %d\n", server -> turno_actual);
+  server -> turno_actual += 1;
+  if (server -> turno_actual > 4) {
+    server -> turno_actual = 0;
+  }
+  printf("--Turno de %d\n", server -> turno_actual);
+  // otras cosas de combates etc
 }
