@@ -25,7 +25,8 @@ int main(int argc, char *argv[]){
   initial_listen(server);
   // Comienzan los turnos
   // _____________________________________________
-  start_playing(server);
+
+  start_playing(server, Jugador* jugadores);
 
   // // Le enviamos al primer cliente un mensaje de bienvenida
   // char * welcome = "Bienvenido Cliente 1!!";
