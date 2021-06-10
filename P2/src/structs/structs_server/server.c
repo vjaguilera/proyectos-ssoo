@@ -131,65 +131,187 @@ void * leader_start(void *args) {
   pthread_exit(NULL);
 }
 
+// [?] jugadores seria server -> clients
 void start_playing(Server* server, Jugador* jugadores){
-  // Se asume que recibe una lista de Jugadores 
+  // [?] Se asume que recibe una lista de Jugadores 
 
-  // Se instancia el mounstro
-  server -> monster = Monster_init()
-
-  // Le enviamos al primer cliente un mensaje de bienvenida 
-  // char * welcome = "Bienvenido Cliente 1!!";
-  // server_send_message(players_info->socket_c1, 1, welcome);
-
-
-  // Guardaremos los sockets en un arreglo e iremos alternando a quién escuchar.
-  int sockets_array[2] = {players_info->sockets_array[0], players_info->socket_c2};
-
+  // [?] Se instancia el mounstro
+  server -> monster = Monster_init();
+  int cantidad_activos = server->cantidad_clientes;
   int rounds = 1;
-  while (1){
-    for (int turn = 0; turn < server->cantidad_clientes; turn++)
-    {
+
+  // WHILE 
+  while (server->monster->vida > 0 && cantidad_activos > 0){
+
+    // FOR
+    for (int turn = 0; turn < server->cantidad_clientes; turn++){
+
+      if (server -> clientes[turn] -> rendido){
+        continue;
+      }
+
       // Juega cada jugador en orden de llegada
       // El jugadador 0 es el lider
-      char * welcome = "Bienvenido Cliente !!";
-      char * currentTurn = "Es el turno del jugador XX";
-      // server_send_message(players_info->socket_c1, 1, welcome);
-      notify_players(currentTurn);
+      char * currentTurnMessage;
+      sprintf(currentTurnMessage, "Es el turno del jugador %i\n", turn);
+      notify_players(currentTurnMessage);
+
       char * options = "Escoge una opcion\n1) Realizar una habilidad\n2) Rendirse\n";
+
+      // [?] Que es el id que se entrega, el segundo parametro
       server_send_message(server -> clientes[turn] -> socket , turn, options);
 
-      int msg_code = server_receive_id(sockets_array[turn]);
+      // [?] El servidor espera respuesta del cliente actual
+      int opc_code = server_receive_id(sockets_array[turn]);
+      // El cliente responde esto
+      char * client_response = server_receive_payload(sockets_array[turn]);
+      // Manejo de ifs
+      if (client_response == "1"){
+        char * optionsPlay;
+        // [?] Como acceder a las habilidades de la clase del jugador actual
+        sprintf(optionsPlay, "Escoge tu habilidad\n1)%s\n2)%s\n3)%s\n",
+          server -> clientes[turn] -> clase -> habilidades[0],
+          server -> clientes[turn] -> clase -> habilidades[1],
+          server -> clientes[turn] -> clase -> habilidades[2]);
+        // [?] Que es el id que se entrega, el segundo parametro
+        server_send_message(server -> clientes[turn] -> socket , turn, optionsPlay);
+        char * client_response_ability = server_receive_payload(sockets_array[turn]);
+        // ver como se comporta la habilidad
+        // [ToDo] notify_players de la habilidad realizada (jugador, habilidad, consecuencia, target, turno)
+        if (server -> clientes[turn] -> clase -> clase_str == "hacker"){
+          if (client_response_ability == 1){
+            char * optionsSQL = "Escoge a quien quieres duplicarle el ataque\n";
+            int opcion = 0;
+            // [?] Como acceder a las habilidades de la clase del jugador actual
+            for (int i = 0; i < server -> cantidad_clientes; i++){
+              if (server ->clientes[i] -> rendido){
+                opcion += 1;
+                continue;
+              }
+              else{
+                sprintf(optionsSQL, "%i) %s\n", opcion, server->clientes[i]->nombre);
+                opcion += 1;
+              }
+            }
+            // [?] Que es el id que se entrega, el segundo parametro
+            server_send_message(server -> clientes[turn] -> socket , turn, optionsSQL);
+            char * client_response_sql = server_receive_payload(sockets_array[turn]);
+            // [?] Se castea asi a int? o con atoi
+            int cliente_a_duplicar = (int)client_response_sql;
+
+            inyeccion_sql_ability(server -> clientes[turn], server->clientes[cliente_a_duplicar]);
+          } 
+          else if (client_response_ability == 2){
+            ataque_ddos_ability(server -> clientes[turn], server -> monster);
+          }
+          else if (client_response_ability == 3){
+            fuerza_bruta_ability(server -> clientes[turn], server -> monster);
+          }
+          else{
+            printf("Ingresa una opcion valida");
+          }
+        }
+        else if (server -> clientes[turn] -> clase -> clase_str == "medico"){
+          if (client_response_ability == 1){
+            // A quien quieres curar
+          char * optionsCure = "Escoge a quien quieres curar\n";
+          int opcion = 0;
+          // [?] Como acceder a las habilidades de la clase del jugador actual
+          for (int i = 0; i < server -> cantidad_clientes; i++){
+            if (server ->clientes[i] -> rendido){
+              opcion += 1;
+              continue;
+            }
+            else{
+              sprintf(optionsCure, "%i) %s\n", opcion, server->clientes[i]->nombre);
+              opcion += 1;
+            }
+          }
+          // [?] Que es el id que se entrega, el segundo parametro
+          server_send_message(server -> clientes[turn] -> socket , turn, optionsCure);
+          char * client_response_cure = server_receive_payload(sockets_array[turn]);
+          // [?] Se castea asi a int? o con atoi
+          int cliente_a_curar = (int)client_response_cure;
+          curar_ability(server -> clientes[turn], server -> clientes[cliente_a_curar]);
+          } 
+          else if (client_response_ability == 2){
+            // Asignar target_recuperacion al azar
+            int jugador_valido = 1;
+            int jugador_recuperado;
+            while(jugador_valido){
+              jugador_recuperado = (rand() % cantidad_jugadores + 1);
+              if (server -> clientes[jugador_recuperado] -> rendido){
+                continue;
+              }
+              else{
+                jugador_valido = 0;
+              }
+            }
+            destello_regenerador_ability(server -> clientes[turn], server -> monster, server -> clientes[jugador_recuperado]);
+          }
+          else if (client_response_ability == 3){
+            descarga_vital_ability(server -> clientes[turn], server -> monster);
+          }
+          else{
+            printf("Ingresa una opcion valida");
+          }
+        }
+        else if (server -> clientes[turn] -> clase -> clase_str == "cazador"){
+          if (client_response_ability == 1){
+            estocada_ability(server -> clientes[turn], server -> monster);
+          } 
+          else if (client_response_ability == 2){
+            corte_cruzado_ability(server -> clientes[turn], server -> monster);
+          }
+          else if (client_response_ability == 3){
+            distraer_ability(server -> clientes[turn], server -> monster);
+          }
+          else{
+            printf("Ingresa una opcion valida");
+          }
+        }
+
+      }
+      else if (client_response == "2"){
+        // server -> cantidad_clientes -= 1;
+        server -> clientes[turn] -> rendido = 1;
+        char * playerSurrender;
+        sprintf(playerSurrender, "El jugador %i se rindio\n", turn);
+        notify_players(playerSurrender);
+      }
     }
-    
-    // Se obtiene el paquete del cliente 1
-    int msg_code = server_receive_id(sockets_array[turn]);
+    // FIN DEL FOR DE JUGADORES
 
-    if (msg_code == 1) //El cliente me envió un mensaje a mi (servidor)
-    {
-      char * client_message = server_receive_payload(sockets_array[turn]);
-      printf("El cliente %d dice: %s\n", turn+1, client_message);
 
-      // Le enviaremos el mismo mensaje invertido jeje
-      char * response = revert(client_message);
+    // [vicho] Aqui juega el moster
 
-      // Le enviamos la respuesta
-      server_send_message(sockets_array[turn], 1, response);
+    // FIN DEL MONSTER
+
+    // Calculamos nueva cantidad de activos
+    int cantidad_activos_aux = 0;
+    for (int i = 0; i < server->cantidad_clientes; i++){
+      if (server->clientes[i]->rendido){
+        continue;
+      }
+      else{
+        cantidad_activos_aux += 1;
+      }
     }
-    else if (msg_code == 2){ //El cliente le envía un mensaje al otro cliente
-      char * client_message = server_receive_payload(sockets_array[turn]);
-      printf("Servidor traspasando desde %d a %d el mensaje: %s\n", turn+1, ((turn+1)%2)+1, client_message);
+    int cantidad_activos = cantidad_activos_aux;
+    rounds += 1;
+  }
+  // FIN DEL WHILE
 
-      // Mi atención cambia al otro socket
-      turn = (turn + 1) % 2;
-
-      server_send_message(sockets_array[turn], 2, client_message);
-    }
-
-    else if (msg_code == 0) {
-      return 0;
-    }
-    printf("------------------\n");
-    
+  // GANAMOS 
+  if (server->monster->vida <= 0){
+    char * winMessage = "El monstruo ha sido derrotado, FELIICITACIONES A LOS JUGADORES\n";  
+    notify_players(winMessage);
+  }
+  // PERDIMOS :(
+  else{
+    // [tomas] si pierden la vida, que se dejen como rendido = 1
+    char * lossMessage = "El monstruo nos ha derrotado\n";
+    notify_players(lossMessage);
   }
 }
 
