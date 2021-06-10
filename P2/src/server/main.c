@@ -20,7 +20,7 @@ int main(int argc, char *argv[]){
   printf("Servidor iniciado\n");
   
   // Se inicializa una estructura propia para guardar los n°s de sockets de los clientes.
-  PlayersInfo * players_info = malloc(sizeof(PlayersInfo));
+  // PlayersInfo * players_info = malloc(sizeof(PlayersInfo));
 
   initial_listen(server);
   
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]){
   // _____________________________________________
   // turnos_listen(server);
 
-  start_playing(server, Jugador* jugadores);
+  start_playing(server, server -> clientes);
 
   // // Le enviamos al primer cliente un mensaje de bienvenida
   // char * welcome = "Bienvenido Cliente 1!!";

@@ -68,7 +68,17 @@ void listen_client(Jugador* jugador, int socket) {
             show_menu("Ataque 1", 1);
             show_menu("Ataque 2", 2);
             int option = pick_option();
-            send_msg(jugador, option, "Texto");
+            char msg[2];
+            sprintf(msg, "%d", option);
+            send_msg(jugador, option, msg);
+        }
+
+        else if (msg_code == 7) {
+            show_menu(message, 0);
+            int option = pick_option();
+            char msg[2];
+            sprintf(msg, "%d", option);
+            send_msg(jugador, option, msg);
         }
         
         
@@ -117,3 +127,40 @@ void clean_jugador(Jugador* jugador) {
     free(jugador);
 }
 
+void update_player_life(Jugador* jugador, int damage) {
+    printf("Quitar %d de vida a jugador %s\n", damage, jugador -> nombre);
+    switch (jugador -> num_clase)
+    {
+    case 0:
+        // jugador -> cazador -> life -= damage;
+        break;
+    case 1:
+        // jugador -> medico -> life -= damage;
+        break;
+    case 2:
+        // jugador -> hacker -> life -= damage;
+        break;
+    
+    default:
+        break;
+    }   
+}
+
+void intoxicate_player(Jugador* jugador, int intoxication) {
+        printf("Quitar %d de vida a jugador %s\n", intoxication, jugador -> nombre);
+    switch (jugador -> num_clase)
+    {
+    case 0:
+        // jugador -> cazador -> intoxicated -= damage;
+        break;
+    case 1:
+        // jugador -> medico -> intoxicated -= damage;
+        break;
+    case 2:
+        // jugador -> hacker -> intoxicated -= damage;
+        break;
+    
+    default:
+        break;
+    }  
+};
