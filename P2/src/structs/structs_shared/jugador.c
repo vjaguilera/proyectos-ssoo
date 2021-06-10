@@ -7,6 +7,7 @@ Jugador* init_jugador() {
     Jugador* jugador = malloc(sizeof(Jugador));
     jugador -> socket = socket;
     jugador -> mi_turno = 0;
+    jugador -> rendido = 0;
     return jugador;
 };
 

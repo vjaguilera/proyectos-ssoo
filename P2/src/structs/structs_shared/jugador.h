@@ -11,6 +11,7 @@ typedef struct player{
   int num_clase;
   int clase; // Deberia ser un enum
   int mi_turno; // 0 no 1 si
+  int rendido;
 } Jugador;
 
 Jugador* init_jugador(); // crea al jugador
