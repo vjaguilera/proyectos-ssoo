@@ -23,6 +23,7 @@ int main(int argc, char *argv[]){
   // PlayersInfo * players_info = malloc(sizeof(PlayersInfo));
 
   initial_listen(server);
+  turnos_listen(server);
 
   return 0;
 
