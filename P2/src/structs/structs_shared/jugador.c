@@ -8,7 +8,8 @@ Jugador* init_jugador(int identificador) {
     jugador -> socket = socket;
     jugador -> mi_turno = 0;
     jugador -> rendido = 0;
-
+    jugador -> duplicado = 0;
+    jugador -> fuerza_bruta = 0;
     switch (identificador)
     {
     case 0:

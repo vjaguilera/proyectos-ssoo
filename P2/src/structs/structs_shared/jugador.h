@@ -22,6 +22,8 @@ typedef struct Jugador{
   Hacker* hacker;
   int mi_turno; // 0 no 1 si
   int rendido; // 0 no rendido, 1 rendido
+  int duplicado;
+  int fuerza_bruta;
 } Jugador;
 
 Jugador* init_jugador(); // crea al jugador
