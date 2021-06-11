@@ -8,6 +8,7 @@ typedef struct hacker
     int duplicado;
     int fuerza_bruta;
     char clase_str;
+    char* habilidades[3];
 } Hacker;
 
 Hacker *hacker_init();

@@ -8,6 +8,7 @@ typedef struct medico
     int current_life;
     int duplicado;
     char clase_str;
+    char* habilidades[3];
 } Medico;
 
 Medico *medico_init();

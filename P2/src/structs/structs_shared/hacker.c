@@ -13,6 +13,7 @@ Hacker *hacker_init()
     hacker -> duplicado = 0;
     hacker -> fuerza_bruta = 0;
     hacker -> clase_str = "hacker";
+    hacker -> habilidades = ["Inyeccion sql", "Ataque ddos", "Fuerza bruta"];
     return hacker;
 }
 

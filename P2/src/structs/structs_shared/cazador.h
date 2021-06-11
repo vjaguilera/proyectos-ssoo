@@ -8,6 +8,7 @@ typedef struct cazador
     int current_life; // se tienen que ir como atributo del player
     int duplicado;
     char clase_str;
+    char* habilidades[3];
 } Cazador;
 
 Cazador *cazador_init();

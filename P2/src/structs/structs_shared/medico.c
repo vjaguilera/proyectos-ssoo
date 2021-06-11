@@ -11,6 +11,7 @@ Medico *medico_init(){
     medico -> current_life = 3000;
     medico -> duplicado = 0;
     medico -> clase_str = "medico";
+    medico -> habilidades = ["Curar", "Destello regenerador", "Descarga vital"]
     return medico;
 }
 

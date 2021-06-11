@@ -13,6 +13,7 @@ Cazador *cazador_init()
     cazador -> clase_str = "cazador";
     // duplicado no estaria aceptando que se pueda cuaduplicar o octuplicar o ... tiene que permitirlo?
     cazador -> duplicado = 0; // cantidad de turnos que le quedan estando duplicado. Si es 0, no se duplica su ataque
+    cazador -> habilidades = ["Estocada", "Corte cruzado", "Distraer"];
     return cazador;
 }
 
@@ -38,6 +39,7 @@ void estocada_ability(Jugador *jugador, Monster *monster){
         }
         else {
             monster -> current_life = 0; // avisar que la vida le llega a 0 ?    
+        }
     }
 }
 
@@ -59,12 +61,13 @@ void corte_cruzado_ability(Jugador *jugador, Monster *monster){
         else {
             monster -> current_life = 0; // avisar que la vida le llega a 0 ? 
         
+        }
     }
 }
 
 
-void distraer_ability(Jugador *jugador, Monster *Monster){
-    mosnter -> me_distrajo = jugador;
+void distraer_ability(Jugador *jugador, Monster *monster){
+    monster -> me_distrajo = jugador;
 }
 
 
