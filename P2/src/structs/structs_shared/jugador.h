@@ -4,19 +4,22 @@
 #include <time.h>
 #include "../structs_client/comunication.h"
 #include "../structs_client/conection.h"
+#include "hacker.h"
+#include "medico.h"
+#include "cazador.h"
 
-
-typedef struct player{
+typedef struct Jugador{
   int socket;
   char* nombre;
   int num_clase;
   int clase; // Deberia ser un enum PENDIENTE
+  int current_life;
   int is_cazador;
   int is_medico;
   int is_hacker;
-  // Cazador* cazador;
-  // Medico* medico;
-  // Hacker* hacker;
+  Cazador* cazador;
+  Medico* medico;
+  Hacker* hacker;
   int mi_turno; // 0 no 1 si
   int rendido; // 0 no rendido, 1 rendido
 } Jugador;

@@ -3,11 +3,40 @@
 #include "../structs_client/conection.h"
 #include "../../helpers/input.h"
 
-Jugador* init_jugador() {
+Jugador* init_jugador(int identificador) {
     Jugador* jugador = malloc(sizeof(Jugador));
     jugador -> socket = socket;
     jugador -> mi_turno = 0;
     jugador -> rendido = 0;
+
+    switch (identificador)
+    {
+    case 0:
+        jugador -> is_cazador = 1;
+        jugador -> is_medico = 0;
+        jugador -> is_ruzalo = 0;
+        jugador -> cazador = cazador_init();
+        jugador -> current_life = jugador -> cazador-> initial_life;
+        break;
+    case 1:
+        jugador -> is_cazador = 0;
+        jugador -> is_medico = 1;
+        jugador -> is_hacker = 0;
+        jugador -> medico = medico_init();
+        jugador -> current_life = jugador -> cazador-> initial_life;~
+        break;
+    case 2:
+        jugador -> is_cazador = 0;
+        jugador -> is_medico = 0;
+        jugador -> is_hacker = 1;
+        jugador -> hacker = hacker_init();
+        jugador -> current_life = jugador -> cazador-> initial_life;
+        break;
+    
+    default:
+        printf("no deberia llegar aca!");
+        break;
+    }
     return jugador;
 };
 
