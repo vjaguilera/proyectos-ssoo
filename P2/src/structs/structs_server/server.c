@@ -1,7 +1,7 @@
 #include "server.h"
 #include "../structs_monsters/monster.h"
 #include "../structs_server/conection.h"
-#include "../structs_shared/abilities_player.h"
+#include "../structs_shared/jugador.h"
 
 Server* init_server(int socket) {
     Server* server = malloc(sizeof(Server));
@@ -176,21 +176,21 @@ void start_playing(Server* server, Jugador** jugadores){
       // Manejo de ifs
       printf("asdsd %d %s\n", client_response == "1", client_response);
       if (client_response[0] == '1'){
-        char optionsPlay[100];
-        // [?] Como acceder a las habilidades de la clase del jugador actual
-        sprintf(optionsPlay, "Escoge tu habilidad\n1)%s\n2)%s\n3)%s\n",
-        "Habilidad 1", "Habilidad 2", "Habilidad 3"
-        );
-          // server -> cliente_actual -> clase -> habilidades[0],
-          // server -> cliente_actual -> clase -> habilidades[1],
-          // server -> cliente_actual -> clase -> habilidades[2]);
-        // [?] Que es el id que se entrega, el segundo parametro
-        server_send_message(server -> cliente_actual -> socket , 7, optionsPlay);
-        char * _client_response_ability = server_receive_payload(server -> cliente_actual -> socket);
-        int client_response_ability = (int) _client_response_ability[0];
-        // ver como se comporta la habilidad
         // [ToDo] notify_players de la habilidad realizada (jugador, habilidad, consecuencia, target, turno)
+        
+        // Hacker
         if (server -> clientes[turn] -> is_hacker == 1){
+          char optionsPlay[120];
+          sprintf(optionsPlay, "Escoge tu habilidad\n1)%s\n2)%s\n3)%s\n",
+          server -> clientes[turn] -> hacker -> habilidades[0],
+          server -> clientes[turn] -> hacker -> habilidades[1],
+          server -> clientes[turn] -> hacker -> habilidades[2]
+          );
+          server_send_message(server -> cliente_actual -> socket , 7, optionsPlay);
+          char * _client_response_ability = server_receive_payload(server -> cliente_actual -> socket);
+          int client_response_ability = (int) _client_response_ability[0];
+
+          // Inyeccion SQL
           if (client_response_ability == 1){
             char optionsSQL[100];
             int opcion = 0;
@@ -213,9 +213,12 @@ void start_playing(Server* server, Jugador** jugadores){
             printf("Que se castea cliente_a_duplicar %d\n", cliente_a_duplicar);
             inyeccion_sql_ability(server -> cliente_actual, server->clientes[cliente_a_duplicar]);
           } 
+
+          // Ataque DDOS
           else if (client_response_ability == 2){
             ataque_ddos_ability(server -> cliente_actual, server -> monster);
           }
+          // Fuerza bruta
           else if (client_response_ability == 3){
             fuerza_bruta_ability(server -> cliente_actual, server -> monster);
           }
@@ -223,19 +226,33 @@ void start_playing(Server* server, Jugador** jugadores){
             printf("Ingresa una opcion valida");
           }
         }
+
+        // Medico
         else if (server -> clientes[turn] -> is_medico == 1){
+          char optionsPlay[120];
+          sprintf(optionsPlay, "Escoge tu habilidad\n1)%s\n2)%s\n3)%s\n",
+          server -> clientes[turn] -> medico -> habilidades[0],
+          server -> clientes[turn] -> medico -> habilidades[1],
+          server -> clientes[turn] -> medico -> habilidades[2]
+          );
+          server_send_message(server -> cliente_actual -> socket , 7, optionsPlay);
+          char * _client_response_ability = server_receive_payload(server -> cliente_actual -> socket);
+          int client_response_ability = (int) _client_response_ability[0];
+
+          // Curar
           if (client_response_ability == 1){
             // A quien quieres curar
           char optionsCure[100];
           int opcion = 0;
           // [?] Como acceder a las habilidades de la clase del jugador actual
+          sprintf(optionsCure, "Escoge a quien quieres curar\n");
           for (int i = 0; i < server -> cantidad_clientes; i++){
             if (server ->clientes[i] -> rendido){
               opcion += 1;
               continue;
             }
             else{
-              sprintf(optionsCure, "Escoge a quien quieres curar\n%i) %s\n", opcion, server->clientes[i]->nombre);
+              sprintf(optionsCure, "%i) %s\n", opcion, server->clientes[i]->nombre);
               opcion += 1;
             }
           }
@@ -246,6 +263,8 @@ void start_playing(Server* server, Jugador** jugadores){
           int cliente_a_curar = (int)client_response_cure;
           curar_ability(server -> cliente_actual, server -> clientes[cliente_a_curar]);
           } 
+          
+          // Destello regenerador
           else if (client_response_ability == 2){
             // Asignar target_recuperacion al azar
             int jugador_valido = 1;
@@ -261,6 +280,7 @@ void start_playing(Server* server, Jugador** jugadores){
             }
             destello_regenerador_ability(server -> cliente_actual, server -> monster, server -> clientes[jugador_recuperado]);
           }
+          // Descarga vital
           else if (client_response_ability == 3){
             descarga_vital_ability(server -> cliente_actual, server -> monster);
           }
@@ -268,13 +288,30 @@ void start_playing(Server* server, Jugador** jugadores){
             printf("Ingresa una opcion valida");
           }
         }
+
+        // Cazador
         else if (server -> cliente_actual -> is_cazador == 1){
+          char optionsPlay[120];
+          sprintf(optionsPlay, "Escoge tu habilidad\n1)%s\n2)%s\n3)%s\n",
+          server -> clientes[turn] -> cazador -> habilidades[0],
+          server -> clientes[turn] -> cazador -> habilidades[1],
+          server -> clientes[turn] -> cazador -> habilidades[2]
+          );
+          server_send_message(server -> cliente_actual -> socket , 7, optionsPlay);
+          char * _client_response_ability = server_receive_payload(server -> cliente_actual -> socket);
+          int client_response_ability = (int) _client_response_ability[0];
+
+          // Estocada
           if (client_response_ability == 1){
             estocada_ability(server -> cliente_actual, server -> monster);
           } 
+          
+          // Corte cruzado
           else if (client_response_ability == 2){
             corte_cruzado_ability(server -> cliente_actual, server -> monster);
           }
+
+          // Distraer
           else if (client_response_ability == 3){
             distraer_ability(server -> cliente_actual, server -> monster);
           }
