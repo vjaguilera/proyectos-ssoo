@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include "../structs_shared/jugador.h"
 #include "../structs_server/server.h"
 
 Ruiz *ruiz_init()

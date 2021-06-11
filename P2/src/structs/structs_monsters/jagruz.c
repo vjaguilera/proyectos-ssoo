@@ -1,5 +1,4 @@
 #include "jagruz.h"
-#include "../structs_shared/jugador.h"
 
 JagRuz *jagruz_init()
 {
