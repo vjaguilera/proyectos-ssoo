@@ -24,7 +24,7 @@ Jugador* init_jugador(int identificador) {
         jugador -> is_medico = 1;
         jugador -> is_hacker = 0;
         jugador -> medico = medico_init();
-        jugador -> current_life = jugador -> cazador-> initial_life;~
+        jugador -> current_life = jugador -> cazador-> initial_life;
         break;
     case 2:
         jugador -> is_cazador = 0;
