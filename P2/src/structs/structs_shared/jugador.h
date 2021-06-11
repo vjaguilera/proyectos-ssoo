@@ -8,7 +8,7 @@
 #include "medico.h"
 #include "cazador.h"
 
-typedef struct Jugador{
+typedef struct jugador{
   int socket;
   char* nombre;
   int num_clase;
@@ -26,7 +26,7 @@ typedef struct Jugador{
   int fuerza_bruta;
 } Jugador;
 
-Jugador* init_jugador(); // crea al jugador
+Jugador* init_jugador(int identificador); // crea al jugador
 
 void set_socket(Jugador* jugador, int socket); // define el socket
 
