@@ -1,12 +1,11 @@
 #pragma once
+#include "../structs_monsters/monster.h"
+#include "../structs_shared/jugador.h"
 
 typedef struct hacker
 {
     int initial_life;
-    int current_life;
-    int duplicado;
-    int fuerza_bruta;
-    char clase_str;
+    char* clase_str;
 } Hacker;
 
 Hacker *hacker_init();

@@ -15,6 +15,8 @@ typedef struct monster
     JagRuz* jagruz;
     Ruiz* ruiz;
     Ruzalo* ruzalo;
+    int estocadas;
+    Jugador* me_distrajo;
 } Monster;
 
 Monster* monster_init(int identificador);

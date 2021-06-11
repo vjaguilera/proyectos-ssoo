@@ -1,11 +1,11 @@
 #pragma once
+#include "../structs_monsters/monster.h"
+#include "../structs_shared/jugador.h"
 
 typedef struct medico
 {
     int initial_life;
-    int current_life;
-    int duplicado;
-    char clase_str;
+    char* clase_str;
 } Medico;
 
 Medico *medico_init();

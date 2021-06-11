@@ -1,11 +1,11 @@
 #pragma once
+#include "../structs_monsters/monster.h"
+#include "../structs_shared/jugador.h"
 
 typedef struct cazador
 {
     int initial_life; 
-    int current_life; // se tienen que ir como atributo del player
-    int duplicado;
-    char clase_str;
+    char* clase_str;
 } Cazador;
 
 Cazador *cazador_init();
@@ -16,4 +16,4 @@ void corte_cruzado_ability(Jugador *jugador, Monster *monster);
 
 void distraer_ability(Jugador *jugador, Monster *monster);
 
-void jagruz_clean(Cazador *cazador);
+void cazador_clean(Cazador *cazador);

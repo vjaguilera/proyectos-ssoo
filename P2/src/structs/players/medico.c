@@ -8,8 +8,6 @@
 Medico *medico_init(){
     Medico *medico = malloc(sizeof(Medico));
     medico -> initial_life = 3000;
-    medico -> current_life = 3000;
-    medico -> duplicado = 0;
     medico -> clase_str = "medico";
     return medico;
 }
@@ -17,11 +15,11 @@ Medico *medico_init(){
 
 void curar_ability(Jugador *player_medico, Jugador *receptor){
 // da 2000 de vida al jugador elegido
-    if (receptor -> current_life > receptor -> clase -> initial_life - 2000){
-        receptor -> current_life = receptor -> clase -> initial_life;
+    if (receptor -> current_life > receptor -> initial_life - 2000){
+        receptor -> current_life = receptor -> initial_life;
     }
     else {
-        receptor -> tipo_player -> current_life += 2000;
+        receptor -> current_life += 2000;
     }
 }
 
@@ -52,8 +50,8 @@ void destello_regenerador_ability(Jugador *jugador_actual, Monster *monster, Jug
 
     int vida_recuperada = (int)cantidad_ataque/2;
 
-    if (jugador_recuperar -> current_life + vida_recuperada > jugador_recuperar -> clase -> initial_life){
-        jugador_recuperar -> current_life = jugador_recuperar -> clase -> initial_life;
+    if (jugador_recuperar -> current_life + vida_recuperada > jugador_recuperar -> initial_life){
+        jugador_recuperar -> current_life = jugador_recuperar -> initial_life;
     }
     else{
         jugador_recuperar -> current_life += vida_recuperada;
@@ -63,7 +61,7 @@ void destello_regenerador_ability(Jugador *jugador_actual, Monster *monster, Jug
 
 
 void descarga_vital_ability(Jugador *jugador, Monster *monster){
-    int dano = 2 * (jugador -> clase -> initial_life - jugador -> current_life);
+    int dano = 2 * (jugador -> initial_life - jugador -> current_life);
     if (jugador -> duplicado != 0){
         if (monster -> current_life <= 2 * dano){
             monster -> current_life = 0; 

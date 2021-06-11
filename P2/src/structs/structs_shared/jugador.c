@@ -8,6 +8,10 @@ Jugador* init_jugador() {
     jugador -> socket = socket;
     jugador -> mi_turno = 0;
     jugador -> rendido = 0;
+    // duplicado no estaria aceptando que se pueda cuaduplicar o octuplicar o ... tiene que permitirlo?
+    jugador -> duplicado = 0; // cantidad de turnos que le quedan estando duplicado. Si es 0, no se duplica su ataque
+    jugador -> fuerza_bruta = 0;
+    jugador -> intoxicated = 0;
     return jugador;
 };
 
@@ -17,12 +21,7 @@ void set_socket(Jugador* jugador, int socket) {
 
 void set_name(Jugador* jugador, char* name) {
     jugador -> nombre = name;
-}; 
-
-void set_class(Jugador* jugador, int num_clase) {
-    jugador -> num_clase = num_clase;
-    jugador -> clase = 0; // deberia ser de enum
-}
+};
 
 void listen_client(Jugador* jugador, int socket) {
     char * message;
@@ -129,38 +128,10 @@ void clean_jugador(Jugador* jugador) {
 
 void update_player_life(Jugador* jugador, int damage) {
     printf("Quitar %d de vida a jugador %s\n", damage, jugador -> nombre);
-    switch (jugador -> num_clase)
-    {
-    case 0:
-        // jugador -> cazador -> life -= damage;
-        break;
-    case 1:
-        // jugador -> medico -> life -= damage;
-        break;
-    case 2:
-        // jugador -> hacker -> life -= damage;
-        break;
-    
-    default:
-        break;
-    }   
+    jugador -> current_life -= damage;
 }
 
 void intoxicate_player(Jugador* jugador, int intoxication) {
-        printf("Quitar %d de vida a jugador %s\n", intoxication, jugador -> nombre);
-    switch (jugador -> num_clase)
-    {
-    case 0:
-        // jugador -> cazador -> intoxicated -= damage;
-        break;
-    case 1:
-        // jugador -> medico -> intoxicated -= damage;
-        break;
-    case 2:
-        // jugador -> hacker -> intoxicated -= damage;
-        break;
-    
-    default:
-        break;
-    }  
+    printf("Quitar %d de intoxicacion a jugador %s\n", intoxication, jugador -> nombre);
+    jugador -> intoxicated += intoxication;
 };

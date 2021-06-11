@@ -10,7 +10,6 @@ typedef struct player{
   int socket;
   char* nombre;
   int num_clase;
-  int clase; // Deberia ser un enum PENDIENTE
   int is_cazador;
   int is_medico;
   int is_hacker;
@@ -19,6 +18,12 @@ typedef struct player{
   // Hacker* hacker;
   int mi_turno; // 0 no 1 si
   int rendido; // 0 no rendido, 1 rendido
+  int duplicado;
+  int fuerza_bruta;
+  int intoxicated;
+  int current_life; // HARCODEADO
+  int initial_life; // HARCODEADO
+  char* clase_str;
 } Jugador;
 
 Jugador* init_jugador(); // crea al jugador

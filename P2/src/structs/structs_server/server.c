@@ -1,7 +1,7 @@
 #include "server.h"
 #include "../structs_monsters/monster.h"
 #include "../structs_server/conection.h"
-#include "../structs_shared/abilities_player.h"
+//#include "../structs_shared/abilities_player.h"
 
 Server* init_server(int socket) {
     Server* server = malloc(sizeof(Server));
@@ -82,6 +82,7 @@ void initial_listen(Server* server) {
         char * client_message = server_receive_payload(new_socket);
         printf("El cliente %d dice: %s\n", server -> cantidad_clientes, client_message);
         actual -> num_clase = atoi(client_message);
+        set_class(actual, actual -> num_clase);
       }
       thrgs -> espera_cliente = 0;
 
@@ -121,7 +122,7 @@ void * leader_start(void *args) {
       char * client_message = server_receive_payload(info -> socket);
       printf("El cliente lider dice: %s\n", client_message);
       if (info -> espera_cliente == 1) {
-          server_send_message(info -> socket, 4, "Hay un cliente registrándose.\n¿Quiere comenzar?");
+        server_send_message(info -> socket, 4, "Hay un cliente registrándose.\n¿Quiere comenzar?");
       } else if (atoi(client_message) == 1) {
         op = 0;
         info -> not_start = 0;
@@ -134,13 +135,25 @@ void * leader_start(void *args) {
   pthread_exit(NULL);
 }
 
+void set_monster(Server* server, int num_monster) {
+  server -> monster = monster_init(num_monster);
+}
+
 // [?] jugadores seria server -> clients
 void start_playing(Server* server, Jugador** jugadores){
   // [?] Se asume que recibe una lista de Jugadores 
 
   // [?] Se instancia el mounstro
   int identificador_monstruo = 0;
-  server -> monster = monster_init(identificador_monstruo);
+
+  server_send_message(server -> lider -> socket, 7, "Elija al monstruo 1");
+  int msg_code = server_receive_id(server -> lider -> socket);
+  if (msg_code == 1) {
+    char * client_message = server_receive_payload(server -> lider -> socket);
+    server -> num_monster = (int) client_message[0];
+    set_monster(server, server -> num_monster);
+  }
+
   int cantidad_activos = server->cantidad_clientes;
   int rounds = 1;
 
@@ -174,7 +187,6 @@ void start_playing(Server* server, Jugador** jugadores){
       // El cliente responde esto
       char * client_response = server_receive_payload(server -> cliente_actual -> socket);
       // Manejo de ifs
-      printf("asdsd %d %s\n", client_response == "1", client_response);
       if (client_response[0] == '1'){
         char optionsPlay[100];
         // [?] Como acceder a las habilidades de la clase del jugador actual
@@ -332,37 +344,4 @@ void notify_players(Server* server, char* message){
   for (int jugador = 0; jugador < server->cantidad_clientes; jugador++){
     server_send_message(server -> clientes[jugador] -> socket , jugador, message);
   }
-}
-
-void turnos_listen(Server* server) {
-  int my_attention = 0;
-  server -> turno_actual = my_attention;
-  server -> active_match = 1;
-  char message[80];
-  while (server -> active_match)
-  {
-
-    printf("Turno de %d\n", server -> turno_actual);
-    server -> cliente_actual = server -> clientes[server -> turno_actual];
-    printf("Nombre: %s\n", server -> cliente_actual -> nombre);
-    sprintf(message, "Es el turno de %s", server -> cliente_actual -> nombre);
-    notify_all_clients(server, message);
-    server_send_message(server -> cliente_actual -> socket, 5, "¿Qué desea hacer?");
-    // Se obtiene el paquete del cliente 1
-    int msg_code = server_receive_id(server -> cliente_actual -> socket);
-    char * client_message = server_receive_payload(server -> cliente_actual -> socket);
-    printf("Se recibe %d: %s\n", msg_code, client_message);
-    printf("------------------\n");
-    change_turn(server);
-  }
-}
-
-void change_turn(Server* server) {
-  printf("-Turno de %d\n", server -> turno_actual);
-  server -> turno_actual += 1;
-  if (server -> turno_actual > 4) {
-    server -> turno_actual = 0;
-  }
-  printf("--Turno de %d\n", server -> turno_actual);
-  // otras cosas de combates etc
 }

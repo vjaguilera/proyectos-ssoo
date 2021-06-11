@@ -9,9 +9,6 @@ Hacker *hacker_init()
 {
     Hacker *hacker = malloc(sizeof(Hacker));
     hacker -> initial_life = 2500;
-    hacker -> current_life = 2500;
-    hacker -> duplicado = 0;
-    hacker -> fuerza_bruta = 0;
     hacker -> clase_str = "hacker";
     return hacker;
 }
@@ -30,7 +27,7 @@ void inyeccion_sql_ability(Jugador *jugador_origen, Jugador *jugador_destino){
 void ataque_ddos_ability(Jugador *jugador, Monster *monster){
 // inflinge 3000 de daño al monstruo
     if (jugador -> duplicado != 0){
-        if (jugador -> monster -> current_life > 3000){
+        if (monster -> current_life > 3000){
             monster -> current_life -= 3000;   
         }
         else {
