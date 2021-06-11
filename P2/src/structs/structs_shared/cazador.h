@@ -1,4 +1,6 @@
 #pragma once
+#include "jugador.h"
+#include "../structs_monsters/monster.h"
 
 typedef struct cazador
 {
