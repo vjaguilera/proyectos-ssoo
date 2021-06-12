@@ -1,6 +1,7 @@
 #pragma once
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <time.h>
 #include "../structs_client/comunication.h"
 #include "../structs_client/conection.h"
@@ -21,8 +22,10 @@ typedef struct player{
   int duplicado;
   int fuerza_bruta;
   int intoxicated;
-  int current_life; // HARCODEADO
-  int initial_life; // HARCODEADO
+  bool demoralized;
+
+  int current_life;
+  int initial_life;
   char* clase_str;
 } Jugador;
 

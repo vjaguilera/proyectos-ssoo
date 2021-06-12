@@ -141,10 +141,9 @@ void set_monster(Server* server, int num_monster) {
 
 // [?] jugadores seria server -> clients
 void start_playing(Server* server, Jugador** jugadores){
-  // [?] Se asume que recibe una lista de Jugadores 
+  // Se asume que recibe una lista de Jugadores 
 
-  // [?] Se instancia el mounstro
-  int identificador_monstruo = 0;
+  // Se instancia el mounstro
 
   server_send_message(server -> lider -> socket, 7, "Elija al monstruo 1");
   int msg_code = server_receive_id(server -> lider -> socket);
@@ -221,7 +220,7 @@ void start_playing(Server* server, Jugador** jugadores){
             server_send_message(server -> cliente_actual -> socket , 7, optionsSQL);
             char * client_response_sql = server_receive_payload(server -> cliente_actual -> socket);
             // [?] Se castea asi a int? o con atoi
-            int cliente_a_duplicar = (int)client_response_sql;
+            int cliente_a_duplicar = (int)client_response_sql[0];
             printf("Que se castea cliente_a_duplicar %d\n", cliente_a_duplicar);
             inyeccion_sql_ability(server -> cliente_actual, server->clientes[cliente_a_duplicar]);
           } 
@@ -255,7 +254,7 @@ void start_playing(Server* server, Jugador** jugadores){
           server_send_message(server -> cliente_actual -> socket , 7, optionsCure);
           char * client_response_cure = server_receive_payload(server -> cliente_actual -> socket);
           // [?] Se castea asi a int? o con atoi
-          int cliente_a_curar = (int)client_response_cure;
+          int cliente_a_curar = (int)client_response_cure[0];
           curar_ability(server -> cliente_actual, server -> clientes[cliente_a_curar]);
           } 
           else if (client_response_ability == 2){
@@ -344,4 +343,25 @@ void notify_players(Server* server, char* message){
   for (int jugador = 0; jugador < server->cantidad_clientes; jugador++){
     server_send_message(server -> clientes[jugador] -> socket , jugador, message);
   }
+}
+
+void sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int players_amount)
+{
+    // Ruiz borra todas las rondas ocurridas hasta ahora para infligir daño a todos los jugadores.
+    // Hace 100·(número de rondas desde el inicio del combate hasta ahora, sin considerar usos anteriores de esta
+    // habilidad) de daño a todos los jugadores.
+
+    // Get rounds until now and get damage
+    int rounds = server->rounds_without_sudo; // Rounds from the beginning til now without usage of sudo rmrf
+
+    int damage = 100 * rounds;
+
+    // Update players life
+    for (int jg = 0; jg < players_amount; jg++)
+    {
+        update_player_life(players[jg], -damage); // Update -damage player life
+    }
+
+    // Set server rounds to 0
+    server->ronda_actual = 0;
 }

@@ -37,6 +37,9 @@ void start_playing(Server* server, Jugador** jugadores);
 
 void* leader_start(void *args);
 
-void sudormrf_hability(Ruiz *ruiz, Server *server, Jugador **players, int players_amount);
-
 void notify_players(Server* server, char* message);
+
+
+// ----------- Monsters actions
+
+void sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int players_amount);

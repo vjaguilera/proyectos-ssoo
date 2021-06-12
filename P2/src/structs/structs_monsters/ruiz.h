@@ -9,10 +9,6 @@ typedef struct ruiz
 
 Ruiz *ruiz_init();
 
-void copycase_hability(Ruiz *ruiz, Jugador *copy_player, Jugador *obj_player);
-
-void reprobatron_hability(Ruiz *ruiz, Jugador *player);
-
 int choose_hability_ruiz();
 
 void ruiz_clean(Ruiz *ruiz);

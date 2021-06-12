@@ -9,10 +9,6 @@ typedef struct jag_ruz
 
 JagRuz *jagruz_init();
 
-void ruzgar_hability(JagRuz *jagruz, Jugador *player);
-
-void coletazo_hability(JagRuz *jagruz, Jugador **players, int players_amount);
-
 int choose_hability_jagruz();
 
 void jagruz_clean(JagRuz *jagruz);

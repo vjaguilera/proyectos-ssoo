@@ -4,6 +4,7 @@
 #include "ruzalo.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef struct monster
 {
@@ -17,6 +18,19 @@ typedef struct monster
     Ruzalo* ruzalo;
     int estocadas;
     Jugador* me_distrajo;
+    bool salto_active;
 } Monster;
 
 Monster* monster_init(int identificador);
+
+void ruzgar_hability(Monster *jagruz, Jugador *player);
+
+void coletazo_hability(Monster *jagruz, Jugador **players, int players_amount);
+
+void copycase_hability(Monster *ruiz, Jugador *copy_player, Jugador *obj_player);
+
+void reprobatron_hability(Monster *ruiz, Jugador *player);
+
+void salto_hability(Monster *ruzalo, Jugador *player);
+
+void espinavenenosa_hability(Monster *ruzalo, Jugador *player);

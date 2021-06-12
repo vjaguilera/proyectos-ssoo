@@ -12,6 +12,7 @@ Jugador* init_jugador() {
     jugador -> duplicado = 0; // cantidad de turnos que le quedan estando duplicado. Si es 0, no se duplica su ataque
     jugador -> fuerza_bruta = 0;
     jugador -> intoxicated = 0;
+    jugador -> demoralized = false;
     return jugador;
 };
 
