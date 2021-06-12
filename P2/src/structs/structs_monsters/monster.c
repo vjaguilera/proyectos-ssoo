@@ -5,33 +5,42 @@ Monster* monster_init(int identificador) {
     monster -> current_life = 10; // harcodeada
     monster -> estocadas = 0;
     monster -> me_distrajo = malloc(sizeof(Jugador));
+    int num = identificador;
     monster -> salto_active = false;
-    switch (identificador)
+    if (identificador == 4) {
+        num = rand() % 3;
+    }
+    switch (num)
     {
-    case 0:
+    case 1:
+        printf("Monstruo escogido: JagRuz\n");
         monster -> is_jagruz = 1;
         monster -> is_ruiz = 0;
         monster -> is_ruzalo = 0;
         monster -> jagruz = jagruz_init();
         monster -> initial_life = monster -> jagruz -> initial_life;
+        monster -> class_str = "JagRuz";
         break;
-    case 1:
+    case 2:
+        printf("Monstruo escogido: Ruiz\n");
         monster -> is_jagruz = 0;
         monster -> is_ruiz = 1;
         monster -> is_ruzalo = 0;
         monster -> ruiz = ruiz_init();
         monster -> initial_life = monster -> ruiz -> initial_life;
+        monster -> class_str = "Ruiz";
         break;
-    case 2:
+    case 3:
+        printf("Monstruo escogido: Ruzalo\n");
         monster -> is_jagruz = 0;
         monster -> is_ruiz = 0;
         monster -> is_ruzalo = 1;
         monster -> ruzalo = ruzalo_init();
         monster -> initial_life = monster -> ruzalo -> initial_life;
+        monster -> class_str = "Ruzalo";
         break;
     
     default:
-        printf("no deberia llegar aca!");
         break;
     }
     return monster;

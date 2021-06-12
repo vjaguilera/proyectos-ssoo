@@ -19,6 +19,7 @@ typedef struct monster
     int estocadas;
     Jugador* me_distrajo;
     bool salto_active;
+    char* class_str;
 } Monster;
 
 Monster* monster_init(int identificador);

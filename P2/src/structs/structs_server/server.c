@@ -145,12 +145,15 @@ void start_playing(Server* server, Jugador** jugadores){
 
   // Se instancia el mounstro
 
-  server_send_message(server -> lider -> socket, 7, "Elija al monstruo 1");
+  server_send_message(server -> lider -> socket, 7, "Seleccione al monstruo\n1) JagRuz\n2) Ruiz\n3) Ruzalo\n4) Al azar\n");
   int msg_code = server_receive_id(server -> lider -> socket);
   if (msg_code == 1) {
     char * client_message = server_receive_payload(server -> lider -> socket);
-    server -> num_monster = (int) client_message[0];
+    server -> num_monster = atoi(client_message);
     set_monster(server, server -> num_monster);
+    char msg[40];
+    sprintf(msg, "Se ha seleccionado al monstruo: %s", server -> monster -> class_str);
+    notify_all_clients(server, msg);
   }
 
   int cantidad_activos = server->cantidad_clientes;
@@ -182,7 +185,7 @@ void start_playing(Server* server, Jugador** jugadores){
       server_send_message(server -> cliente_actual -> socket , 7, options);
 
       // [?] El servidor espera respuesta del cliente actual
-      int opc_code = server_receive_id(server -> cliente_actual -> socket);
+      // int opc_code = server_receive_id(server -> cliente_actual -> socket); // definimos como 1 siempre
       // El cliente responde esto
       char * client_response = server_receive_payload(server -> cliente_actual -> socket);
       // Manejo de ifs

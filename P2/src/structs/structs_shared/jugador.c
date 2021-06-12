@@ -43,6 +43,8 @@ void listen_client(Jugador* jugador, int socket) {
         } else if (msg_code == 2) {
             show_menu(message, 0);
             show_menu("Cazador", 1);
+            show_menu("Hacker", 2);
+            show_menu("Médico", 3);
             int option = pick_option();
             char response[2];
             sprintf(response, "%d", option);
@@ -78,7 +80,7 @@ void listen_client(Jugador* jugador, int socket) {
             int option = pick_option();
             char msg[2];
             sprintf(msg, "%d", option);
-            send_msg(jugador, option, msg);
+            send_msg(jugador, 1, msg);
         }
         
         
