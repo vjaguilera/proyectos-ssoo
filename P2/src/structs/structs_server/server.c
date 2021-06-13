@@ -310,6 +310,67 @@ void start_playing(Server* server, Jugador** jugadores){
 
 
     // [vicho] Aqui juega el moster
+    printf("Es el turno del Monstruo \n");
+    sprintf("El Monstruo escogido es un %s \n", server->monster->class_str);
+
+    // Select ability
+    int monster_ability = monster_choose_ability(server->monster);
+    // Use ability
+    if (server -> monster->is_jagruz == 1){
+      if (monster_ability == 0){
+        // RUZGAR
+        // Obtener cliente random
+        Jugador* affected_player = choose_random_player(server);
+        ruzgar_hability(server->monster, affected_player);
+        printf("[JAGRUZ] - [RUZGAR]");
+        char* msg = "El JagRuz ha utilizado RUZGAR";
+        notify_all_clients(server, msg);
+      } 
+      else if (monster_ability == 1){
+        // COLETAZO
+        coletazo_hability(server->monster, server->clientes, server->cantidad_clientes);
+      }
+      else{
+        printf("Problemas procesando el ataque del monstruo JAGRUZ");
+      }
+    }
+    else if (server -> monster->is_ruiz == 1){
+      if (monster_ability == 0){
+        // COPY CASE
+        // TODO
+      } 
+      else if (monster_ability == 1) {
+        // Reprobatron
+        // Obtener jugador random
+        Jugador* affected_player = choose_random_player(server);
+        reprobatron_hability(server->monster, affected_player);
+      }
+      else if (monster_ability == 2){
+        // SUDO RM RF
+        sudormrf_hability(server->monster, server, server->clientes, server->cantidad_clientes);
+      }
+      else{
+        printf("Problemas procesando el ataque del monstruo");
+      }
+    }
+    else if (server -> monster->is_ruzalo == 1){
+      if (monster_ability == 0){
+        // SALTO
+        // Obtener jugador random
+        Jugador* affected_player = choose_random_player(server);
+        salto_hability(server->monster, affected_player);
+      } 
+      else if (monster_ability == 1){
+        // Espina venenosa
+        // Obtener jugador random
+        Jugador* affected_player = choose_random_player(server);
+        espinavenenosa_hability(server->monster, affected_player);
+      }
+      else{
+        printf("Problemas procesando el ataque del monstruo");
+      }
+    }
+
 
     // FIN DEL MONSTER
 
@@ -346,6 +407,15 @@ void notify_players(Server* server, char* message){
   for (int jugador = 0; jugador < server->cantidad_clientes; jugador++){
     server_send_message(server -> clientes[jugador] -> socket , jugador, message);
   }
+}
+
+Jugador* choose_random_player(Server* server) {
+  // Retorna un jugador al azar dentro de los que estan inscritos
+  int random_num;
+
+  random_num = rand() % 3;
+  return server->clientes[random_num];
+
 }
 
 void sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int players_amount)

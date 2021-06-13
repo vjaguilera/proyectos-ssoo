@@ -39,6 +39,8 @@ void* leader_start(void *args);
 
 void notify_players(Server* server, char* message);
 
+Jugador* choose_random_player(Server* server);
+
 
 // ----------- Monsters actions
 

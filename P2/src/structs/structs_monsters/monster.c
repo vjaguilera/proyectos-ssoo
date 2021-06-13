@@ -20,6 +20,7 @@ Monster* monster_init(int identificador) {
         monster -> jagruz = jagruz_init();
         monster -> initial_life = monster -> jagruz -> initial_life;
         monster -> class_str = "JagRuz";
+        monster->class_int = 1;
         break;
     case 2:
         printf("Monstruo escogido: Ruiz\n");
@@ -29,6 +30,7 @@ Monster* monster_init(int identificador) {
         monster -> ruiz = ruiz_init();
         monster -> initial_life = monster -> ruiz -> initial_life;
         monster -> class_str = "Ruiz";
+        monster->class_int = 2;
         break;
     case 3:
         printf("Monstruo escogido: Ruzalo\n");
@@ -38,6 +40,7 @@ Monster* monster_init(int identificador) {
         monster -> ruzalo = ruzalo_init();
         monster -> initial_life = monster -> ruzalo -> initial_life;
         monster -> class_str = "Ruzalo";
+        monster->class_int = 3;
         break;
     
     default:
@@ -52,6 +55,71 @@ void monster_clean(Monster* monster) {
     free(monster -> ruiz);
     free(monster -> ruzalo);
     free(monster);
+}
+
+int choose_ability(int* options, int* percentage, int options_amount)
+{
+    float random_num;
+
+    random_num = rand() % 10;
+    printf("%f\n", random_num);
+
+    if (options_amount == 1)
+    {
+        return options[0];
+    }
+
+    int current_percent = 0;
+    for (int opt=0; opt<options_amount; opt++)
+    {
+        if (random_num >= current_percent && random_num < percentage[opt] + current_percent)
+        {
+            return options[opt];
+        }
+        current_percent += percentage[opt];
+
+    }
+    return 0;
+}
+
+int monster_choose_ability(Monster* monster)
+{
+    // Se escoge la habilidad del monstruo con valores entre 0 y 2 dependiendo del tipo
+    switch (monster->class_int)
+    {
+    case 1:
+        // JagRuz
+        // 0: ruzgar 50%
+        // 1: coletazo 50%
+        int options[2] = {0, 1};
+        int percentage[2] = {5, 5};
+        int ability = choose_ability(options, percentage, 2);
+        return ability;
+    case 2:
+        // Ruiz
+        // 0: copycase 40%
+        // 1: reprobatron 20%
+        // 2: sudo rmrf 40%
+        int options[3] = {0, 1, 2};
+        int percentage[3] = {4, 2, 4};
+        int ability = choose_ability(options, percentage, 3);
+        return ability;
+    case 3:
+        // Ruzalo
+        // 0: salto 40%
+        // 1: espinavenenosa 60%
+        if (monster->ruzalo->salto_active){
+            return 1;
+        }
+        int options[2] = {0, 1};
+        int percentage[2] = {4, 6};
+        int ability = choose_ability(options, percentage, 2);
+        return ability;
+    default:
+        break;
+    }
+    return 0;
+
 }
 
 void ruzgar_hability(Monster *jagruz, Jugador *player)

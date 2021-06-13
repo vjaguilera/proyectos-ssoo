@@ -20,9 +20,12 @@ typedef struct monster
     Jugador* me_distrajo;
     bool salto_active;
     char* class_str;
+    int class_int;
 } Monster;
 
 Monster* monster_init(int identificador);
+
+int monster_choose_ability(Monster* monster);
 
 void ruzgar_hability(Monster *jagruz, Jugador *player);
 
