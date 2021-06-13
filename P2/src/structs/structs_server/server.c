@@ -309,7 +309,100 @@ void start_playing(Server* server, Jugador** jugadores){
     // FIN DEL FOR DE JUGADORES
 
 
-    // [vicho] Aqui juega el moster
+    // Aqui juega el moster
+    printf("Es el turno del Monstruo \n");
+    printf("El Monstruo escogido es un %s \n", server->monster->class_str);
+
+    // Agregar sangrado
+    check_monster_sangrado(server->monster);
+    // Verificar si murio con el sangrado
+    int monster_bleeded = check_monster_dead(server->monster);
+
+    if (monster_bleeded)
+    {
+      printf("EL MONSTRUO MURIO DESANGRADO");
+    } else {
+      // Select ability
+      int monster_ability = monster_choose_ability(server->monster);
+      // Use ability
+      if (server -> monster->is_jagruz == 1){
+        if (monster_ability == 0){
+          // RUZGAR
+          // Obtener cliente random
+          Jugador* affected_player = monster_choose_random_player(server);
+          ruzgar_hability(server->monster, affected_player);
+          printf("[JAGRUZ] - [RUZGAR]");
+          char* msg = "El JagRuz ha utilizado RUZGAR";
+          notify_all_clients(server, msg);
+        } 
+        else if (monster_ability == 1){
+          // COLETAZO
+          coletazo_hability(server->monster, server->clientes, server->cantidad_clientes);
+          printf("[JAGRUZ] - [COLETAZO]");
+          char* msg = "El JagRuz ha utilizado COLETAZO";
+          notify_all_clients(server, msg);
+        }
+        else{
+          printf("Problemas procesando el ataque del monstruo JAGRUZ");
+        }
+      }
+      else if (server -> monster->is_ruiz == 1){
+        if (monster_ability == 0){
+          // COPY CASE
+          // Obtener jugador objetivo random
+          Jugador* affected_player = monster_choose_random_player(server);
+          // Obtener jugador para copiar
+          Jugador* copy_player = monster_choose_random_player(server);
+          copycase_hability(server->monster, copy_player, affected_player);
+          // TODO
+          printf("[RUIZ] - [COPYCASE]");
+          char* msg = "El Ruiz ha utilizado CASO DE COPIA";
+          notify_all_clients(server, msg);
+        } 
+        else if (monster_ability == 1) {
+          // Reprobatron
+          // Obtener jugador random
+          Jugador* affected_player = monster_choose_random_player(server);
+          reprobatron_hability(server->monster, affected_player);
+          printf("[RUIZ] - [REPROBATRON]");
+          char* msg = "El Ruiz ha utilizado REPROBATRON";
+          notify_all_clients(server, msg);
+        }
+        else if (monster_ability == 2){
+          // SUDO RM RF
+          sudormrf_hability(server->monster, server, server->clientes, server->cantidad_clientes);
+          printf("[RUIZ] - [SUDO RM RF]");
+          char* msg = "El Ruiz ha utilizado SUDO RM RF";
+          notify_all_clients(server, msg);
+        }
+        else{
+          printf("Problemas procesando el ataque del monstruo");
+        }
+      }
+      else if (server -> monster->is_ruzalo == 1){
+        if (monster_ability == 0){
+          // SALTO
+          // Obtener jugador random
+          Jugador* affected_player = monster_choose_random_player(server);
+          salto_hability(server->monster, affected_player);
+          printf("[RUZALO] - [SALTO]");
+          char* msg = "El Ruzalo ha utilizado SALTO";
+          notify_all_clients(server, msg);
+        } 
+        else if (monster_ability == 1){
+          // Espina venenosa
+          // Obtener jugador random
+          Jugador* affected_player = monster_choose_random_player(server);
+          espinavenenosa_hability(server->monster, affected_player);
+          printf("[RUZALO] - [ESPINA VENENOSA]");
+          char* msg = "El Ruzalo ha utilizado ESPINA VENENOSA";
+          notify_all_clients(server, msg);
+        }
+        else{
+          printf("Problemas procesando el ataque del monstruo");
+        }
+      }
+    }
 
     // FIN DEL MONSTER
 
@@ -348,6 +441,36 @@ void notify_players(Server* server, char* message){
   }
 }
 
+Jugador* choose_random_player(Server* server) {
+  // Retorna un jugador al azar dentro de los que estan inscritos
+  int random_num;
+
+  random_num = rand() % 3;
+  return server->clientes[random_num];
+
+}
+
+Jugador* monster_choose_random_player(Server *server)
+{
+  // Retorna un jugador al hacer, si esque no hay una distraccion
+  // Si existe una distraccion lo retorna y deja la distraccion en NULL
+  if (server->monster->me_distrajo)
+  {
+    for(int jg=0; jg<server->cantidad_clientes;jg++)
+    {
+      if (server->clientes[jg]->nombre == server->monster->me_distrajo->nombre)
+      {
+        server->monster->me_distrajo = NULL;
+        return server->clientes[jg];
+      }
+    }
+  } else {
+    return choose_random_player(server);
+  }
+  return NULL;
+
+}
+
 void sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int players_amount)
 {
     // Ruiz borra todas las rondas ocurridas hasta ahora para infligir daño a todos los jugadores.
@@ -362,6 +485,9 @@ void sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int pla
     // Update players life
     for (int jg = 0; jg < players_amount; jg++)
     {
+      if (players[jg]->demoralized){
+        damage *= 1.5;
+      }
         update_player_life(players[jg], -damage); // Update -damage player life
     }
 

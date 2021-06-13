@@ -5,6 +5,7 @@ typedef struct ruiz
 {
     int initial_life;
     int current_life;
+    int duplicado;
 } Ruiz;
 
 Ruiz *ruiz_init();
