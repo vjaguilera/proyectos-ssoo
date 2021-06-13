@@ -41,6 +41,8 @@ void notify_players(Server* server, char* message);
 
 Jugador* choose_random_player(Server* server);
 
+Jugador* monster_choose_random_player(Server* server);
+
 
 // ----------- Monsters actions
 

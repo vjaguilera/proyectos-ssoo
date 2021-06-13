@@ -23,6 +23,7 @@ typedef struct player{
   int fuerza_bruta;
   int intoxicated;
   bool demoralized;
+  int estocadas;
 
   int current_life;
   int initial_life;

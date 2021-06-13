@@ -38,3 +38,29 @@ void reprobatron_hability(Monster *ruiz, Jugador *player);
 void salto_hability(Monster *ruzalo, Jugador *player);
 
 void espinavenenosa_hability(Monster *ruzalo, Jugador *player);
+
+// COPY CASE
+
+void estocada_ability_copy(Ruiz* ruiz, Jugador *player);
+
+void corte_cruzado_ability_copy(Ruiz* ruiz, Jugador *player);
+
+void distraer_ability_copy(Ruiz* ruiz, Jugador *player);
+
+void inyeccion_sql_ability_copy(Ruiz* ruiz);
+
+void ataque_ddos_ability_copy(Ruiz* ruiz, Jugador* player);
+
+void fuerza_bruta_ability_copy(Ruiz* ruiz, Jugador* player);
+
+void curar_ability_copy(Monster* monster);
+
+void destello_regenerador_ability_copy(Monster *monster, Jugador *player);
+
+void descarga_vital_ability_copy(Monster *monster, Jugador *player);
+
+// General
+
+void check_monster_sangrado(Monster *monster);
+
+int check_monster_dead(Monster *monster);

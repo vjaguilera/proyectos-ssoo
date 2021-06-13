@@ -9,6 +9,7 @@ Ruiz *ruiz_init()
 {
     Ruiz *ruiz = malloc(sizeof(Ruiz));
     ruiz->initial_life = 25000;
+    ruiz->duplicado = 0;
     return ruiz;
 }
 

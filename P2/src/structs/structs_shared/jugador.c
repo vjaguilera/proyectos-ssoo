@@ -13,6 +13,7 @@ Jugador* init_jugador() {
     jugador -> fuerza_bruta = 0;
     jugador -> intoxicated = 0;
     jugador -> demoralized = false;
+    jugador -> estocadas = 0;
     return jugador;
 };
 
