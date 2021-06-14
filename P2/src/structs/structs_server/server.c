@@ -97,7 +97,7 @@ void initial_listen(Server* server) {
         }
       }
 
-      sprintf(response, "%s ha ingresado a la partida con la clase %d\n", actual -> nombre, actual -> num_clase);
+      sprintf(response, "%s ha ingresado a la partida con la clase %s\n", actual -> nombre, actual -> clase_str);
       notify_all_clients(server, response);
     }
 
@@ -147,14 +147,14 @@ void start_playing(Server* server, Jugador** jugadores){
 
   server_send_message(server -> lider -> socket, 7, "Seleccione al monstruo\n1) JagRuz\n2) Ruiz\n3) Ruzalo\n4) Al azar\n");
   int msg_code = server_receive_id(server -> lider -> socket);
-  if (msg_code == 1) {
-    char * client_message = server_receive_payload(server -> lider -> socket);
-    server -> num_monster = atoi(client_message);
-    set_monster(server, server -> num_monster);
-    char msg[40];
-    sprintf(msg, "Se ha seleccionado al monstruo: %s\n", server -> monster -> class_str);
-    notify_all_clients(server, msg);
-  }
+  char * client_message = server_receive_payload(server -> lider -> socket);
+  server -> num_monster = msg_code;
+  set_monster(server, server -> num_monster);
+  char msg[40];
+  sprintf(msg, "Se ha seleccionado al monstruo: %s", server -> monster -> class_str);
+  notify_all_clients(server, msg);
+
+  send_state(server);
 
   int cantidad_activos = server->cantidad_clientes;
   int rounds = 1;
@@ -172,12 +172,13 @@ void start_playing(Server* server, Jugador** jugadores){
       // Juega cada jugador en orden de llegada
       // El jugadador 0 es el lider
       char currentTurnMessage[50];
-      sprintf(currentTurnMessage, "Es el turno del jugador %i\n", turn);
+      server -> cliente_actual = server -> clientes[turn];
+      sprintf(currentTurnMessage, "Es el turno del jugador %s\n", server -> cliente_actual -> nombre);
       notify_all_clients(server, currentTurnMessage);
 
-      printf("Turno de %d round %d \n", turn, rounds);
+      printf("Turno de %s round %d \n", server -> cliente_actual -> nombre, rounds);
+
       server -> turno_actual = turn;
-      server -> cliente_actual = server -> clientes[turn];
 
       server_send_message(server -> cliente_actual -> socket, 8, "Escoge una opcion\n");
       msg_code = server_receive_id(server -> cliente_actual -> socket);
@@ -303,7 +304,7 @@ void start_playing(Server* server, Jugador** jugadores){
             int jugador_valido = 1;
             int jugador_recuperado;
             while(jugador_valido){
-              jugador_recuperado = (rand() % (server -> cantidad_clientes + 1));
+              jugador_recuperado = (rand() % (server -> cantidad_clientes));
               if (server -> clientes[jugador_recuperado] -> rendido){
                 continue;
               }
@@ -350,9 +351,10 @@ void start_playing(Server* server, Jugador** jugadores){
       }
       else if (option == 2){
         // server -> cantidad_clientes -= 1;
+        printf("El jugador %i se rindió\n", turn);
         server -> cliente_actual -> rendido = 1;
-        char playerSurrender[50];
-        sprintf(playerSurrender, "El jugador %i se rindio\n", turn);
+        char playerSurrender[60];
+        sprintf(playerSurrender, "El jugador %s se rindio\n", server -> cliente_actual -> nombre);
         notify_all_clients(server, playerSurrender);
       }
     }
@@ -371,7 +373,7 @@ void start_playing(Server* server, Jugador** jugadores){
 
     if (monster_bleeded)
     {
-      printf("EL MONSTRUO MURIO DESANGRADO");
+      printf("EL MONSTRUO MURIO DESANGRADO\n");
     } else {
       // Select ability
       int monster_ability = monster_choose_ability(server->monster);
@@ -382,14 +384,14 @@ void start_playing(Server* server, Jugador** jugadores){
           // Obtener cliente random
           Jugador* affected_player = monster_choose_random_player(server);
           ruzgar_hability(server->monster, affected_player);
-          printf("[JAGRUZ] - [RUZGAR]");
+          printf("[JAGRUZ] - [RUZGAR]\n");
           char* msg = "El JagRuz ha utilizado RUZGAR";
           notify_all_clients(server, msg);
         } 
         else if (monster_ability == 1){
           // COLETAZO
           coletazo_hability(server->monster, server->clientes, server->cantidad_clientes);
-          printf("[JAGRUZ] - [COLETAZO]");
+          printf("[JAGRUZ] - [COLETAZO]\n");
           char* msg = "El JagRuz ha utilizado COLETAZO";
           notify_all_clients(server, msg);
         }
@@ -406,7 +408,7 @@ void start_playing(Server* server, Jugador** jugadores){
           Jugador* copy_player = monster_choose_random_player(server);
           copycase_hability(server->monster, copy_player, affected_player);
           // TODO
-          printf("[RUIZ] - [COPYCASE]");
+          printf("[RUIZ] - [COPYCASE]\n");
           char* msg = "El Ruiz ha utilizado CASO DE COPIA";
           notify_all_clients(server, msg);
         } 
@@ -415,19 +417,19 @@ void start_playing(Server* server, Jugador** jugadores){
           // Obtener jugador random
           Jugador* affected_player = monster_choose_random_player(server);
           reprobatron_hability(server->monster, affected_player);
-          printf("[RUIZ] - [REPROBATRON]");
+          printf("[RUIZ] - [REPROBATRON]\n");
           char* msg = "El Ruiz ha utilizado REPROBATRON";
           notify_all_clients(server, msg);
         }
         else if (monster_ability == 2){
           // SUDO RM RF
           sudormrf_hability(server->monster, server, server->clientes, server->cantidad_clientes);
-          printf("[RUIZ] - [SUDO RM RF]");
+          printf("[RUIZ] - [SUDO RM RF]\n");
           char* msg = "El Ruiz ha utilizado SUDO RM RF";
           notify_all_clients(server, msg);
         }
         else{
-          printf("Problemas procesando el ataque del monstruo");
+          printf("Problemas procesando el ataque del monstruo\n");
         }
       }
       else if (server -> monster->is_ruzalo == 1){
@@ -436,7 +438,7 @@ void start_playing(Server* server, Jugador** jugadores){
           // Obtener jugador random
           Jugador* affected_player = monster_choose_random_player(server);
           salto_hability(server->monster, affected_player);
-          printf("[RUZALO] - [SALTO]");
+          printf("[RUZALO] - [SALTO]\n");
           char* msg = "El Ruzalo ha utilizado SALTO";
           notify_all_clients(server, msg);
         } 
@@ -445,12 +447,12 @@ void start_playing(Server* server, Jugador** jugadores){
           // Obtener jugador random
           Jugador* affected_player = monster_choose_random_player(server);
           espinavenenosa_hability(server->monster, affected_player);
-          printf("[RUZALO] - [ESPINA VENENOSA]");
+          printf("[RUZALO] - [ESPINA VENENOSA]\n");
           char* msg = "El Ruzalo ha utilizado ESPINA VENENOSA";
           notify_all_clients(server, msg);
         }
         else{
-          printf("Problemas procesando el ataque del monstruo");
+          printf("Problemas procesando el ataque del monstruo\n");
         }
       }
     }
@@ -460,27 +462,31 @@ void start_playing(Server* server, Jugador** jugadores){
     // Calculamos nueva cantidad de activos
     int cantidad_activos_aux = 0;
     for (int i = 0; i < server->cantidad_clientes; i++){
-      if (server->clientes[i]->rendido){
+      if (server->clientes[i]->rendido || server->clientes[i] -> current_life <= 0){
         continue;
       }
       else{
         cantidad_activos_aux += 1;
       }
     }
-    int cantidad_activos = cantidad_activos_aux;
+    cantidad_activos = cantidad_activos_aux;
+    printf("Cantidad activos %d\n", cantidad_activos);
     rounds += 1;
+    printf("-----------------------------------\n");
+    send_state(server);
   }
   // FIN DEL WHILE
 
+
   // GANAMOS 
   if (server->monster->current_life <= 0){
-    char * winMessage = "El monstruo ha sido derrotado, FELIICITACIONES A LOS JUGADORES\n";  
+    char * winMessage = "\nEl monstruo ha sido derrotado, FELIICITACIONES A LOS JUGADORES\n";  
     notify_all_clients(server, winMessage);
   }
   // PERDIMOS :(
   else{
     // [tomas] si pierden la vida, que se dejen como rendido = 1
-    char * lossMessage = "El monstruo nos ha derrotado\n";
+    char * lossMessage = "\n¡EL MONSTRUO NOS HA DERROTADO!\n";
     notify_all_clients(server, lossMessage);
   }
 }
@@ -496,7 +502,7 @@ Jugador* choose_random_player(Server* server) {
   // Retorna un jugador al azar dentro de los que estan inscritos
   int random_num;
 
-  random_num = rand() % 3;
+  random_num = rand() % server -> cantidad_clientes;
   return server->clientes[random_num];
 
 }
@@ -505,13 +511,13 @@ Jugador* monster_choose_random_player(Server *server)
 {
   // Retorna un jugador al hacer, si esque no hay una distraccion
   // Si existe una distraccion lo retorna y deja la distraccion en NULL
-  if (server->monster->me_distrajo)
+  if (server->monster->distraido == 1)
   {
     for(int jg=0; jg<server->cantidad_clientes;jg++)
     {
       if (server->clientes[jg]->nombre == server->monster->me_distrajo->nombre)
       {
-        server->monster->me_distrajo = NULL;
+        server->monster->distraido = 0;
         return server->clientes[jg];
       }
     }
@@ -544,4 +550,34 @@ void sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int pla
 
     // Set server rounds to 0
     server->ronda_actual = 0;
+}
+
+void end_listen(Server* server) {
+  notify_all_clients(server, "¿Quieres continuar?\n");
+  printf("Revisar si se quieren salir\n");
+  printf("Hacer cambio de lider si es necesario\n");
+  // server -> lider = 
+  // server -> cantidad_clientes = 
+}
+
+void send_state(Server* server) {
+  notify_all_clients(server, "\n$$$$$$$$$$$$$ ESTADISTICAS $$$$$$$$$$$$$$$");
+  for (int i = 0; i < server -> cantidad_clientes; i++) {
+    char message[100];
+    sprintf(message, "%s[%s] -> VIDA: %d / %d",
+      server -> clientes[i] ->nombre,
+      server -> clientes[i] ->clase_str,
+      server -> clientes[i] ->current_life,
+      server -> clientes[i] ->initial_life
+    );
+    notify_all_clients(server, message);
+  }
+  char message[100];
+  sprintf(message, "Monstruo[%s] -> VIDA: %d / %d",
+    server -> monster -> class_str,
+    server -> monster -> current_life,
+    server -> monster -> initial_life
+  );
+  notify_all_clients(server, message);
+  notify_all_clients(server, "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
 }

@@ -17,7 +17,9 @@ Cazador *cazador_init()
 void estocada_ability(Jugador *jugador, Monster *monster){
 // estocada al mounstruo. 1000 de daño y dejando sangrado que quita 500 cada ronda, hasta maximo
 // 3 acumulados
+    printf("Jugador %s %d\n", jugador -> nombre, jugador -> duplicado);
     if (jugador -> duplicado != 0){
+        printf("Ataque\n");
         if (monster -> current_life > 2000){
             monster -> current_life -= 2000;
             if (monster -> estocadas < 3){
@@ -65,6 +67,7 @@ void corte_cruzado_ability(Jugador *jugador, Monster *monster){
 
 void distraer_ability(Jugador *jugador, Monster *monster){
     monster -> me_distrajo = jugador;
+    monster -> distraido = 1;
 }
 
 

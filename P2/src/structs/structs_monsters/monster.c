@@ -4,6 +4,8 @@ Monster* monster_init(int identificador) {
     Monster* monster = malloc(sizeof(Monster));
     monster -> estocadas = 0;
     monster -> me_distrajo = malloc(sizeof(Jugador));
+    monster -> distraido = 0;
+    monster -> duplicado = 0;
     int num = identificador;
     monster -> salto_active = false;
     if (identificador == 4) {
@@ -210,37 +212,37 @@ void copycase_hability(Monster *monster, Jugador *copy_player, Jugador *obj_play
     case 0:
     {
       // Cazador - estocada
-      estocada_ability_copy(monster->ruiz, obj_player);
+      estocada_ability_copy(monster, obj_player);
       break;
     }
     case 1:
     {
       // Cazador - corte cruzado
-      corte_cruzado_ability_copy(monster->ruiz, obj_player);
+      corte_cruzado_ability_copy(monster, obj_player);
       break;
     }
     case 2:
     {
       // Cazador - distraer
-      distraer_ability_copy(monster->ruiz, obj_player);
+      distraer_ability_copy(monster, obj_player);
       break;
     }
     case 3:
     {
       // Hacker - sql injection
-      inyeccion_sql_ability_copy(monster->ruiz);
+      inyeccion_sql_ability_copy(monster);
       break;
     }
     case 4:
     {
       // Hacker - ddos
-      ataque_ddos_ability_copy(monster->ruiz, obj_player);
+      ataque_ddos_ability_copy(monster, obj_player);
       break;
     }
     case 5:
     {
       // Hacker - brute force
-      fuerza_bruta_ability_copy(monster->ruiz, obj_player);
+      fuerza_bruta_ability_copy(monster, obj_player);
       break;
     }
     case 6:
@@ -266,8 +268,8 @@ void copycase_hability(Monster *monster, Jugador *copy_player, Jugador *obj_play
     }
     
     // Disminuir turnos duplicados
-    if (monster->ruiz->duplicado > 0) {
-      monster->ruiz->duplicado -= 1;
+    if (monster->duplicado > 0) {
+      monster->duplicado -= 1;
     }
 
 }
@@ -317,7 +319,7 @@ void espinavenenosa_hability(Monster *ruzalo, Jugador *player)
     ruzalo->salto_active = false;
 }
 
-void estocada_ability_copy(Ruiz* ruiz, Jugador *player)
+void estocada_ability_copy(Monster* ruiz, Jugador *player)
 {
   // estocada al jugador. 1000 de daño y dejando sangrado que quita 500 cada ronda, hasta maximo
   // 3 acumulados
@@ -335,7 +337,7 @@ void estocada_ability_copy(Ruiz* ruiz, Jugador *player)
   }
 }
 
-void corte_cruzado_ability_copy(Ruiz* ruiz, Jugador *player)
+void corte_cruzado_ability_copy(Monster* ruiz, Jugador *player)
 {
   // Inflige 3000 de dano al jugador
   int damage = 3000;
@@ -349,18 +351,18 @@ void corte_cruzado_ability_copy(Ruiz* ruiz, Jugador *player)
   update_player_life(player, -damage); // Update -damage player life
 }
 
-void distraer_ability_copy(Ruiz* ruiz, Jugador *player)
+void distraer_ability_copy(Monster* ruiz, Jugador *player)
 {
   // TODO
   // Como se hace esta implementacion
 }
 
-void inyeccion_sql_ability_copy(Ruiz* ruiz)
+void inyeccion_sql_ability_copy(Monster* ruiz)
 {
   ruiz->duplicado +=2;
 }
 
-void ataque_ddos_ability_copy(Ruiz* ruiz, Jugador* player)
+void ataque_ddos_ability_copy(Monster* ruiz, Jugador* player)
 {
   // Inflinge 1500 de dano al jugador
   int damage = 1500;
@@ -374,7 +376,7 @@ void ataque_ddos_ability_copy(Ruiz* ruiz, Jugador* player)
   update_player_life(player, -damage); // Update -damage player life
 }
 
-void fuerza_bruta_ability_copy(Ruiz* ruiz, Jugador* player)
+void fuerza_bruta_ability_copy(Monster* ruiz, Jugador* player)
 {
   // TODO
   // Como se hace esta implemetacion
@@ -383,7 +385,7 @@ void fuerza_bruta_ability_copy(Ruiz* ruiz, Jugador* player)
 void curar_ability_copy(Monster* monster)
 {
   monster->current_life += 2000;
-  monster->ruiz->current_life += 2000;
+  monster->current_life += 2000;
 }
 
 void destello_regenerador_ability_copy(Monster *monster, Jugador *player)
@@ -395,7 +397,7 @@ void destello_regenerador_ability_copy(Monster *monster, Jugador *player)
   if (player->demoralized){
       damage *= 1.5;
   }
-  if (monster->ruiz->duplicado > 0)
+  if (monster->duplicado > 0)
   {
     damage *= 2;
   }
@@ -412,7 +414,7 @@ void descarga_vital_ability_copy(Monster *monster, Jugador *player)
   if (player->demoralized){
       damage *= 1.5;
   }
-  if (monster->ruiz->duplicado > 0)
+  if (monster->duplicado > 0)
   {
     damage *= 2;
   }
