@@ -27,6 +27,8 @@ void estocada_ability(Jugador *jugador, Monster *monster){
         else {
             monster -> current_life = 0; // avisar que la vida le llega a 0 ? 
         }
+    }
+    else{
         if (monster -> current_life > 1000){
             monster -> current_life -= 1000;
             if (monster -> estocadas < 3){
