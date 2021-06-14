@@ -82,6 +82,16 @@ void listen_client(Jugador* jugador, int socket) {
             sprintf(response, "%d", option);
             send_msg(jugador, option, response);
         }
+        // Elegir habilidad o rendirse
+        else if(msg_code == 8){
+            show_menu(message, 0);
+            show_menu("Realizar una habilidad", 1);
+            show_menu("Rendirse", 2);
+            int option = pick_option();
+            char response[2];
+            sprintf(response, "%d", option);
+            send_msg(jugador, 1, response);
+        }
         
         
         else if (msg_code == 10 || msg_code == 20) 
@@ -94,7 +104,59 @@ void listen_client(Jugador* jugador, int socket) {
             printf("Ingrese su mensaje: ");
             char * response = get_input();
             send_msg(jugador, option, response);
-        } else {
+        }
+        // Escoger habilidad hacker
+        else if(msg_code == 11){
+            show_menu(message, 0);
+            show_menu("Inyeccion SQL", 1);
+            show_menu("Ataque DDOS", 2);
+            show_menu("Fuerza bruta", 3);
+            int option = pick_option();
+            char response[2];
+            sprintf(response, "%d", option);
+            send_msg(jugador, 1, response);
+        }
+        // Inyeccion SQL
+        else if(msg_code == 12){
+            show_menu(message, 0);
+            int option = pick_option();
+            char response[2];
+            sprintf(response, "%d", option);
+            send_msg(jugador, 1, response);
+        }
+        // Medico
+        else if(msg_code == 13){
+            show_menu(message, 0);
+            show_menu("Curar", 1);
+            show_menu("Destello regenerador", 2);
+            show_menu("Descarga vital", 3);
+            int option = pick_option();
+            char response[2];
+            sprintf(response, "%d", option);
+            send_msg(jugador, 1, response);
+        }
+        // Escoge a quien curar
+        else if(msg_code == 14){
+            show_menu(message, 0);
+            int option = pick_option();
+            char response[2];
+            sprintf(response, "%d", option);
+            send_msg(jugador, 1, response);
+        }
+        // Cazador
+        else if(msg_code == 15){
+            show_menu(message, 0);
+            show_menu("Estocada", 1);
+            show_menu("Corte cruzado", 2);
+            show_menu("Distraer", 3);
+            int option = pick_option();
+            char response[2];
+            sprintf(response, "%d", option);
+            send_msg(jugador, 1, response);
+        }
+
+        
+         else {
             printf("Msg code %d no procesado\n", msg_code);
             if (msg_code != 0) {
                 free(message);

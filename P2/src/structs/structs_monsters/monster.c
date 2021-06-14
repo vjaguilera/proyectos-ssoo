@@ -199,13 +199,13 @@ void coletazo_hability(Monster *jagruz, Jugador **players, int players_amount)
     }
 }
 
-void copycase_hability(Monster *monster, Jugador *copy_player, Jugador *obj_player)
+void copycase_hability(Monster *monster, Jugador *copy_player, Jugador *obj_player, char* habilidadText)
 {
     // Ruiz rompe el Código de Honor y copia de forma aleatoria una de las habilidades de
     // algún jugador y la usa contra alguno de los jugadores causando los efectos asociados. Si la habilidad normal-
     // mente involucra ayudar a un jugador aliado, Ruiz recibe el efecto sobre si mismo.
     int ability = player_choose_ability(copy_player);
-
+    printf("La habilidad a copiar es la numero %d\n", ability);
     // UTILIZAR HABILIDAD
     switch (ability)
     {
@@ -213,54 +213,63 @@ void copycase_hability(Monster *monster, Jugador *copy_player, Jugador *obj_play
     {
       // Cazador - estocada
       estocada_ability_copy(monster, obj_player);
+      sprintf(habilidadText, "%s", "Estocada");
       break;
     }
     case 1:
     {
       // Cazador - corte cruzado
       corte_cruzado_ability_copy(monster, obj_player);
+      sprintf(habilidadText, "%s", "Corte cruzado");
       break;
     }
     case 2:
     {
       // Cazador - distraer
       distraer_ability_copy(monster, obj_player);
+      sprintf(habilidadText, "%s", "Distraer");
       break;
     }
     case 3:
     {
       // Hacker - sql injection
       inyeccion_sql_ability_copy(monster);
+      sprintf(habilidadText, "%s", "Inyeccion sql");
       break;
     }
     case 4:
     {
       // Hacker - ddos
       ataque_ddos_ability_copy(monster, obj_player);
+      sprintf(habilidadText, "%s", "Ataque DDOS");
       break;
     }
     case 5:
     {
       // Hacker - brute force
       fuerza_bruta_ability_copy(monster, obj_player);
+      sprintf(habilidadText, "%s", "Fuerza bruta");
       break;
     }
     case 6:
     {
       // Medico - curar
       curar_ability_copy(monster);
+      sprintf(habilidadText, "%s", "Curar");
       break;
     }
     case 7:
     {
       // Medico - destello regenerador
       destello_regenerador_ability_copy(monster, obj_player);
+      sprintf(habilidadText, "%s", "Destello regenerador");
       break;
     }
     case 8:
     {
       // Medico - descarga vital
       descarga_vital_ability_copy(monster, obj_player);
+      sprintf(habilidadText, "%s", "Descarga vital");
       break;
     }
     default:
@@ -271,7 +280,6 @@ void copycase_hability(Monster *monster, Jugador *copy_player, Jugador *obj_play
     if (monster->duplicado > 0) {
       monster->duplicado -= 1;
     }
-
 }
 
 void reprobatron_hability(Monster *ruiz, Jugador *player)

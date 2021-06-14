@@ -9,7 +9,7 @@ Server* init_server(int socket) {
     server -> cantidad_clientes = 0;
     server -> socket = socket;
     server -> monster = malloc(sizeof(Monster));
-    server -> rounds_without_sudo = 0;
+    server -> rounds_without_sudo = 1;
     return server;
 }
 
@@ -176,115 +176,141 @@ void start_playing(Server* server, Jugador** jugadores){
       sprintf(currentTurnMessage, "Es el turno del jugador %s\n", server -> cliente_actual -> nombre);
       notify_all_clients(server, currentTurnMessage);
 
-      char * options = "Escoge una opcion\n1) Realizar una habilidad\n2) Rendirse\n";
-
       printf("Turno de %s round %d \n", server -> cliente_actual -> nombre, rounds);
+
       server -> turno_actual = turn;
 
-      // [?] Que es el id que se entrega, el segundo parametro
-      server_send_message(server -> cliente_actual -> socket , 7, options);
+      server_send_message(server -> cliente_actual -> socket, 8, "Escoge una opcion\n");
+      msg_code = server_receive_id(server -> cliente_actual -> socket);
+      int option;
+      if (msg_code == 1) {
+        char * client_message = server_receive_payload(server -> cliente_actual -> socket);
+        // Turn corresponde al id del cliente
+        printf("El cliente %d dice: %s\n", turn, client_message);
+        option = atoi(client_message);
+      }
 
-      // [?] El servidor espera respuesta del cliente actual
-      int option_principal = server_receive_id(server -> cliente_actual -> socket); // definimos como 1 siempre
-      client_message = server_receive_payload(server -> lider -> socket);
-      // El cliente responde esto
-      // char * client_response = server_receive_payload(server -> cliente_actual -> socket);
+      printf("Opcion elegida es %d\n", option);
+
       // Manejo de ifs
-      // int option_principal = atoi(client_response);
-      // [?] El servidor espera respuesta del cliente actual
-      // int opc_code = server_receive_id(server -> cliente_actual -> socket); // definimos como 1 siempre
-      
-      // Manejo de ifs
-      if (option_principal == 1){
-        char optionsPlay[100];
-        // [?] Como acceder a las habilidades de la clase del jugador actual
-        if (server -> cliente_actual -> is_cazador) {
-          sprintf(optionsPlay, "Escoge tu habilidad\n1)%s\n2)%s\n3)%s\n",
-          "Estocada", "Corte Cruzado", "Distraer"
-          );
-        } else if (server -> cliente_actual -> is_hacker) {
-          sprintf(optionsPlay, "Escoge tu habilidad\n1)%s\n2)%s\n3)%s\n",
-          "Inyección SQL", "Ataque DDOS", "Fuerza bruta"
-          );
-        } else if (server -> cliente_actual -> is_medico) {
-          sprintf(optionsPlay, "Escoge tu habilidad\n1)%s\n2)%s\n3)%s\n",
-          "Curar", "Destello Regenerador", "Descarga Vital"
-          );
-        } else {
-          sprintf(optionsPlay, "jamon");
-        }
-          // server -> cliente_actual -> clase -> habilidades[0],
-          // server -> cliente_actual -> clase -> habilidades[1],
-          // server -> cliente_actual -> clase -> habilidades[2]);
-        // [?] Que es el id que se entrega, el segundo parametro
-        server_send_message(server -> cliente_actual -> socket , 7, optionsPlay);
-        // char * _client_response_ability = server_receive_payload(server -> cliente_actual -> socket);
-        // int client_response_ability = atoi(_client_response_ability);
-        int client_response_ability = server_receive_id(server -> cliente_actual -> socket);
-        client_message = server_receive_payload(server -> lider -> socket);
-        // ver como se comporta la habilidad
-        // [ToDo] notify_players de la habilidad realizada (jugador, habilidad, consecuencia, target, turno)
-        if (server -> clientes[turn] -> is_hacker == 1){
-          if (client_response_ability == 1){
-            char optionsSQL[100];
-            int opcion = 0;
+      if (option == 1){
+        // HACKER 
+        if (server -> clientes[turn] -> clase_str[0] == 'h'){
+          server_send_message(server -> cliente_actual -> socket, 11, "Escoge una habilidad\n");
+          msg_code = server_receive_id(server -> cliente_actual -> socket);
+          int optionHacker;
+          if (msg_code == 1) {
+            char * client_message = server_receive_payload(server -> cliente_actual -> socket);
+            // Turn corresponde al id del cliente
+            printf("El cliente %d dice: %s\n", turn, client_message);
+            optionHacker = atoi(client_message);
+          }
+          // Inyeccion SQL
+          if (optionHacker == 1){
+            char duplicateMessage[100];
+            int numeroJugador = 0;
             // [?] Como acceder a las habilidades de la clase del jugador actual
+            char* textoInicial = "Escoge a quien quieres duplicarle el ataque\n";
+            strcat(duplicateMessage, textoInicial);
+            char playerToDuplicate[50];
             for (int i = 0; i < server -> cantidad_clientes; i++){
               if (server ->clientes[i] -> rendido){
-                opcion += 1;
+                printf("El jugador rendido es %i: %s", numeroJugador, server->clientes[i]->nombre);
+                numeroJugador += 1;
                 continue;
               }
               else{
-                sprintf(optionsSQL, "Escoge a quien quieres duplicarle el ataque\n%i) %s\n", opcion, server->clientes[i]->nombre);
-                opcion += 1;
+                if (numeroJugador == turn){
+                    numeroJugador += 1;
+                    continue;
+                }
+                sprintf(playerToDuplicate, "%i: %s\n", numeroJugador, server->clientes[i]->nombre);
+                strcat(duplicateMessage, playerToDuplicate);
+                numeroJugador += 1;
               }
             }
-            // [?] Que es el id que se entrega, el segundo parametro
-            server_send_message(server -> cliente_actual -> socket , 7, optionsSQL);
-            // [?] Se castea asi a int? o con atoi
-            // char * client_response_sql = server_receive_payload(server -> cliente_actual -> socket);
-            int cliente_a_duplicar = server_receive_id(server -> cliente_actual -> socket);
-            client_message = server_receive_payload(server -> lider -> socket);
-            // int cliente_a_duplicar = atoi(client_response_sql);
-            printf("Que se castea cliente_a_duplicar %d\n", cliente_a_duplicar);
-            inyeccion_sql_ability(server -> cliente_actual, server->clientes[cliente_a_duplicar]);
+            server_send_message(server -> cliente_actual -> socket, 12, duplicateMessage);
+            msg_code = server_receive_id(server -> cliente_actual -> socket);
+
+            int optionSQL;
+            if (msg_code == 1) {
+              char * client_message = server_receive_payload(server -> cliente_actual -> socket);
+              // Turn corresponde al id del cliente
+              printf("El cliente %d dice: %s\n", turn, client_message);
+              optionSQL = atoi(client_message);
+              inyeccion_sql_ability(server -> cliente_actual, server->clientes[optionSQL]);
+              char mensaje[100];
+              sprintf(mensaje, "Usó inyección sql sobre %s\n", server->clientes[optionSQL]->nombre);
+              notify_all_clients(server, mensaje);
+            }
           } 
-          else if (client_response_ability == 2){
+          // Ataque DDOS
+          else if (optionHacker == 2){
+            printf("Entre a ataque ddos\n");
             ataque_ddos_ability(server -> cliente_actual, server -> monster);
+            notify_all_clients(server, "Usó Ataque DDOS");
           }
-          else if (client_response_ability == 3){
+          // Fuerza Bruta
+          else if (optionHacker == 3){
             fuerza_bruta_ability(server -> cliente_actual, server -> monster);
+            notify_all_clients(server, "Usó Fuerza Bruta");
           }
           else{
             printf("Ingresa una opcion valida");
           }
         }
-        else if (server -> clientes[turn] -> is_medico == 1){
-          if (client_response_ability == 1){
-            // A quien quieres curar
-          char optionsCure[100];
-          int opcion = 0;
-          // [?] Como acceder a las habilidades de la clase del jugador actual
-          for (int i = 0; i < server -> cantidad_clientes; i++){
-            if (server ->clientes[i] -> rendido){
-              opcion += 1;
-              continue;
-            }
-            else{
-              sprintf(optionsCure, "Escoge a quien quieres curar\n%i) %s\n", opcion, server->clientes[i]->nombre);
-              opcion += 1;
-            }
+
+        // MEDICO
+        else if (server -> clientes[turn] -> clase_str[0] == 'm'){
+          server_send_message(server -> cliente_actual -> socket, 13, "Escoge una habilidad\n");
+          msg_code = server_receive_id(server -> cliente_actual -> socket);
+          int optionMedico;
+          if (msg_code == 1) {
+            char * client_message = server_receive_payload(server -> cliente_actual -> socket);
+            // Turn corresponde al id del cliente
+            printf("El cliente %d dice: %s\n", turn, client_message);
+            optionMedico = atoi(client_message);
           }
-          // [?] Que es el id que se entrega, el segundo parametro
-          server_send_message(server -> cliente_actual -> socket , 7, optionsCure);
-          // char * client_response_cure = server_receive_payload(server -> cliente_actual -> socket);
-          // [?] Se castea asi a int? o con atoi
-          // int cliente_a_curar = atoi(client_response_cure);
-          int cliente_a_curar = server_receive_id(server -> cliente_actual -> socket);
-          client_message = server_receive_payload(server -> lider -> socket);
-          curar_ability(server -> cliente_actual, server -> clientes[cliente_a_curar]);
+          // Curar
+          if (optionMedico == 1){
+            char cureMessage[100];
+            int numeroJugador = 0;
+            // [?] Como acceder a las habilidades de la clase del jugador actual
+            char* textoInicial = "Escoge a quien quieres curar\n";
+            strcat(cureMessage, textoInicial);
+            char playerToCure[50];
+            for (int i = 0; i < server -> cantidad_clientes; i++){
+              if (server ->clientes[i] -> rendido){
+                numeroJugador += 1;
+                continue;
+              }
+              else{
+                if (numeroJugador == turn){
+                    numeroJugador += 1;
+                    continue;
+                }
+                sprintf(playerToCure, "%i: %s\n", numeroJugador, server->clientes[i]->nombre);
+                strcat(cureMessage, playerToCure);
+                numeroJugador += 1;
+              }
+            }
+            server_send_message(server -> cliente_actual -> socket, 14, cureMessage);
+            msg_code = server_receive_id(server -> cliente_actual -> socket);
+
+            int cliente_a_curar;
+            if (msg_code == 1) {
+              char * client_message = server_receive_payload(server -> cliente_actual -> socket);
+              // Turn corresponde al id del cliente
+              printf("El cliente %d dice: %s\n", turn, client_message);
+              cliente_a_curar = atoi(client_message);
+              curar_ability(server -> cliente_actual, server -> clientes[cliente_a_curar]);
+              char mensaje[100];
+              sprintf(mensaje, "Usó Curar sobre %s\n", server->clientes[cliente_a_curar]->nombre);
+              notify_all_clients(server, mensaje);
+            }
           } 
-          else if (client_response_ability == 2){
+          // Destello regenerador
+          else if (optionMedico == 2){
             // Asignar target_recuperacion al azar
             int jugador_valido = 1;
             int jugador_recuperado;
@@ -298,24 +324,43 @@ void start_playing(Server* server, Jugador** jugadores){
               }
             }
             destello_regenerador_ability(server -> cliente_actual, server -> monster, server -> clientes[jugador_recuperado]);
+            notify_all_clients(server, "Usó Destello Regenerador\n");
           }
-          else if (client_response_ability == 3){
+          // Descarga Vital
+          else if (optionMedico == 3){
             descarga_vital_ability(server -> cliente_actual, server -> monster);
+            notify_all_clients(server, "Usó Descarga Vital\n");
           }
           else{
             printf("Ingresa una opcion valida");
           }
         }
-        else if (server -> cliente_actual -> is_cazador == 1){
-          if (client_response_ability == 1){
-            printf("Estocada\n");
-            estocada_ability(server -> cliente_actual, server -> monster);
-          } 
-          else if (client_response_ability == 2){
-            corte_cruzado_ability(server -> cliente_actual, server -> monster);
+        // CAZADOR
+        else if (server -> cliente_actual -> clase_str[0] == 'c'){
+
+          server_send_message(server -> cliente_actual -> socket, 15, "Escoge una habilidad\n");
+          msg_code = server_receive_id(server -> cliente_actual -> socket);
+          int optionCazador;
+          if (msg_code == 1) {
+            char * client_message = server_receive_payload(server -> cliente_actual -> socket);
+            // Turn corresponde al id del cliente
+            printf("El cliente %d dice: %s\n", turn, client_message);
+            optionCazador = atoi(client_message);
           }
-          else if (client_response_ability == 3){
+          // Estocada
+          if (optionCazador == 1){
+            estocada_ability(server -> cliente_actual, server -> monster);
+            notify_all_clients(server, "Usó Estocada\n");
+          } 
+          // Corte Cruzado
+          else if (optionCazador == 2){
+            corte_cruzado_ability(server -> cliente_actual, server -> monster);
+            notify_all_clients(server, "Usó Corte Cruzado\n");
+          }
+          // Distraer
+          else if (optionCazador == 3){
             distraer_ability(server -> cliente_actual, server -> monster);
+            notify_all_clients(server, "Usó Distraer\n");
           }
           else{
             printf("Ingresa una opcion valida");
@@ -323,7 +368,7 @@ void start_playing(Server* server, Jugador** jugadores){
         }
 
       }
-      else if (option_principal == 2){
+      else if (option == 2){
         // server -> cantidad_clientes -= 1;
         printf("El jugador %i se rindió\n", turn);
         server -> cliente_actual -> rendido = 1;
@@ -335,9 +380,10 @@ void start_playing(Server* server, Jugador** jugadores){
     // FIN DEL FOR DE JUGADORES
 
 
-    // Aqui juega el moster
+    // Aqui juega el MONSTER
     printf("Es el turno del Monstruo \n");
     printf("El Monstruo escogido es un %s \n", server->monster->class_str);
+    printf("El Monstruo tiene %d vida\n", server->monster->current_life);
 
     // Agregar sangrado
     check_monster_sangrado(server->monster);
@@ -379,10 +425,12 @@ void start_playing(Server* server, Jugador** jugadores){
           Jugador* affected_player = monster_choose_random_player(server);
           // Obtener jugador para copiar
           Jugador* copy_player = monster_choose_random_player(server);
-          copycase_hability(server->monster, copy_player, affected_player);
-          // TODO
+          char habilidadText[30];
+          copycase_hability(server->monster, copy_player, affected_player, habilidadText);
+          // TODO castear numero de hjabilidad a su nombre
           printf("[RUIZ] - [COPYCASE]\n");
-          char* msg = "El Ruiz ha utilizado CASO DE COPIA";
+          char msg[100];
+          sprintf(msg, "El Ruiz ha utilizado CASO DE COPIA\nCopio la habilidad %s\n", habilidadText);
           notify_all_clients(server, msg);
         } 
         else if (monster_ability == 1) {
@@ -445,6 +493,7 @@ void start_playing(Server* server, Jugador** jugadores){
     cantidad_activos = cantidad_activos_aux;
     printf("Cantidad activos %d\n", cantidad_activos);
     rounds += 1;
+    server->rounds_without_sudo += 1;
     printf("-----------------------------------\n");
     send_state(server);
   }
@@ -522,7 +571,7 @@ void sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int pla
     }
 
     // Set server rounds to 0
-    server->ronda_actual = 0;
+    server->rounds_without_sudo = 0;
 }
 
 void end_listen(Server* server) {
@@ -531,6 +580,7 @@ void end_listen(Server* server) {
   printf("Hacer cambio de lider si es necesario\n");
   // server -> lider = 
   // server -> cantidad_clientes = 
+  // resetear info de los jugadores**
 }
 
 void send_state(Server* server) {
