@@ -2,7 +2,6 @@
 
 Monster* monster_init(int identificador) {
     Monster* monster = malloc(sizeof(Monster));
-    monster -> current_life = 10; // harcodeada
     monster -> estocadas = 0;
     monster -> me_distrajo = malloc(sizeof(Jugador));
     int num = identificador;
@@ -19,6 +18,7 @@ Monster* monster_init(int identificador) {
         monster -> is_ruzalo = 0;
         monster -> jagruz = jagruz_init();
         monster -> initial_life = monster -> jagruz -> initial_life;
+        monster -> current_life = monster -> jagruz -> initial_life;
         monster -> class_str = "JagRuz";
         monster->class_int = 1;
         break;
@@ -29,6 +29,7 @@ Monster* monster_init(int identificador) {
         monster -> is_ruzalo = 0;
         monster -> ruiz = ruiz_init();
         monster -> initial_life = monster -> ruiz -> initial_life;
+        monster -> current_life = monster -> ruiz -> initial_life;
         monster -> class_str = "Ruiz";
         monster->class_int = 2;
         break;
@@ -39,6 +40,7 @@ Monster* monster_init(int identificador) {
         monster -> is_ruzalo = 1;
         monster -> ruzalo = ruzalo_init();
         monster -> initial_life = monster -> ruzalo -> initial_life;
+        monster -> current_life = monster -> ruzalo -> initial_life;
         monster -> class_str = "Ruzalo";
         monster->class_int = 3;
         break;
