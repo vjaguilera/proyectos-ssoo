@@ -558,6 +558,7 @@ void end_listen(Server* server) {
   printf("Hacer cambio de lider si es necesario\n");
   // server -> lider = 
   // server -> cantidad_clientes = 
+  // resetear info de los jugadores**
 }
 
 void send_state(Server* server) {
