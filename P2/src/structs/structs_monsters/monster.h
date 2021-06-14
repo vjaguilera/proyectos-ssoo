@@ -33,7 +33,7 @@ void ruzgar_hability(Monster *jagruz, Jugador *player);
 
 void coletazo_hability(Monster *jagruz, Jugador **players, int players_amount);
 
-void copycase_hability(Monster *ruiz, Jugador *copy_player, Jugador *obj_player);
+void copycase_hability(Monster *ruiz, Jugador *copy_player, Jugador *obj_player, char* habilidadText);
 
 void reprobatron_hability(Monster *ruiz, Jugador *player);
 
