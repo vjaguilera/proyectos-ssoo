@@ -9,7 +9,7 @@ Server* init_server(int socket) {
     server -> cantidad_clientes = 0;
     server -> socket = socket;
     server -> monster = malloc(sizeof(Monster));
-    server -> rounds_without_sudo = 0;
+    server -> rounds_without_sudo = 1;
     return server;
 }
 
@@ -493,6 +493,7 @@ void start_playing(Server* server, Jugador** jugadores){
     cantidad_activos = cantidad_activos_aux;
     printf("Cantidad activos %d\n", cantidad_activos);
     rounds += 1;
+    server->rounds_without_sudo += 1;
     printf("-----------------------------------\n");
     send_state(server);
   }
@@ -570,7 +571,7 @@ void sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int pla
     }
 
     // Set server rounds to 0
-    server->ronda_actual = 0;
+    server->rounds_without_sudo = 0;
 }
 
 void end_listen(Server* server) {
