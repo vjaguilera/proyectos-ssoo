@@ -188,6 +188,13 @@ void start_playing(Server* server, Jugador** jugadores){
       // int opc_code = server_receive_id(server -> cliente_actual -> socket); // definimos como 1 siempre
       // El cliente responde esto
       char * client_response = server_receive_payload(server -> cliente_actual -> socket);
+
+
+      server_send_message(server -> cliente_actual -> socket, 7, "Hola ctm");
+      client_response = server_receive_id(server -> cliente_actual -> socket);
+
+      printf(" client_response[0] = %s\n", client_response);
+
       // Manejo de ifs
       if (client_response[0] == '1'){
         char optionsPlay[100];
@@ -309,7 +316,7 @@ void start_playing(Server* server, Jugador** jugadores){
     // FIN DEL FOR DE JUGADORES
 
 
-    // Aqui juega el moster
+    // Aqui juega el MONSTER
     printf("Es el turno del Monstruo \n");
     printf("El Monstruo escogido es un %s \n", server->monster->class_str);
 
