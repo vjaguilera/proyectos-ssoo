@@ -239,22 +239,29 @@ void start_playing(Server* server, Jugador** jugadores){
               printf("El cliente %d dice: %s\n", turn, client_message);
               optionSQL = atoi(client_message);
               inyeccion_sql_ability(server -> cliente_actual, server->clientes[optionSQL]);
+              char mensaje[100];
+              sprintf(mensaje, "Usó inyección sql sobre %s\n", server->clientes[optionSQL]->nombre);
+              notify_all_clients(server, mensaje);
             }
           } 
-
+          // Ataque DDOS
           else if (optionHacker == 2){
             printf("Entre a ataque ddos\n");
             ataque_ddos_ability(server -> cliente_actual, server -> monster);
+            notify_all_clients(server, "Usó Ataque DDOS");
           }
+          // Fuerza Bruta
           else if (optionHacker == 3){
             fuerza_bruta_ability(server -> cliente_actual, server -> monster);
+            notify_all_clients(server, "Usó Fuerza Bruta");
           }
           else{
             printf("Ingresa una opcion valida");
           }
         }
-        else if (server -> clientes[turn] -> clase_str[0] == 'm'){
 
+        // MEDICO
+        else if (server -> clientes[turn] -> clase_str[0] == 'm'){
           server_send_message(server -> cliente_actual -> socket, 13, "Escoge una habilidad\n");
           msg_code = server_receive_id(server -> cliente_actual -> socket);
           int optionMedico;
@@ -264,7 +271,7 @@ void start_playing(Server* server, Jugador** jugadores){
             printf("El cliente %d dice: %s\n", turn, client_message);
             optionMedico = atoi(client_message);
           }
-
+          // Curar
           if (optionMedico == 1){
             char cureMessage[100];
             int numeroJugador = 0;
@@ -297,8 +304,12 @@ void start_playing(Server* server, Jugador** jugadores){
               printf("El cliente %d dice: %s\n", turn, client_message);
               cliente_a_curar = atoi(client_message);
               curar_ability(server -> cliente_actual, server -> clientes[cliente_a_curar]);
+              char mensaje[100];
+              sprintf(mensaje, "Usó Curar sobre %s\n", server->clientes[cliente_a_curar]->nombre);
+              notify_all_clients(server, mensaje);
             }
           } 
+          // Destello regenerador
           else if (optionMedico == 2){
             // Asignar target_recuperacion al azar
             int jugador_valido = 1;
@@ -313,9 +324,12 @@ void start_playing(Server* server, Jugador** jugadores){
               }
             }
             destello_regenerador_ability(server -> cliente_actual, server -> monster, server -> clientes[jugador_recuperado]);
+            notify_all_clients(server, "Usó Destello Regenerador\n");
           }
+          // Descarga Vital
           else if (optionMedico == 3){
             descarga_vital_ability(server -> cliente_actual, server -> monster);
+            notify_all_clients(server, "Usó Descarga Vital\n");
           }
           else{
             printf("Ingresa una opcion valida");
@@ -333,15 +347,20 @@ void start_playing(Server* server, Jugador** jugadores){
             printf("El cliente %d dice: %s\n", turn, client_message);
             optionCazador = atoi(client_message);
           }
-
+          // Estocada
           if (optionCazador == 1){
             estocada_ability(server -> cliente_actual, server -> monster);
+            notify_all_clients(server, "Usó Estocada\n");
           } 
+          // Corte Cruzado
           else if (optionCazador == 2){
             corte_cruzado_ability(server -> cliente_actual, server -> monster);
+            notify_all_clients(server, "Usó Corte Cruzado\n");
           }
+          // Distraer
           else if (optionCazador == 3){
             distraer_ability(server -> cliente_actual, server -> monster);
+            notify_all_clients(server, "Usó Distraer\n");
           }
           else{
             printf("Ingresa una opcion valida");
@@ -406,10 +425,12 @@ void start_playing(Server* server, Jugador** jugadores){
           Jugador* affected_player = monster_choose_random_player(server);
           // Obtener jugador para copiar
           Jugador* copy_player = monster_choose_random_player(server);
-          copycase_hability(server->monster, copy_player, affected_player);
-          // TODO
+          char habilidadText[30];
+          copycase_hability(server->monster, copy_player, affected_player, habilidadText);
+          // TODO castear numero de hjabilidad a su nombre
           printf("[RUIZ] - [COPYCASE]\n");
-          char* msg = "El Ruiz ha utilizado CASO DE COPIA";
+          char msg[100];
+          sprintf(msg, "El Ruiz ha utilizado CASO DE COPIA\nCopio la habilidad %s\n", habilidadText);
           notify_all_clients(server, msg);
         } 
         else if (monster_ability == 1) {
