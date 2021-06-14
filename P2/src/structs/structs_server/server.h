@@ -43,6 +43,10 @@ Jugador* choose_random_player(Server* server);
 
 Jugador* monster_choose_random_player(Server* server);
 
+void end_listen(Server* server);
+
+void send_state(Server* server);
+
 
 // ----------- Monsters actions
 

@@ -5,7 +5,6 @@
 
 Jugador* init_jugador() {
     Jugador* jugador = malloc(sizeof(Jugador));
-    jugador -> socket = socket;
     jugador -> mi_turno = 0;
     jugador -> rendido = 0;
     // duplicado no estaria aceptando que se pueda cuaduplicar o octuplicar o ... tiene que permitirlo?
@@ -29,7 +28,7 @@ void listen_client(Jugador* jugador, int socket) {
     char * message;
     while (1){
         int msg_code = client_receive_id(socket);
-        printf("Msg receive client: %d\n", msg_code);
+        // printf("Msg receive client: %d\n", msg_code);
 
         if (msg_code != 0)
         {
@@ -79,9 +78,9 @@ void listen_client(Jugador* jugador, int socket) {
         else if (msg_code == 7) {
             show_menu(message, 0);
             int option = pick_option();
-            char msg[2];
-            sprintf(msg, "%d", option);
-            send_msg(jugador, 1, msg);
+            char response[2];
+            sprintf(response, "%d", option);
+            send_msg(jugador, option, response);
         }
         
         
@@ -103,7 +102,7 @@ void listen_client(Jugador* jugador, int socket) {
             break;
         }
 
-        printf("------------------\n");
+        // printf("------------------\n");
     }
     close(jugador -> socket);
 }
@@ -132,7 +131,7 @@ void clean_jugador(Jugador* jugador) {
 
 void update_player_life(Jugador* jugador, int damage) {
     printf("Quitar %d de vida a jugador %s\n", damage, jugador -> nombre);
-    jugador -> current_life -= damage;
+    jugador -> current_life += damage;
 }
 
 void intoxicate_player(Jugador* jugador, int intoxication) {

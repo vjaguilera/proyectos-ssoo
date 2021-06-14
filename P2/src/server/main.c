@@ -24,10 +24,10 @@ int main(int argc, char *argv[]){
 
   initial_listen(server);
   
-  start_playing(server, server -> clientes);
-
-  printf("Ahora se debería llamar a uan función para que los usuarios decidan si salir o no\n");
-  printf("Después llamar nuevamente a start_playing\n");
+  while (server -> cantidad_clientes > 0) {
+    start_playing(server, server -> clientes);
+    end_listen(server);
+  }
 
   return 0;
 }
