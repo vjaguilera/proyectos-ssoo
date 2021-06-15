@@ -121,9 +121,13 @@ void * leader_start(void *args) {
   ArgumentsCreateThread * info = args;
 
   int op = 1;
+  server_send_message(info -> socket, 4, "¿Quiere comenzar?");
   while (op ) {
-    server_send_message(info -> socket, 4, "¿Quiere comenzar?");
-    msg_code = server_receive_id(info -> socket);
+    printf("op %d NOT %d\n", op, info -> not_start);
+    if (info -> not_start != 0) {
+      printf("Enviar\n");
+      msg_code = server_receive_id(info -> socket);
+    }
     if (msg_code == 1) {
       char * client_message = server_receive_payload(info -> socket);
       printf("El cliente lider dice: %s\n", client_message);
