@@ -193,10 +193,24 @@ void clean_jugador(Jugador* jugador) {
 
 void update_player_life(Jugador* jugador, int damage) {
     printf("Quitar %d de vida a jugador %s\n", damage, jugador -> nombre);
-    jugador -> current_life += damage;
+    if (jugador -> current_life + damage <= 0){
+        jugador-> current_life = 0;
+    }
+    else {
+        jugador -> current_life += damage;
+    }
 }
 
 void intoxicate_player(Jugador* jugador, int intoxication) {
     printf("Quitar %d de intoxicacion a jugador %s\n", intoxication, jugador -> nombre);
     jugador -> intoxicated += intoxication;
 };
+
+int check_player_dead(Jugador* jugador){
+    if (jugador -> current_life == 0){
+        printf("El jugador %s ha sido asesinado por el monstruo\n", jugador -> nombre);
+        jugador -> rendido = 1;
+        return 1;
+    }
+    return 0;
+}

@@ -51,3 +51,5 @@ void clean_jugador(Jugador* jugador); // free
 void update_player_life(Jugador* jugador, int damage);
 
 void intoxicate_player(Jugador* jugador, int intoxication);
+
+int check_player_dead(Jugador* jugador);

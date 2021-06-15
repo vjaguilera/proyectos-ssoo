@@ -407,6 +407,12 @@ void start_playing(Server* server, Jugador** jugadores){
           char msg[100];
           sprintf(msg, "El JagRuz ha utilizado RUZGAR contra %s inflingiendo %d\n", affected_player->nombre, damage);
           notify_all_clients(server, msg);
+          int murio_jugador = check_player_dead(affected_player);
+          if (murio_jugador){
+            char aviso_muerte[100];
+            sprintf(aviso_muerte, "El JagRuz ha matado a %s\n", affected_player->nombre);
+            notify_all_clients(server, aviso_muerte);
+          }
         } 
         else if (monster_ability == 1){
           // COLETAZO
@@ -415,6 +421,15 @@ void start_playing(Server* server, Jugador** jugadores){
           char msg[100];
           sprintf(msg, "El JagRuz ha utilizado COLETAZO contra TODOS LOS JUGADORES inflingiendo %d\n", damage);
           notify_all_clients(server, msg);
+          for (int i = 0; i < server->cantidad_clientes; i++){
+            Jugador* affected_player = server->clientes[i];
+            int murio_jugador = check_player_dead(affected_player);
+            if (murio_jugador){
+              char aviso_muerte[100];
+              sprintf(aviso_muerte, "El JagRuz ha matado a %s\n", affected_player->nombre);
+              notify_all_clients(server, aviso_muerte);
+            }
+          }
         }
         else{
           printf("Problemas procesando el ataque del monstruo JAGRUZ");
@@ -434,6 +449,13 @@ void start_playing(Server* server, Jugador** jugadores){
           char msg[200];
           sprintf(msg, "El Ruiz ha utilizado CASO DE COPIA contra %s inflingiendo %d\nCopio la habilidad %s del jugador %s\n", affected_player->nombre, damage, habilidadText, copy_player->nombre);
           notify_all_clients(server, msg);
+          int murio_jugador = check_player_dead(affected_player);
+          if (murio_jugador){
+            char aviso_muerte[100];
+            sprintf(aviso_muerte, "El JagRuz ha matado a %s\n", affected_player->nombre);
+            notify_all_clients(server, aviso_muerte);
+          }
+          
         } 
         else if (monster_ability == 1) {
           // Reprobatron
@@ -444,6 +466,12 @@ void start_playing(Server* server, Jugador** jugadores){
           char msg[100];
           sprintf(msg, "El Ruiz ha utilizado REPROBRATRON contra %s inflingiendo 0\n", affected_player->nombre);
           notify_all_clients(server, msg);
+          int murio_jugador = check_player_dead(affected_player);
+          if (murio_jugador){
+            char aviso_muerte[100];
+            sprintf(aviso_muerte, "El JagRuz ha matado a %s\n", affected_player->nombre);
+            notify_all_clients(server, aviso_muerte);
+          }
         }
         else if (monster_ability == 2){
           // SUDO RM RF
@@ -452,6 +480,16 @@ void start_playing(Server* server, Jugador** jugadores){
           char msg[100];
           sprintf(msg, "El Ruiz ha utilizado REPROBRATRON contra TODOS inflingiendo %d\n", damage);
           notify_all_clients(server, msg);
+          for (int i = 0; i < server->cantidad_clientes; i++){
+            Jugador* affected_player = server->clientes[i];
+            int murio_jugador = check_player_dead(affected_player);
+            if (murio_jugador){
+              char aviso_muerte[100];
+              sprintf(aviso_muerte, "El JagRuz ha matado a %s\n", affected_player->nombre);
+              notify_all_clients(server, aviso_muerte);
+            }
+          }
+          
         }
         else{
           printf("Problemas procesando el ataque del monstruo\n");
@@ -467,6 +505,12 @@ void start_playing(Server* server, Jugador** jugadores){
           char msg[100];
           sprintf(msg, "El Ruzalo ha utilizado SALTO contra %s inflingiendo %d\n", affected_player->nombre, damage);
           notify_all_clients(server, msg);
+          int murio_jugador = check_player_dead(affected_player);
+          if (murio_jugador){
+            char aviso_muerte[100];
+            sprintf(aviso_muerte, "El JagRuz ha matado a %s\n", affected_player->nombre);
+            notify_all_clients(server, aviso_muerte);
+          }
         } 
         else if (monster_ability == 1){
           // Espina venenosa
@@ -477,6 +521,12 @@ void start_playing(Server* server, Jugador** jugadores){
           char msg[100];
           sprintf(msg, "El Ruzalo ha utilizado ESPINA VENENOSA contra %s inflingiendo %d\n", affected_player->nombre, damage);
           notify_all_clients(server, msg);
+          int murio_jugador = check_player_dead(affected_player);
+          if (murio_jugador){
+            char aviso_muerte[100];
+            sprintf(aviso_muerte, "El JagRuz ha matado a %s\n", affected_player->nombre);
+            notify_all_clients(server, aviso_muerte);
+          }
         }
         else{
           printf("Problemas procesando el ataque del monstruo\n");
