@@ -6,10 +6,13 @@ Monster* monster_init(int identificador) {
     monster -> me_distrajo = malloc(sizeof(Jugador));
     monster -> distraido = 0;
     monster -> duplicado = 0;
+    monster -> on = 1;
     int num = identificador;
     monster -> salto_active = false;
     if (identificador == 4) {
         num = rand() % 3;
+        printf("Number %d\n", num);
+        num += 1;
     }
     switch (num)
     {
@@ -58,7 +61,7 @@ void monster_clean(Monster* monster) {
     free(monster -> jagruz);
     free(monster -> ruiz);
     free(monster -> ruzalo);
-    free(monster);
+    // free(monster);
 }
 
 int choose_ability(int* options, int* percentage, int options_amount)
@@ -312,7 +315,7 @@ void espinavenenosa_hability(Monster *ruzalo, Jugador *player)
     // puntos de daño cada turno (dura 3 turnos este efecto). Si el objetivo ya está intoxicado, inflije 500 puntos de
     // daño
     int damage = 500;
-    // PENDIENTE
+    // TODO
     if (player -> intoxicated)
     {
         if (player->demoralized){

@@ -23,6 +23,7 @@ typedef struct monster
     char* class_str;
     int class_int;
     int duplicado;
+    int on;
 } Monster;
 
 Monster* monster_init(int identificador);

@@ -28,6 +28,7 @@ typedef struct player{
   int current_life;
   int initial_life;
   char* clase_str;
+  int deleted;
 } Jugador;
 
 Jugador* init_jugador(); // crea al jugador
