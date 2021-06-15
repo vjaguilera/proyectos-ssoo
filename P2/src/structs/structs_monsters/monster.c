@@ -176,7 +176,7 @@ int player_choose_ability(Jugador *player)
 
 }
 
-void ruzgar_hability(Monster *jagruz, Jugador *player)
+int ruzgar_hability(Monster *jagruz, Jugador *player)
 {
     // El JagRuz ocupa sus poderosas garRaz para atacar a un enemigo 1000 puntos de daño"""
     int damage = 1000;
@@ -184,9 +184,10 @@ void ruzgar_hability(Monster *jagruz, Jugador *player)
         damage *= 1.5;
     }
     update_player_life(player, -damage); // Update -damage player life
+    return damage;
 }
 
-void coletazo_hability(Monster *jagruz, Jugador **players, int players_amount)
+int coletazo_hability(Monster *jagruz, Jugador **players, int players_amount)
 {
     int damage = 500;
     // El JagRuz golpea a todos los objetivos con su cola 500 puntos de daño
@@ -197,29 +198,31 @@ void coletazo_hability(Monster *jagruz, Jugador **players, int players_amount)
         }
         update_player_life(players[jg], -damage); // Update -damage player life
     }
+    return damage;
 }
 
-void copycase_hability(Monster *monster, Jugador *copy_player, Jugador *obj_player, char* habilidadText)
+int copycase_hability(Monster *monster, Jugador *copy_player, Jugador *obj_player, char* habilidadText)
 {
     // Ruiz rompe el Código de Honor y copia de forma aleatoria una de las habilidades de
     // algún jugador y la usa contra alguno de los jugadores causando los efectos asociados. Si la habilidad normal-
     // mente involucra ayudar a un jugador aliado, Ruiz recibe el efecto sobre si mismo.
     int ability = player_choose_ability(copy_player);
     printf("La habilidad a copiar es la numero %d\n", ability);
+    int damage = 0;
     // UTILIZAR HABILIDAD
     switch (ability)
     {
     case 0:
     {
       // Cazador - estocada
-      estocada_ability_copy(monster, obj_player);
+      damage += estocada_ability_copy(monster, obj_player);
       sprintf(habilidadText, "%s", "Estocada");
       break;
     }
     case 1:
     {
       // Cazador - corte cruzado
-      corte_cruzado_ability_copy(monster, obj_player);
+      damage += corte_cruzado_ability_copy(monster, obj_player);
       sprintf(habilidadText, "%s", "Corte cruzado");
       break;
     }
@@ -240,7 +243,7 @@ void copycase_hability(Monster *monster, Jugador *copy_player, Jugador *obj_play
     case 4:
     {
       // Hacker - ddos
-      ataque_ddos_ability_copy(monster, obj_player);
+      damage += ataque_ddos_ability_copy(monster, obj_player);
       sprintf(habilidadText, "%s", "Ataque DDOS");
       break;
     }
@@ -261,14 +264,14 @@ void copycase_hability(Monster *monster, Jugador *copy_player, Jugador *obj_play
     case 7:
     {
       // Medico - destello regenerador
-      destello_regenerador_ability_copy(monster, obj_player);
+      damage += destello_regenerador_ability_copy(monster, obj_player);
       sprintf(habilidadText, "%s", "Destello regenerador");
       break;
     }
     case 8:
     {
       // Medico - descarga vital
-      descarga_vital_ability_copy(monster, obj_player);
+      damage += descarga_vital_ability_copy(monster, obj_player);
       sprintf(habilidadText, "%s", "Descarga vital");
       break;
     }
@@ -280,6 +283,7 @@ void copycase_hability(Monster *monster, Jugador *copy_player, Jugador *obj_play
     if (monster->duplicado > 0) {
       monster->duplicado -= 1;
     }
+    return damage;
 }
 
 void reprobatron_hability(Monster *ruiz, Jugador *player)
@@ -293,7 +297,7 @@ void reprobatron_hability(Monster *ruiz, Jugador *player)
     player -> demoralized = true;
 }
 
-void salto_hability(Monster *ruzalo, Jugador *player)
+int salto_hability(Monster *ruzalo, Jugador *player)
 {
     // El Ruzalos salta sobre su objetivo, cayendo con gran fuerza sobre el, este recibe 1500 puntos de
     // daño. Ruzalos no puede usar esta habilidad 2 o más veces seguidas, es decir, si usa esta habilidad, en su próximo
@@ -304,9 +308,10 @@ void salto_hability(Monster *ruzalo, Jugador *player)
     }
     update_player_life(player, -damage); // Update -damage player life
     ruzalo->salto_active = true;
+    return damage;
 }
 
-void espinavenenosa_hability(Monster *ruzalo, Jugador *player)
+int espinavenenosa_hability(Monster *ruzalo, Jugador *player)
 {
     // El Ruzalos golpea al objetivo con la espina en su cola intoxicándolo, recibiendo 400
     // puntos de daño cada turno (dura 3 turnos este efecto). Si el objetivo ya está intoxicado, inflije 500 puntos de
@@ -325,9 +330,10 @@ void espinavenenosa_hability(Monster *ruzalo, Jugador *player)
     int intoxication = 400;
     intoxicate_player(player, intoxication);
     ruzalo->salto_active = false;
+    return damage;
 }
 
-void estocada_ability_copy(Monster* ruiz, Jugador *player)
+int estocada_ability_copy(Monster* ruiz, Jugador *player)
 {
   // estocada al jugador. 1000 de daño y dejando sangrado que quita 500 cada ronda, hasta maximo
   // 3 acumulados
@@ -343,9 +349,10 @@ void estocada_ability_copy(Monster* ruiz, Jugador *player)
   if (player->estocadas < 3) {
     player->estocadas += 1;
   }
+  return damage;
 }
 
-void corte_cruzado_ability_copy(Monster* ruiz, Jugador *player)
+int corte_cruzado_ability_copy(Monster* ruiz, Jugador *player)
 {
   // Inflige 3000 de dano al jugador
   int damage = 3000;
@@ -357,6 +364,7 @@ void corte_cruzado_ability_copy(Monster* ruiz, Jugador *player)
     damage *= 2;
   }
   update_player_life(player, -damage); // Update -damage player life
+  return damage;
 }
 
 void distraer_ability_copy(Monster* ruiz, Jugador *player)
@@ -370,7 +378,7 @@ void inyeccion_sql_ability_copy(Monster* ruiz)
   ruiz->duplicado +=2;
 }
 
-void ataque_ddos_ability_copy(Monster* ruiz, Jugador* player)
+int ataque_ddos_ability_copy(Monster* ruiz, Jugador* player)
 {
   // Inflinge 1500 de dano al jugador
   int damage = 1500;
@@ -382,6 +390,7 @@ void ataque_ddos_ability_copy(Monster* ruiz, Jugador* player)
     damage *= 2;
   }
   update_player_life(player, -damage); // Update -damage player life
+  return damage;
 }
 
 void fuerza_bruta_ability_copy(Monster* ruiz, Jugador* player)
@@ -396,7 +405,7 @@ void curar_ability_copy(Monster* monster)
   monster->current_life += 2000;
 }
 
-void destello_regenerador_ability_copy(Monster *monster, Jugador *player)
+int destello_regenerador_ability_copy(Monster *monster, Jugador *player)
 {
   // inflinge entre 750 y 2000 de dano al jugador
   // se cura con la mitad
@@ -414,9 +423,10 @@ void destello_regenerador_ability_copy(Monster *monster, Jugador *player)
   // Recuperar mitad de la vida
   int vida_recuperada = (int)damage/2;
   monster->current_life += vida_recuperada;
+  return damage;
 }
 
-void descarga_vital_ability_copy(Monster *monster, Jugador *player)
+int descarga_vital_ability_copy(Monster *monster, Jugador *player)
 {
   int damage = 2 * (monster->initial_life - monster -> current_life);
   if (player->demoralized){
@@ -427,6 +437,7 @@ void descarga_vital_ability_copy(Monster *monster, Jugador *player)
     damage *= 2;
   }
   update_player_life(player, -damage); // Update -damage player life
+  return damage;
 }
 
 void check_monster_sangrado(Monster *monster)

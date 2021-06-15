@@ -402,16 +402,18 @@ void start_playing(Server* server, Jugador** jugadores){
           // RUZGAR
           // Obtener cliente random
           Jugador* affected_player = monster_choose_random_player(server);
-          ruzgar_hability(server->monster, affected_player);
+          int damage = ruzgar_hability(server->monster, affected_player);
           printf("[JAGRUZ] - [RUZGAR]\n");
-          char* msg = "El JagRuz ha utilizado RUZGAR";
+          char msg[100];
+          sprintf(msg, "El JagRuz ha utilizado RUZGAR contra %s inflingiendo %d\n", affected_player->nombre, damage);
           notify_all_clients(server, msg);
         } 
         else if (monster_ability == 1){
           // COLETAZO
-          coletazo_hability(server->monster, server->clientes, server->cantidad_clientes);
+          int damage = coletazo_hability(server->monster, server->clientes, server->cantidad_clientes);
           printf("[JAGRUZ] - [COLETAZO]\n");
-          char* msg = "El JagRuz ha utilizado COLETAZO";
+          char msg[100];
+          sprintf(msg, "El JagRuz ha utilizado COLETAZO contra TODOS LOS JUGADORES inflingiendo %d\n", damage);
           notify_all_clients(server, msg);
         }
         else{
@@ -426,11 +428,11 @@ void start_playing(Server* server, Jugador** jugadores){
           // Obtener jugador para copiar
           Jugador* copy_player = monster_choose_random_player(server);
           char habilidadText[30];
-          copycase_hability(server->monster, copy_player, affected_player, habilidadText);
+          int damage = copycase_hability(server->monster, copy_player, affected_player, habilidadText);
           // TODO castear numero de hjabilidad a su nombre
           printf("[RUIZ] - [COPYCASE]\n");
-          char msg[100];
-          sprintf(msg, "El Ruiz ha utilizado CASO DE COPIA\nCopio la habilidad %s\n", habilidadText);
+          char msg[200];
+          sprintf(msg, "El Ruiz ha utilizado CASO DE COPIA contra %s inflingiendo %d\nCopio la habilidad %s del jugador %s\n", affected_player->nombre, damage, habilidadText, copy_player->nombre);
           notify_all_clients(server, msg);
         } 
         else if (monster_ability == 1) {
@@ -439,14 +441,16 @@ void start_playing(Server* server, Jugador** jugadores){
           Jugador* affected_player = monster_choose_random_player(server);
           reprobatron_hability(server->monster, affected_player);
           printf("[RUIZ] - [REPROBATRON]\n");
-          char* msg = "El Ruiz ha utilizado REPROBATRON";
+          char msg[100];
+          sprintf(msg, "El Ruiz ha utilizado REPROBRATRON contra %s inflingiendo 0\n", affected_player->nombre);
           notify_all_clients(server, msg);
         }
         else if (monster_ability == 2){
           // SUDO RM RF
-          sudormrf_hability(server->monster, server, server->clientes, server->cantidad_clientes);
+          int damage = sudormrf_hability(server->monster, server, server->clientes, server->cantidad_clientes);
           printf("[RUIZ] - [SUDO RM RF]\n");
-          char* msg = "El Ruiz ha utilizado SUDO RM RF";
+          char msg[100];
+          sprintf(msg, "El Ruiz ha utilizado REPROBRATRON contra TODOS inflingiendo %d\n", damage);
           notify_all_clients(server, msg);
         }
         else{
@@ -458,18 +462,20 @@ void start_playing(Server* server, Jugador** jugadores){
           // SALTO
           // Obtener jugador random
           Jugador* affected_player = monster_choose_random_player(server);
-          salto_hability(server->monster, affected_player);
+          int damage = salto_hability(server->monster, affected_player);
           printf("[RUZALO] - [SALTO]\n");
-          char* msg = "El Ruzalo ha utilizado SALTO";
+          char msg[100];
+          sprintf(msg, "El Ruzalo ha utilizado SALTO contra %s inflingiendo %d\n", affected_player->nombre, damage);
           notify_all_clients(server, msg);
         } 
         else if (monster_ability == 1){
           // Espina venenosa
           // Obtener jugador random
           Jugador* affected_player = monster_choose_random_player(server);
-          espinavenenosa_hability(server->monster, affected_player);
+          int damage = espinavenenosa_hability(server->monster, affected_player);
           printf("[RUZALO] - [ESPINA VENENOSA]\n");
-          char* msg = "El Ruzalo ha utilizado ESPINA VENENOSA";
+          char msg[100];
+          sprintf(msg, "El Ruzalo ha utilizado ESPINA VENENOSA contra %s inflingiendo %d\n", affected_player->nombre, damage);
           notify_all_clients(server, msg);
         }
         else{
@@ -550,7 +556,7 @@ Jugador* monster_choose_random_player(Server *server)
 
 }
 
-void sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int players_amount)
+int sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int players_amount)
 {
     // Ruiz borra todas las rondas ocurridas hasta ahora para infligir daño a todos los jugadores.
     // Hace 100·(número de rondas desde el inicio del combate hasta ahora, sin considerar usos anteriores de esta
@@ -572,6 +578,7 @@ void sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int pla
 
     // Set server rounds to 0
     server->rounds_without_sudo = 0;
+    return damage;
 }
 
 void end_listen(Server* server) {
