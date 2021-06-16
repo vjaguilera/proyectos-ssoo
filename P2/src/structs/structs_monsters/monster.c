@@ -316,10 +316,11 @@ int espinavenenosa_hability(Monster *ruzalo, Jugador *player)
     // El Ruzalos golpea al objetivo con la espina en su cola intoxicándolo, recibiendo 400
     // puntos de daño cada turno (dura 3 turnos este efecto). Si el objetivo ya está intoxicado, inflije 500 puntos de
     // daño
-    int damage = 500;
+    int damage = 0;
     // PENDIENTE
-    if (player -> intoxicated)
+    if (player -> intoxicated > 0)
     {
+        damage = 500;
         if (player->demoralized){
             damage *= 1.5;
         }
@@ -327,8 +328,7 @@ int espinavenenosa_hability(Monster *ruzalo, Jugador *player)
         update_player_life(player, -damage); // Update -damage player life
     }
     // Intoxicar jugador
-    int intoxication = 400;
-    intoxicate_player(player, intoxication);
+    intoxicate_player(player);
     ruzalo->salto_active = false;
     return damage;
 }

@@ -178,6 +178,15 @@ void start_playing(Server* server, Jugador** jugadores){
 
       printf("Turno de %s round %d \n", server -> cliente_actual -> nombre, rounds);
 
+      // Chequeo!
+      // Intoxicacion
+      int intoxicated = check_player_intoxicated(server->cliente_actual);
+      if (intoxicated) {
+        char msg[100];
+        sprintf(msg, "El jugador %s ha recibido 400 de dano por intoxicacion\n", server -> cliente_actual->nombre);
+        notify_all_clients(server, msg);
+      }
+
       server -> turno_actual = turn;
 
       server_send_message(server -> cliente_actual -> socket, 8, "Escoge una opcion\n");

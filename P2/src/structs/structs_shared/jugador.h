@@ -50,4 +50,6 @@ void clean_jugador(Jugador* jugador); // free
 
 void update_player_life(Jugador* jugador, int damage);
 
-void intoxicate_player(Jugador* jugador, int intoxication);
+void intoxicate_player(Jugador* jugador);
+
+int check_player_intoxicated(Jugador* jugador);
