@@ -50,4 +50,4 @@ void send_state(Server* server);
 
 // ----------- Monsters actions
 
-void sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int players_amount);
+int sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int players_amount);

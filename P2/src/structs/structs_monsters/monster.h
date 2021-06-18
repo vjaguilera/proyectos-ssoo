@@ -30,37 +30,37 @@ Monster* monster_init(int identificador);
 
 int monster_choose_ability(Monster* monster);
 
-void ruzgar_hability(Monster *jagruz, Jugador *player);
+int ruzgar_hability(Monster *jagruz, Jugador *player);
 
-void coletazo_hability(Monster *jagruz, Jugador **players, int players_amount);
+int coletazo_hability(Monster *jagruz, Jugador **players, int players_amount);
 
-void copycase_hability(Monster *ruiz, Jugador *copy_player, Jugador *obj_player, char* habilidadText);
+int copycase_hability(Monster *ruiz, Jugador *copy_player, Jugador *obj_player, char* habilidadText);
 
 void reprobatron_hability(Monster *ruiz, Jugador *player);
 
-void salto_hability(Monster *ruzalo, Jugador *player);
+int salto_hability(Monster *ruzalo, Jugador *player);
 
-void espinavenenosa_hability(Monster *ruzalo, Jugador *player);
+int espinavenenosa_hability(Monster *ruzalo, Jugador *player);
 
 // COPY CASE
 
-void estocada_ability_copy(Monster* ruiz, Jugador *player);
+int estocada_ability_copy(Monster* ruiz, Jugador *player);
 
-void corte_cruzado_ability_copy(Monster* ruiz, Jugador *player);
+int corte_cruzado_ability_copy(Monster* ruiz, Jugador *player);
 
 void distraer_ability_copy(Monster* ruiz, Jugador *player);
 
 void inyeccion_sql_ability_copy(Monster* ruiz);
 
-void ataque_ddos_ability_copy(Monster* ruiz, Jugador* player);
+int ataque_ddos_ability_copy(Monster* ruiz, Jugador* player);
 
 void fuerza_bruta_ability_copy(Monster* ruiz, Jugador* player);
 
 void curar_ability_copy(Monster* monster);
 
-void destello_regenerador_ability_copy(Monster *monster, Jugador *player);
+int destello_regenerador_ability_copy(Monster *monster, Jugador *player);
 
-void descarga_vital_ability_copy(Monster *monster, Jugador *player);
+int descarga_vital_ability_copy(Monster *monster, Jugador *player);
 
 // General
 

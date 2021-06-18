@@ -232,7 +232,17 @@ void update_player_life(Jugador* jugador, int damage) {
     jugador -> current_life += damage;
 }
 
-void intoxicate_player(Jugador* jugador, int intoxication) {
-    printf("Quitar %d de intoxicacion a jugador %s\n", intoxication, jugador -> nombre);
-    jugador -> intoxicated += intoxication;
+void intoxicate_player(Jugador* jugador) {
+    printf("Aumentar la intoxicacion a jugador %s\n", jugador -> nombre);
+    jugador -> intoxicated += 3;
 };
+
+int check_player_intoxicated(Jugador* jugador) {
+    printf("Checkeando si jugador esta intoxicado, si es asi, descuento de 400\n");
+    if (jugador->intoxicated > 0) {
+        jugador->current_life -= 400;
+        jugador->intoxicated -= 1;
+        return 1;
+    }
+    return 0;
+}

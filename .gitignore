@@ -3,3 +3,7 @@ P1/osfs
 .vscode/
 simdiskfilled.bin
 simdiskformat.bin
+
+P2/obj
+P2/server
+P2/client
