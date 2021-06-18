@@ -35,4 +35,12 @@ void set_class(Jugador* jugador, int num_clase) {
     default:
         break;
     }
+    jugador -> mi_turno = 0;
+    jugador -> rendido = 0;
+    jugador -> duplicado = 0;
+    jugador -> fuerza_bruta = 0;
+    jugador -> intoxicated = 0;
+    jugador -> demoralized = false;
+    jugador -> estocadas = 0;
+    jugador -> deleted = 0;
 }

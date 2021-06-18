@@ -1,6 +1,7 @@
 #include "server.h"
 #include "../structs_monsters/monster.h"
 #include "../structs_server/conection.h"
+
 //#include "../structs_shared/abilities_player.h"
 
 Server* init_server(int socket) {
@@ -14,10 +15,13 @@ Server* init_server(int socket) {
 }
 
 void notify_all_clients(Server* server, char* msg) {
-  printf("cantidad clients %d\n", server -> cantidad_clientes);
-    for (int i = 0; i < server -> cantidad_clientes; i++) {
-        server_send_message(server -> clientes[i] -> socket, 3, msg);
-    }
+  // printf("cantidad clients %d\n", server -> cantidad_clientes);
+  for (int i = 0; i < server -> cantidad_clientes; i++) {
+    if (server -> clientes[i] -> deleted){
+      continue;
+    } 
+    server_send_message(server -> clientes[i] -> socket, 3, msg);
+  }
 }
 
 void initial_listen(Server* server) {
@@ -98,7 +102,9 @@ void initial_listen(Server* server) {
       }
 
       sprintf(response, "%s ha ingresado a la partida con la clase %s\n", actual -> nombre, actual -> clase_str);
-      notify_all_clients(server, response);
+      if (pos != 0) {
+        notify_all_clients(server, response);
+      }
     }
 
     if (thrgs -> not_start == 0) {
@@ -115,9 +121,13 @@ void * leader_start(void *args) {
   ArgumentsCreateThread * info = args;
 
   int op = 1;
+  server_send_message(info -> socket, 4, "¿Quiere comenzar?");
   while (op ) {
-    server_send_message(info -> socket, 4, "¿Quiere comenzar?");
-    msg_code = server_receive_id(info -> socket);
+    printf("op %d NOT %d\n", op, info -> not_start);
+    if (info -> not_start != 0) {
+      printf("Enviar\n");
+      msg_code = server_receive_id(info -> socket);
+    }
     if (msg_code == 1) {
       char * client_message = server_receive_payload(info -> socket);
       printf("El cliente lider dice: %s\n", client_message);
@@ -136,6 +146,9 @@ void * leader_start(void *args) {
 }
 
 void set_monster(Server* server, int num_monster) {
+  if (server -> monster -> on == 1) {
+    monster_clean(server -> monster);
+  }
   server -> monster = monster_init(num_monster);
 }
 
@@ -165,7 +178,7 @@ void start_playing(Server* server, Jugador** jugadores){
     // FOR
     for (int turn = 0; turn < server->cantidad_clientes; turn++){
 
-      if (server -> clientes[turn] -> rendido){
+      if (server -> clientes[turn] -> rendido || server -> clientes[turn] -> deleted){
         continue;
       }
 
@@ -590,13 +603,62 @@ int sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int play
     return damage;
 }
 
+void fix_clients_pos(Server* server, int total) {
+  int c = -1;
+  for (int i = 0; i < server -> cantidad_clientes; i++) {
+    if (i == total) {
+      break;
+    }
+    if (c != i && server -> clientes[i] -> deleted == 1 && server -> clientes[i + 1] -> deleted == 0) {
+      server -> clientes[i] = server -> clientes[i + 1];
+      c = i + 1;
+    } else if (c == i) {
+      while (c < server -> cantidad_clientes - 1) {
+        server -> clientes[c] = server -> clientes[c + 1];
+        c += 1;
+      }
+      c = -1;
+    }
+  }
+  for (int i = 0; i < total; i++) {
+    printf("Sigue jugando %s\n", server -> clientes[i] -> nombre);
+  }
+}
+
 void end_listen(Server* server) {
-  notify_all_clients(server, "¿Quieres continuar?\n");
-  printf("Revisar si se quieren salir\n");
-  printf("Hacer cambio de lider si es necesario\n");
-  // server -> lider = 
-  // server -> cantidad_clientes = 
-  // resetear info de los jugadores**
+  int total = server -> cantidad_clientes;
+  for (int i = 0; i < server -> cantidad_clientes; i++) {
+    server_send_message(server -> clientes[i] -> socket, 4, "¿Quieres continuar?");
+    int msg_code = server_receive_id(server -> clientes[i] -> socket);
+
+    char * client_message = server_receive_payload(server -> clientes[i] -> socket);
+    if (atoi(client_message) == 1) {
+      server_send_message(server -> clientes[i] -> socket, 2, "Seleccione su clase");
+      msg_code = server_receive_id(server -> clientes[i] -> socket);
+      if (msg_code == 1) {
+        char * client_message = server_receive_payload(server -> clientes[i] -> socket);
+        printf("El cliente %d dice: %s\n", server -> cantidad_clientes, client_message);
+        server -> clientes[i] -> num_clase = atoi(client_message);
+        set_class(server -> clientes[i], server -> clientes[i] -> num_clase);
+        char response[50];
+        sprintf(response, "%s ha ingresado a la partida con la clase %s\n",
+          server -> clientes[i] -> nombre,
+          server -> clientes[i] -> clase_str
+        );
+        notify_all_clients(server, response);
+      }
+    } else {
+      server -> clientes[i] -> deleted = 1;
+      total -= 1;
+      server_send_message(server -> clientes[i] -> socket, 16, "¡Gracias por jugar!");
+      if (total != 0 && server -> lider -> nombre == server -> clientes[i] -> nombre) {
+        server -> lider = server -> clientes[i + 1];
+        server_send_message(server -> clientes[i + 1] -> socket, 3, "Ahora eres líder");
+      }
+    }
+  }
+  fix_clients_pos(server, total);
+  server -> cantidad_clientes = total;
 }
 
 void send_state(Server* server) {

@@ -2,6 +2,11 @@
 #include "../structs_client/comunication.h"
 #include "../structs_client/conection.h"
 #include "../../helpers/input.h"
+#include <fcntl.h>
+#include <stdbool.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <errno.h>
 
 Jugador* init_jugador() {
     Jugador* jugador = malloc(sizeof(Jugador));
@@ -13,6 +18,7 @@ Jugador* init_jugador() {
     jugador -> intoxicated = 0;
     jugador -> demoralized = false;
     jugador -> estocadas = 0;
+    jugador -> deleted = 0;
     return jugador;
 };
 
@@ -58,6 +64,32 @@ void listen_client(Jugador* jugador, int socket) {
             show_menu("Si", 1);
             show_menu("No", 2);
             int option = pick_option();
+            // int flags = fcntl(socket, F_GETFL);
+            // flags |= O_NONBLOCK;
+            // fcntl(socket, F_SETFL, flags);
+
+            // int option, keep_running = true;
+            // char rbuf[1];
+            // while (keep_running) {
+            //     while (true) {
+            //         if ((option = getchar_unlocked())) {
+            //             printf("asd %d\n", option);
+            //             break;
+            //         }
+            //         usleep(100);
+            //         errno = 0;
+            //         if (client_receive_id(socket) != -1)
+            //             break;
+            //     }
+            //     if (option == 12) {
+            //         printf("Message from you: %c (%i)\n", option, option);
+            //         // if (option == 19)
+            //         keep_running = false;
+            //     }
+            //     else {
+            //         printf("Message from server: %s\n", rbuf);
+            //     }
+            // }
             char response[2];
             sprintf(response, "%d", option);
             send_msg(jugador, 1, response);
@@ -153,6 +185,10 @@ void listen_client(Jugador* jugador, int socket) {
             char response[2];
             sprintf(response, "%d", option);
             send_msg(jugador, 1, response);
+        }
+        else if(msg_code == 16){
+            show_menu(message, 0);
+            break;
         }
 
         
