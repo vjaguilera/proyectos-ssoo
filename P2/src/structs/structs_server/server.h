@@ -31,7 +31,7 @@ Server* init_server(int socket);
 
 void notify_all_clients(Server* server, char* msg);
 
-void initial_listen(Server* server);
+ArgumentsCreateThread* initial_listen(Server* server);
 
 void start_playing(Server* server, Jugador** jugadores);
 
@@ -46,6 +46,8 @@ Jugador* monster_choose_random_player(Server* server);
 void end_listen(Server* server);
 
 void send_state(Server* server);
+
+void server_clean(Server *server);
 
 
 // ----------- Monsters actions

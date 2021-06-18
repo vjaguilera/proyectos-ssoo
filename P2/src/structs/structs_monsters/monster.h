@@ -27,6 +27,8 @@ typedef struct monster
 
 Monster* monster_init(int identificador);
 
+void monster_clean(Monster* monster);
+
 int monster_choose_ability(Monster* monster);
 
 int ruzgar_hability(Monster *jagruz, Jugador *player);

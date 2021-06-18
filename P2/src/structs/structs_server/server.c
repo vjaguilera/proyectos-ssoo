@@ -20,7 +20,7 @@ void notify_all_clients(Server* server, char* msg) {
     }
 }
 
-void initial_listen(Server* server) {
+ArgumentsCreateThread* initial_listen(Server* server) {
   int new_socket;
   int pos;
   int msg_code;
@@ -74,6 +74,7 @@ void initial_listen(Server* server) {
         char * client_message = server_receive_payload(new_socket);
         printf("El cliente %d dice: %s\n", server -> cantidad_clientes, client_message);
         actual -> nombre = client_message;
+        free(client_message);
 
       }
       server_send_message(new_socket, 2, "Seleccione su clase");
@@ -83,6 +84,7 @@ void initial_listen(Server* server) {
         printf("El cliente %d dice: %s\n", server -> cantidad_clientes, client_message);
         actual -> num_clase = atoi(client_message);
         set_class(actual, actual -> num_clase);
+        free(client_message);
       }
       thrgs -> espera_cliente = 0;
 
@@ -108,6 +110,7 @@ void initial_listen(Server* server) {
   }
   printf("Empezará la partida\n");
   notify_all_clients(server, "¡Comenzará la partida!");
+  return thrgs;
 }
 
 void * leader_start(void *args) {
@@ -123,11 +126,14 @@ void * leader_start(void *args) {
       printf("El cliente lider dice: %s\n", client_message);
       if (info -> espera_cliente == 1) {
         server_send_message(info -> socket, 4, "Hay un cliente registrándose.\n¿Quiere comenzar?");
+        free(client_message);
       } else if (atoi(client_message) == 1) {
         op = 0;
         info -> not_start = 0;
+        free(client_message);
         break;
       } else {
+        free(client_message);
       }
     }
   }
@@ -148,6 +154,7 @@ void start_playing(Server* server, Jugador** jugadores){
   server_send_message(server -> lider -> socket, 7, "Seleccione al monstruo\n1) JagRuz\n2) Ruiz\n3) Ruzalo\n4) Al azar\n");
   int msg_code = server_receive_id(server -> lider -> socket);
   char * client_message = server_receive_payload(server -> lider -> socket);
+  free(client_message);
   server -> num_monster = msg_code;
   set_monster(server, server -> num_monster);
   char msg[40];
@@ -197,6 +204,7 @@ void start_playing(Server* server, Jugador** jugadores){
         // Turn corresponde al id del cliente
         printf("El cliente %d dice: %s\n", turn, client_message);
         option = atoi(client_message);
+        free(client_message);
       }
 
       printf("Opcion elegida es %d\n", option);
@@ -213,6 +221,7 @@ void start_playing(Server* server, Jugador** jugadores){
             // Turn corresponde al id del cliente
             printf("El cliente %d dice: %s\n", turn, client_message);
             optionHacker = atoi(client_message);
+            free(client_message);
           }
           // Inyeccion SQL
           if (optionHacker == 1){
@@ -251,6 +260,7 @@ void start_playing(Server* server, Jugador** jugadores){
               char mensaje[100];
               sprintf(mensaje, "Usó inyección sql sobre %s\n", server->clientes[optionSQL]->nombre);
               notify_all_clients(server, mensaje);
+              free(client_message);
             }
           } 
           // Ataque DDOS
@@ -279,6 +289,7 @@ void start_playing(Server* server, Jugador** jugadores){
             // Turn corresponde al id del cliente
             printf("El cliente %d dice: %s\n", turn, client_message);
             optionMedico = atoi(client_message);
+            free(client_message);
           }
           // Curar
           if (optionMedico == 1){
@@ -316,6 +327,7 @@ void start_playing(Server* server, Jugador** jugadores){
               char mensaje[100];
               sprintf(mensaje, "Usó Curar sobre %s\n", server->clientes[cliente_a_curar]->nombre);
               notify_all_clients(server, mensaje);
+              free(client_message);
             }
           } 
           // Destello regenerador
@@ -355,6 +367,7 @@ void start_playing(Server* server, Jugador** jugadores){
             // Turn corresponde al id del cliente
             printf("El cliente %d dice: %s\n", turn, client_message);
             optionCazador = atoi(client_message);
+            free(client_message);
           }
           // Estocada
           if (optionCazador == 1){
@@ -620,3 +633,14 @@ void send_state(Server* server) {
   notify_all_clients(server, message);
   notify_all_clients(server, "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
 }
+
+void server_clean(Server *server)
+{
+  free(server->lider);
+  for(int jg=0; jg < 5; jg++){
+    free(server->clientes[jg]);
+  }
+  free(server->cliente_actual);
+  monster_clean(server->monster);
+  free(server);
+};

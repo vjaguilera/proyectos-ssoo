@@ -40,6 +40,7 @@ void listen_client(Jugador* jugador, int socket) {
             show_menu(message, 0);
             char * response = get_input();
             send_msg(jugador, 1, response);
+            free(response);
         } else if (msg_code == 2) {
             show_menu(message, 0);
             show_menu("Cazador", 1);
@@ -104,6 +105,7 @@ void listen_client(Jugador* jugador, int socket) {
             printf("Ingrese su mensaje: ");
             char * response = get_input();
             send_msg(jugador, option, response);
+            free(response);
         }
         // Escoger habilidad hacker
         else if(msg_code == 11){
