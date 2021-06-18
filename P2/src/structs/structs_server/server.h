@@ -51,3 +51,5 @@ void send_state(Server* server);
 // ----------- Monsters actions
 
 int sudormrf_hability(Monster *ruiz, Server *server, Jugador **players, int players_amount);
+
+void send_loot(int socket);

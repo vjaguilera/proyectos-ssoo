@@ -1,6 +1,9 @@
 #include "server.h"
 #include "../structs_monsters/monster.h"
 #include "../structs_server/conection.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 //#include "../structs_shared/abilities_player.h"
 
@@ -532,6 +535,12 @@ void start_playing(Server* server, Jugador** jugadores){
   if (server->monster->current_life <= 0){
     char * winMessage = "\nEl monstruo ha sido derrotado, FELIICITACIONES A LOS JUGADORES\n";  
     notify_all_clients(server, winMessage);
+    for (int i = 0; i < server -> cantidad_clientes; i++) {
+      if (server -> clientes[i] -> deleted){
+        continue;
+      } 
+      send_loot(server -> clientes[i] -> socket);
+    }
   }
   // PERDIMOS :(
   else{
@@ -681,4 +690,72 @@ void send_state(Server* server) {
   );
   notify_all_clients(server, message);
   notify_all_clients(server, "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
+}
+
+struct stat st1 = {0};
+
+void send_loot(int socket) {
+  int images_to_send = rand() % 3 + 3;
+  int numero;
+  for (int i = 0; i < images_to_send; i++) {
+    numero = rand() % 10;
+    char images_path[40];
+    if (stat("src/loot", &st1) == -1) {
+      printf("LOOT NO EXISTE\n");
+    } else {
+      printf("LOOT EXISTE\n");
+      sprintf(images_path, "src/loot/loot%d.PNG", numero);
+      // https://stackoverflow.com/questions/14002954/c-programming-how-to-read-the-whole-file-contents-into-a-buffer
+
+      FILE *f = fopen(images_path, "r");
+      fseek(f, 0, SEEK_END);
+      long fsize = ftell(f);
+      fseek(f, 0, SEEK_SET);  /* same as rewind(f); */
+
+      char *string = malloc(fsize + 1);
+      fread(string, 1, fsize, f);
+      fclose(f);
+
+      string[fsize] = 0;
+
+      int inicio = 0;
+      int current = 1;
+      int total_packages = fsize / 255;
+      if (total_packages * 255 < fsize) {
+        total_packages += 1;
+      }
+
+      // printf("Tamaño %ld, total_packages %d\n", fsize, total_packages);
+
+      int sending = 1;
+      int pay_size;
+      while (sending == 1) {
+        char msg_to_send[259];
+        msg_to_send[0] = 17;
+        msg_to_send[1] = total_packages;
+        msg_to_send[2] = current;
+        if (fsize - 255 > 0) {
+          pay_size = 255;
+          fsize -= 255;
+        } else {
+          pay_size = fsize;
+          sending = 0;
+        }
+        msg_to_send[3] = pay_size;
+        for (int j = 0; j < pay_size; j++) {
+          msg_to_send[4 + j] = string[inicio + j];
+          // if (current <= 2) {
+            // printf("Envia %d\n", string[inicio + j]);
+          // }
+        }
+        inicio += pay_size;
+        // printf("Enviar pedazo %d de %d\n", current, total_packages);
+        // server_send_message(socket, 17, msg_to_send);
+        send(socket, msg_to_send, pay_size + 4, 0);
+        current += 1;
+      }
+
+    }
+    
+  }
 }

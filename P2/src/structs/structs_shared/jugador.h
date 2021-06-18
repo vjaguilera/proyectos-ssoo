@@ -54,3 +54,5 @@ void update_player_life(Jugador* jugador, int damage);
 void intoxicate_player(Jugador* jugador);
 
 int check_player_intoxicated(Jugador* jugador);
+
+void check_folder();
