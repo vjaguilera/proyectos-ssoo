@@ -19,6 +19,8 @@ typedef struct server{
     int ronda_actual;
     int active_match;
     int rounds_without_sudo;
+    int cant_initial;
+    int has_monster;
 } Server;
 
 typedef struct thread_arguments {
