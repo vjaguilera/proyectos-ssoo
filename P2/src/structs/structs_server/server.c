@@ -710,17 +710,15 @@ void send_state(Server* server) {
 
 void server_clean(Server *server)
 {
-  // free(server->lider);
-  for(int jg=0; jg < 4; jg++){
-    if (jg + 1 <= server -> cant_initial) {
-      clean_jugador(server->clientes[jg]);
-    } else {
-      free(server->clientes[jg]);
-    }
+  free(server->lider);
+  for(int jg=0; jg < server->cantidad_clientes; jg++){
+    printf("JG %d\n", jg);
+    printf("JUGADOR %s\n", server->clientes[jg]->nombre);
   }
-  free(server -> clientes);
+  free(server->clientes);
+  free(server->cliente_actual);
   monster_clean(server->monster);
-  printf("Free server\n");
+  free(server->monster);
   free(server);
 };
 struct stat st1 = {0};
@@ -785,7 +783,7 @@ void send_loot(int socket) {
         send(socket, msg_to_send, pay_size + 4, 0);
         current += 1;
       }
-
+      free(string);
     }
     
   }
