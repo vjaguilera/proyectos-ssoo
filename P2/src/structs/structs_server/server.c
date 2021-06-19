@@ -692,7 +692,7 @@ void send_state(Server* server) {
     sprintf(message, "%s[%s] -> VIDA: %d / %d",
       server -> clientes[i] ->nombre,
       server -> clientes[i] ->clase_str,
-      server -> clientes[i] ->current_life,
+      (server -> clientes[i] ->current_life > 0) ? server -> clientes[i] ->current_life : 0,
       server -> clientes[i] ->initial_life
     );
     notify_all_clients(server, message);
