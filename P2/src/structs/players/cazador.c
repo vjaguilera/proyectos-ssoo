@@ -8,7 +8,7 @@
 Cazador *cazador_init()
 {
     Cazador *cazador = malloc(sizeof(Cazador));
-    cazador -> initial_life = 100000; 
+    cazador -> initial_life = 5000; 
     cazador -> clase_str = "cazador";
     return cazador;
 }
