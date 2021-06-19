@@ -29,6 +29,7 @@ int main(int argc, char *argv[]){
     end_listen(server);
   }
   free(thrgs);
+  printf("A limpiar\n");
   server_clean(server);
 
   return 0;

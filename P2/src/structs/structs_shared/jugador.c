@@ -33,7 +33,10 @@ void set_socket(Jugador* jugador, int socket) {
 }
 
 void set_name(Jugador* jugador, char* name) {
-    jugador -> nombre = name;
+    jugador -> nombre = malloc(strlen(name));
+    for (int i = 0; i < strlen(name); i++) {
+        jugador -> nombre[i] = name[i];
+    }
 };
 
 void listen_client(Jugador* jugador, int socket) {
@@ -292,6 +295,7 @@ int pick_option() {
 }
 
 void clean_jugador(Jugador* jugador) {
+    free(jugador -> nombre);
     free(jugador);
 }
 

@@ -57,11 +57,17 @@ Monster* monster_init(int identificador) {
 }
 
 void monster_clean(Monster* monster) {
+    if (monster -> is_jagruz) {
+      free(monster -> jagruz);
+    }
+    if (monster -> is_ruiz) {
+      free(monster -> ruiz);
+    }
+    if (monster -> is_ruzalo) {
+      free(monster -> ruzalo);
+    }
     free(monster -> me_distrajo);
-    free(monster -> jagruz);
-    free(monster -> ruiz);
-    free(monster -> ruzalo);
-    // free(monster);
+    free(monster);
 }
 
 int choose_ability(int* options, int* percentage, int options_amount)
