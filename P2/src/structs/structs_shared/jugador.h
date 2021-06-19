@@ -28,6 +28,7 @@ typedef struct player{
   int current_life;
   int initial_life;
   char* clase_str;
+  int deleted;
 } Jugador;
 
 Jugador* init_jugador(); // crea al jugador
@@ -53,3 +54,5 @@ void update_player_life(Jugador* jugador, int damage);
 void intoxicate_player(Jugador* jugador);
 
 int check_player_intoxicated(Jugador* jugador);
+
+void check_folder();
