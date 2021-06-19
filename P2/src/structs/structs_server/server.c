@@ -12,7 +12,6 @@ Server* init_server(int socket) {
     server -> clientes = malloc(sizeof(Jugador) * 4);
     server -> cantidad_clientes = 0;
     server -> socket = socket;
-    server -> monster = malloc(sizeof(Monster));
     server -> rounds_without_sudo = 1;
     server -> cant_initial = 0;
     server -> has_monster = 0;
@@ -710,15 +709,15 @@ void send_state(Server* server) {
 
 void server_clean(Server *server)
 {
-  free(server->lider);
-  for(int jg=0; jg < server->cantidad_clientes; jg++){
-    printf("JG %d\n", jg);
-    printf("JUGADOR %s\n", server->clientes[jg]->nombre);
+  int cant_inicial = server->cant_initial;
+  for(int jg=0; jg < 4; jg++){
+    if (jg+1<= cant_inicial) {
+      clean_jugador(server->clientes[jg]);
+    }
   }
+
   free(server->clientes);
-  free(server->cliente_actual);
   monster_clean(server->monster);
-  free(server->monster);
   free(server);
 };
 struct stat st1 = {0};
