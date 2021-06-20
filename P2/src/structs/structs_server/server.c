@@ -116,6 +116,8 @@ ArgumentsCreateThread* initial_listen(Server* server) {
     }
   }
   printf("Empezará la partida\n");
+  void *retval;
+  pthread_join(tid[0], &retval);
   notify_all_clients(server, "¡Comenzará la partida!");
   server -> cant_initial = server -> cantidad_clientes;
   return thrgs;
