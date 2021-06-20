@@ -42,7 +42,7 @@ int main (int argc, char *argv[]){
     int server_socket = prepare_socket(IP, PORT);
     Jugador* jugador = init_jugador();
     set_socket(jugador, server_socket);
-    printf("Esperando al servidor...\n Mi socket %d\n", server_socket);
+    printf("Esperando al servidor...\n");
     listen_client(jugador, server_socket);
 
     clean_jugador(jugador);

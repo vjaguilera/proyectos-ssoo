@@ -261,8 +261,14 @@ void listen_client(Jugador* jugador, int socket) {
 
 
         }
+
+        else if (msg_code == 40) {
+            printf("%s\n", message);
+            free(message);
+            break;
+        }
         
-         else {
+        else {
             printf("Msg code %d no procesado\n", msg_code);
             if (msg_code != 0) {
                 free(message);
@@ -314,6 +320,15 @@ int check_player_intoxicated(Jugador* jugador) {
     if (jugador->intoxicated > 0) {
         jugador->current_life -= 400;
         jugador->intoxicated -= 1;
+        return 1;
+    }
+    return 0;
+}
+
+int check_player_dead(Jugador* jugador){
+    if (jugador -> current_life <= 0){
+        printf("El jugador %s ha sido asesinado por el monstruo\n", jugador -> nombre);
+        jugador -> rendido = 1;
         return 1;
     }
     return 0;

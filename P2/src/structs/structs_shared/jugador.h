@@ -56,3 +56,5 @@ void intoxicate_player(Jugador* jugador);
 int check_player_intoxicated(Jugador* jugador);
 
 void check_folder();
+
+int check_player_dead(Jugador* jugador);

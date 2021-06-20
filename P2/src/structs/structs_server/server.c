@@ -64,7 +64,13 @@ ArgumentsCreateThread* initial_listen(Server* server) {
     }
     else
     {
-      new_socket = accept(server -> socket, (struct sockaddr *)&client1_addr, &addr_size);
+      if (server -> cantidad_clientes < 4) {
+        new_socket = accept(server -> socket, (struct sockaddr *)&client1_addr, &addr_size);
+      } else {
+        new_socket = accept(server -> socket, (struct sockaddr *)&client1_addr, &addr_size);
+        server_send_message(new_socket, 40, "Ya hay 4 jugadores. : /");
+        continue;
+      }
     
 
       thrgs -> espera_cliente = 1;
@@ -520,6 +526,16 @@ void start_playing(Server* server, Jugador** jugadores){
         }
         else{
           printf("Problemas procesando el ataque del monstruo\n");
+        }
+      }
+      for (int i = 0; i < server -> cantidad_clientes; i++) {
+        if (server -> clientes[i] -> rendido != 1) {
+          int murio_jugador = check_player_dead(server -> clientes[i]);
+          if (murio_jugador){
+            char aviso_muerte[100];
+            sprintf(aviso_muerte, "El monstruo ha matado a %s\n", server -> clientes[i]->nombre);
+            notify_all_clients(server, aviso_muerte);
+          }
         }
       }
     }
