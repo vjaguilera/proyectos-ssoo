@@ -10,8 +10,9 @@ int main (int argc, char *argv[]){
     //Se obtiene la ip y el puerto donde está escuchando el servidor (la ip y puerto de este cliente da igual)
     char * IP = "0.0.0.0";
     int PORT = 8080;
-    int po, ip = 0;
-    if (0) {
+    int po = 0;
+    int ip = 0;
+    if (1) {
         for (int i = 1; i < argc; i++) {
             /* Check for a switch (leading "-"). */
             if (argv[i][0] == '-') {
@@ -29,11 +30,10 @@ int main (int argc, char *argv[]){
             }
         }
         if (po == 0 || ip == 0){
-            printf("Missing parameters\n");
+            printf("Missing parameters -p or -i\n");
             return 0;
         } else {
             printf("Conectando servidor en IP: %s, PORT: %d\n", IP, PORT);
-            return 0;
         }
 
     }
