@@ -3,7 +3,6 @@
 Monster* monster_init(int identificador) {
     Monster* monster = malloc(sizeof(Monster));
     monster -> estocadas = 0;
-    monster -> me_distrajo = malloc(sizeof(Jugador));
     monster -> distraido = 0;
     monster -> duplicado = 0;
     monster -> on = 1;
