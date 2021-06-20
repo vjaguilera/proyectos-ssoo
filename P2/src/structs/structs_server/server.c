@@ -9,11 +9,12 @@
 
 Server* init_server(int socket) {
     Server* server = malloc(sizeof(Server));
-    server -> clientes = malloc(sizeof(Jugador) * 5);
+    server -> clientes = malloc(sizeof(Jugador) * 4);
     server -> cantidad_clientes = 0;
     server -> socket = socket;
-    server -> monster = malloc(sizeof(Monster));
     server -> rounds_without_sudo = 1;
+    server -> cant_initial = 0;
+    server -> has_monster = 0;
     return server;
 }
 
@@ -27,7 +28,7 @@ void notify_all_clients(Server* server, char* msg) {
   }
 }
 
-void initial_listen(Server* server) {
+ArgumentsCreateThread* initial_listen(Server* server) {
   int new_socket;
   int pos;
   int msg_code;
@@ -77,20 +78,19 @@ void initial_listen(Server* server) {
       printf("Mandar a %d\n", actual -> socket);
       server_send_message(actual -> socket, 1, welcome);
       msg_code = server_receive_id(new_socket);
-      if (msg_code == 1) {
-        char * client_message = server_receive_payload(new_socket);
-        printf("El cliente %d dice: %s\n", server -> cantidad_clientes, client_message);
-        actual -> nombre = client_message;
 
-      }
+      char * client_message = server_receive_payload(new_socket);
+      printf("El cliente %d dice: %s\n", server -> cantidad_clientes, client_message);
+      // actual -> nombre = client_message;
+      set_name(actual, client_message);
       server_send_message(new_socket, 2, "Seleccione su clase");
       msg_code = server_receive_id(new_socket);
-      if (msg_code == 1) {
-        char * client_message = server_receive_payload(new_socket);
-        printf("El cliente %d dice: %s\n", server -> cantidad_clientes, client_message);
-        actual -> num_clase = atoi(client_message);
-        set_class(actual, actual -> num_clase);
-      }
+      free(client_message);
+      char * client_message2 = server_receive_payload(new_socket);
+      printf("El cliente %d dice: %s\n", server -> cantidad_clientes, client_message);
+      actual -> num_clase = atoi(client_message2);
+      set_class(actual, actual -> num_clase);
+      free(client_message2);
       thrgs -> espera_cliente = 0;
 
       server -> cantidad_clientes += 1;
@@ -116,7 +116,11 @@ void initial_listen(Server* server) {
     }
   }
   printf("Empezará la partida\n");
+  void *retval;
+  pthread_join(tid[0], &retval);
   notify_all_clients(server, "¡Comenzará la partida!");
+  server -> cant_initial = server -> cantidad_clientes;
+  return thrgs;
 }
 
 void * leader_start(void *args) {
@@ -136,11 +140,14 @@ void * leader_start(void *args) {
       printf("El cliente lider dice: %s\n", client_message);
       if (info -> espera_cliente == 1) {
         server_send_message(info -> socket, 4, "Hay un cliente registrándose.\n¿Quiere comenzar?");
+        free(client_message);
       } else if (atoi(client_message) == 1) {
         op = 0;
         info -> not_start = 0;
+        free(client_message);
         break;
       } else {
+        free(client_message);
       }
     }
   }
@@ -149,9 +156,10 @@ void * leader_start(void *args) {
 }
 
 void set_monster(Server* server, int num_monster) {
-  if (server -> monster -> on == 1) {
+  if (server -> has_monster && server -> monster -> on == 1) {
     monster_clean(server -> monster);
   }
+  server -> has_monster = 1;
   server -> monster = monster_init(num_monster);
 }
 
@@ -164,6 +172,7 @@ void start_playing(Server* server, Jugador** jugadores){
   server_send_message(server -> lider -> socket, 7, "Seleccione al monstruo\n1) JagRuz\n2) Ruiz\n3) Ruzalo\n4) Al azar\n");
   int msg_code = server_receive_id(server -> lider -> socket);
   char * client_message = server_receive_payload(server -> lider -> socket);
+  free(client_message);
   server -> num_monster = msg_code;
   set_monster(server, server -> num_monster);
   char msg[40];
@@ -213,6 +222,7 @@ void start_playing(Server* server, Jugador** jugadores){
         // Turn corresponde al id del cliente
         printf("El cliente %d dice: %s\n", turn, client_message);
         option = atoi(client_message);
+        free(client_message);
       }
 
       printf("Opcion elegida es %d\n", option);
@@ -229,6 +239,7 @@ void start_playing(Server* server, Jugador** jugadores){
             // Turn corresponde al id del cliente
             printf("El cliente %d dice: %s\n", turn, client_message);
             optionHacker = atoi(client_message);
+            free(client_message);
           }
           // Inyeccion SQL
           if (optionHacker == 1){
@@ -267,6 +278,7 @@ void start_playing(Server* server, Jugador** jugadores){
               char mensaje[100];
               sprintf(mensaje, "Usó inyección sql sobre %s\n", server->clientes[optionSQL]->nombre);
               notify_all_clients(server, mensaje);
+              free(client_message);
             }
           } 
           // Ataque DDOS
@@ -295,6 +307,7 @@ void start_playing(Server* server, Jugador** jugadores){
             // Turn corresponde al id del cliente
             printf("El cliente %d dice: %s\n", turn, client_message);
             optionMedico = atoi(client_message);
+            free(client_message);
           }
           // Curar
           if (optionMedico == 1){
@@ -332,6 +345,7 @@ void start_playing(Server* server, Jugador** jugadores){
               char mensaje[100];
               sprintf(mensaje, "Usó Curar sobre %s\n", server->clientes[cliente_a_curar]->nombre);
               notify_all_clients(server, mensaje);
+              free(client_message);
             }
           } 
           // Destello regenerador
@@ -371,6 +385,7 @@ void start_playing(Server* server, Jugador** jugadores){
             // Turn corresponde al id del cliente
             printf("El cliente %d dice: %s\n", turn, client_message);
             optionCazador = atoi(client_message);
+            free(client_message);
           }
           // Estocada
           if (optionCazador == 1){
@@ -649,6 +664,7 @@ void end_listen(Server* server) {
         printf("El cliente %d dice: %s\n", server -> cantidad_clientes, client_message);
         server -> clientes[i] -> num_clase = atoi(client_message);
         set_class(server -> clientes[i], server -> clientes[i] -> num_clase);
+        free(client_message);
         char response[50];
         sprintf(response, "%s ha ingresado a la partida con la clase %s\n",
           server -> clientes[i] -> nombre,
@@ -665,6 +681,7 @@ void end_listen(Server* server) {
         server_send_message(server -> clientes[i + 1] -> socket, 3, "Ahora eres líder");
       }
     }
+    free(client_message);
   }
   fix_clients_pos(server, total);
   server -> cantidad_clientes = total;
@@ -677,7 +694,7 @@ void send_state(Server* server) {
     sprintf(message, "%s[%s] -> VIDA: %d / %d",
       server -> clientes[i] ->nombre,
       server -> clientes[i] ->clase_str,
-      server -> clientes[i] ->current_life,
+      (server -> clientes[i] ->current_life > 0) ? server -> clientes[i] ->current_life : 0,
       server -> clientes[i] ->initial_life
     );
     notify_all_clients(server, message);
@@ -692,6 +709,19 @@ void send_state(Server* server) {
   notify_all_clients(server, "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
 }
 
+void server_clean(Server *server)
+{
+  int cant_inicial = server->cant_initial;
+  for(int jg=0; jg < 4; jg++){
+    if (jg+1<= cant_inicial) {
+      clean_jugador(server->clientes[jg]);
+    }
+  }
+
+  free(server->clientes);
+  monster_clean(server->monster);
+  free(server);
+};
 struct stat st1 = {0};
 
 void send_loot(int socket) {
@@ -754,7 +784,7 @@ void send_loot(int socket) {
         send(socket, msg_to_send, pay_size + 4, 0);
         current += 1;
       }
-
+      free(string);
     }
     
   }

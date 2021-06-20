@@ -22,12 +22,15 @@ int main(int argc, char *argv[]){
   // Se inicializa una estructura propia para guardar los n°s de sockets de los clientes.
   // PlayersInfo * players_info = malloc(sizeof(PlayersInfo));
 
-  initial_listen(server);
+  ArgumentsCreateThread* thrgs = initial_listen(server);
   
   while (server -> cantidad_clientes > 0) {
     start_playing(server, server -> clientes);
     end_listen(server);
   }
+  free(thrgs);
+  printf("A limpiar\n");
+  server_clean(server);
 
   return 0;
 }
